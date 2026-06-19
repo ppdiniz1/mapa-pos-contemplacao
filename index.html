@@ -3,143 +3,191 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guia de Processos · Pós-Contemplação</title>
+<title>Guia de Processos · Porto Vale Consórcio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
   :root {
-    --bg: #ffffff; --bg2: #f5f5f4; --bg3: #efefed;
-    --text: #1a1a19; --text2: #6b6b67; --text3: #9c9a92;
-    --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
-    --info-bg: #e6f1fb; --info-text: #185fa5; --info-border: rgba(24,95,165,0.25);
-    --success-bg: #eaf3de; --success-text: #3b6d11; --success-border: rgba(59,109,17,0.25);
-    --warning-bg: #faeeda; --warning-text: #854f0b; --warning-border: rgba(133,79,11,0.3);
-    --danger-bg: #fcebeb; --danger-text: #a32d2d; --danger-border: rgba(163,45,45,0.25);
-    --radius-md: 8px; --radius-lg: 12px;
+    --brand:        #009BDB;
+    --brand-dark:   #0079aa;
+    --brand-light:  #f0faff;
+    --brand-border: rgba(0,155,219,0.2);
+
+    --bg:      #ffffff;
+    --bg2:     #f8f8f8;
+    --bg3:     #f2f2f2;
+    --bg4:     #ebebeb;
+
+    --black:   #111111;
+    --gray1:   #333333;
+    --gray2:   #666666;
+    --gray3:   #999999;
+
+    --border:  rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.15);
+
+    --success-bg:     #eaf3de;
+    --success-text:   #2e5a0e;
+    --success-border: rgba(46,90,14,0.2);
+    --warning-bg:     #fff8ee;
+    --warning-text:   #7a4500;
+    --warning-border: rgba(122,69,0,0.2);
+    --danger-bg:      #fff0f0;
+    --danger-text:    #9b2020;
+    --danger-border:  rgba(155,32,32,0.2);
+
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+
+    --font-display: 'Barlow Condensed', sans-serif;
+    --font-body:    'Inter', sans-serif;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1c1c1a; --bg2: #252523; --bg3: #2e2e2b;
-      --text: #e8e6de; --text2: #9c9a92; --text3: #6b6b67;
-      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
-      --info-bg: #0c447c22; --info-text: #85b7eb; --info-border: rgba(133,183,235,0.2);
-      --success-bg: #27500a22; --success-text: #97c459; --success-border: rgba(151,196,89,0.2);
-      --warning-bg: #63380622; --warning-text: #fac775; --warning-border: rgba(250,199,117,0.2);
-      --danger-bg: #791f1f22; --danger-text: #f09595; --danger-border: rgba(240,149,149,0.2);
-    }
-  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg3); color: var(--text);
-    min-height: 100vh; display: flex;
-    align-items: flex-start; justify-content: center; padding: 24px 16px;
+    font-family: var(--font-body);
+    background: var(--bg3);
+    color: var(--black);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 16px;
   }
+
   .app {
-    background: var(--bg); border-radius: var(--radius-lg);
-    border: 0.5px solid var(--border); width: 100%;
-    max-width: 720px; min-height: 600px; overflow: hidden; position: relative;
+    background: var(--bg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border2);
+    width: 100%;
+    max-width: 720px;
+    min-height: 600px;
+    overflow: hidden;
   }
+
   .screen { display: none; }
   .screen.active { display: block; }
   .sr-only { position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0); }
 
-  /* LOGIN */
+  /* ── LOGIN ── */
   .login-wrap {
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     min-height: 600px; padding: 40px 24px;
+    background: var(--bg);
   }
-  .login-logo {
-    width: 48px; height: 48px; background: var(--bg2);
-    border: 0.5px solid var(--border); border-radius: var(--radius-lg);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 20px; font-size: 22px; color: var(--text2);
+  .login-logo-wrap { margin-bottom: 20px; }
+  .login-logo-wrap img { height: 38px; width: auto; display: block; }
+  .login-divider { width: 36px; height: 3px; background: var(--brand); border-radius: 2px; margin: 16px auto 20px; }
+  .login-title {
+    font-family: var(--font-display); font-size: 24px; font-weight: 700;
+    color: var(--black); letter-spacing: 0.02em; text-align: center; margin-bottom: 4px;
   }
-  .login-title { font-size: 18px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
-  .login-sub { font-size: 13px; color: var(--text2); margin-bottom: 32px; }
+  .login-sub { font-size: 13px; color: var(--gray2); margin-bottom: 28px; text-align: center; }
   .login-card {
-    width: 100%; max-width: 360px; background: var(--bg);
-    border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 24px;
+    width: 100%; max-width: 360px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg); padding: 24px;
   }
   .field { margin-bottom: 14px; }
   .field label {
-    display: block; font-size: 12px; font-weight: 500; color: var(--text2);
-    margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em;
+    display: block; font-size: 11px; font-weight: 500; color: var(--gray2);
+    margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em;
   }
   .field input {
-    width: 100%; padding: 10px 12px; border: 0.5px solid var(--border2);
-    border-radius: var(--radius-md); font-size: 14px;
-    background: var(--bg2); color: var(--text); font-family: inherit;
-    transition: border-color 0.15s;
+    width: 100%; padding: 10px 12px;
+    border: 1px solid var(--border2); border-radius: var(--radius-md);
+    font-size: 14px; font-family: var(--font-body);
+    background: var(--bg); color: var(--black); transition: border-color 0.15s;
   }
-  .field input:focus { outline: none; border-color: var(--info-text); }
+  .field input:focus { outline: none; border-color: var(--brand); }
   .login-error {
-    display: none; background: var(--danger-bg); border: 0.5px solid var(--danger-border);
+    display: none; background: var(--danger-bg); border: 1px solid var(--danger-border);
     border-radius: var(--radius-md); padding: 10px 12px;
     font-size: 13px; color: var(--danger-text); margin-bottom: 14px;
   }
   .login-error.visible { display: flex; align-items: center; gap: 8px; }
   .btn-login {
-    width: 100%; padding: 11px; background: var(--text); color: var(--bg);
-    border: none; border-radius: var(--radius-md);
-    font-size: 14px; font-weight: 500; cursor: pointer;
-    transition: opacity 0.15s; margin-top: 4px;
+    width: 100%; padding: 11px; background: var(--brand); color: #fff;
+    border: none; border-radius: var(--radius-md); font-family: var(--font-display);
+    font-size: 16px; font-weight: 700; letter-spacing: 0.04em;
+    cursor: pointer; transition: background 0.15s; margin-top: 4px;
   }
-  .btn-login:hover { opacity: 0.85; }
-  .login-hint { margin-top: 20px; font-size: 12px; color: var(--text3); text-align: center; line-height: 1.6; }
+  .btn-login:hover { background: var(--brand-dark); }
+  .login-hint { margin-top: 14px; font-size: 12px; color: var(--gray3); text-align: center; }
 
-  /* HEADER */
+  /* ── HEADER ── */
   .header {
-    padding: 14px 20px; border-bottom: 0.5px solid var(--border);
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border2);
     display: flex; align-items: center; gap: 12px;
+    background: var(--bg);
   }
-  .header-title { font-size: 15px; font-weight: 500; color: var(--text); }
-  .header-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .header-brand { display: flex; align-items: center; gap: 10px; }
+  .header-brand img { height: 26px; width: auto; }
+  .header-divider { width: 1px; height: 20px; background: var(--border2); }
+  .header-title {
+    font-family: var(--font-display); font-size: 15px; font-weight: 700;
+    color: var(--black); letter-spacing: 0.02em;
+  }
+  .header-sub { font-size: 11px; color: var(--gray2); margin-top: 1px; }
   .header-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
   .perfil-badge {
-    font-size: 11px; font-weight: 500;
-    padding: 3px 10px; border-radius: var(--radius-md); border: 0.5px solid;
+    font-size: 11px; font-weight: 500; padding: 3px 10px;
+    border-radius: var(--radius-sm); border: 1px solid;
   }
-  .perfil-badge.atendente { background: var(--info-bg); color: var(--info-text); border-color: var(--info-border); }
+  .perfil-badge.atendente { background: var(--brand-light); color: var(--brand); border-color: var(--brand-border); }
   .perfil-badge.coordenador { background: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }
   .logout-btn {
-    background: none; border: 0.5px solid var(--border2);
-    border-radius: var(--radius-md); padding: 5px 10px;
-    font-size: 12px; color: var(--text2); cursor: pointer;
+    background: none; border: 1px solid var(--border2); border-radius: var(--radius-sm);
+    padding: 5px 10px; font-size: 12px; color: var(--gray2); cursor: pointer;
     display: flex; align-items: center; gap: 5px; transition: background 0.15s;
   }
   .logout-btn:hover { background: var(--bg2); }
   .back-btn {
-    background: none; border: 0.5px solid var(--border2);
-    border-radius: var(--radius-md); padding: 6px 12px;
-    font-size: 13px; cursor: pointer; color: var(--text2);
+    background: none; border: 1px solid var(--border2); border-radius: var(--radius-sm);
+    padding: 6px 12px; font-size: 13px; cursor: pointer; color: var(--gray2);
     display: flex; align-items: center; gap: 6px; transition: background 0.15s;
   }
   .back-btn:hover { background: var(--bg2); }
 
-  /* HOME */
-  .home-content { padding: 24px 20px; }
-  .home-greeting { font-size: 18px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
-  .home-desc { font-size: 14px; color: var(--text2); margin-bottom: 28px; line-height: 1.6; }
+  /* ── HOME ── */
+  .home-content { padding: 24px 20px; background: var(--bg); }
+  .home-greeting {
+    font-family: var(--font-display); font-size: 24px; font-weight: 700;
+    color: var(--black); letter-spacing: 0.02em; margin-bottom: 4px;
+  }
+  .home-desc { font-size: 14px; color: var(--gray2); margin-bottom: 24px; line-height: 1.6; }
+  .section-label {
+    font-size: 11px; font-weight: 500; color: var(--brand);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px;
+  }
   .bem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
   .bem-card {
-    background: var(--bg); border: 0.5px solid var(--border);
+    background: var(--bg2); border: 1px solid var(--border2);
     border-radius: var(--radius-lg); padding: 20px; cursor: pointer;
     transition: border-color 0.15s, background 0.15s; text-align: left;
   }
-  .bem-card:hover { border-color: var(--border2); background: var(--bg2); }
-  .bem-icon { font-size: 26px; margin-bottom: 10px; color: var(--text2); }
-  .bem-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
-  .bem-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .bem-card:hover { border-color: var(--brand); background: var(--brand-light); }
+  .bem-icon { font-size: 26px; margin-bottom: 10px; color: var(--brand); }
+  .bem-title {
+    font-family: var(--font-display); font-size: 18px; font-weight: 700;
+    color: var(--black); letter-spacing: 0.02em; margin-bottom: 4px;
+  }
+  .bem-count { font-size: 12px; color: var(--brand); font-weight: 500; }
   .pending-banner {
-    background: var(--warning-bg); border: 0.5px solid var(--warning-border);
+    background: var(--warning-bg); border: 1px solid var(--warning-border);
     border-radius: var(--radius-md); padding: 12px 16px;
-    display: flex; align-items: center; gap: 10px;
-    cursor: pointer; transition: opacity 0.15s;
+    display: flex; align-items: center; gap: 10px; cursor: pointer; transition: opacity 0.15s;
   }
   .pending-banner:hover { opacity: 0.85; }
   .pending-count {
-    background: var(--bg); border: 0.5px solid var(--warning-border);
+    background: var(--bg); border: 1px solid var(--warning-border);
     border-radius: 50%; width: 28px; height: 28px;
     display: flex; align-items: center; justify-content: center;
     font-size: 13px; font-weight: 500; color: var(--warning-text); flex-shrink: 0;
@@ -147,165 +195,193 @@
   .pending-text { font-size: 13px; color: var(--warning-text); font-weight: 500; }
   .pending-sub { font-size: 12px; color: var(--warning-text); opacity: 0.8; }
 
-  /* FLOW */
+  /* ── FLOW ── */
   .flow-header-tag {
     display: inline-flex; align-items: center; gap: 6px;
-    background: var(--info-bg); border-radius: var(--radius-md);
-    padding: 4px 10px; font-size: 12px; color: var(--info-text); font-weight: 500;
+    background: var(--brand-light); border-radius: var(--radius-sm);
+    padding: 3px 10px; font-size: 12px; color: var(--brand); font-weight: 500;
+    border: 1px solid var(--brand-border);
   }
   .flow-body { display: flex; min-height: 500px; }
-  .flow-map { flex: 1; padding: 20px; overflow-y: auto; border-right: 0.5px solid var(--border); }
+  .flow-map {
+    flex: 1; padding: 20px; overflow-y: auto;
+    border-right: 1px solid var(--border2); background: var(--bg);
+  }
   .flow-map-title {
-    font-size: 11px; color: var(--text3); margin-bottom: 16px;
-    font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;
+    font-size: 11px; color: var(--brand); margin-bottom: 16px;
+    font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em;
   }
   .etapa-row { display: flex; flex-direction: column; align-items: center; }
   .etapa-node {
-    width: 100%; background: var(--bg); border: 0.5px solid var(--border);
-    border-radius: var(--radius-md); padding: 10px 14px; cursor: pointer;
+    width: 100%; background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: var(--radius-md); padding: 11px 14px; cursor: pointer;
     transition: border-color 0.15s, background 0.15s;
     display: flex; align-items: center; gap: 10px;
   }
-  .etapa-node:hover, .etapa-node.selected { border-color: var(--info-border); background: var(--info-bg); }
+  .etapa-node:hover { border-color: var(--brand); background: var(--brand-light); }
+  .etapa-node.selected { border-color: var(--brand); background: var(--brand-light); }
   .etapa-num {
     width: 22px; height: 22px; border-radius: 50%;
-    background: var(--bg2); border: 0.5px solid var(--border);
-    font-size: 11px; font-weight: 500; color: var(--text2);
+    background: var(--bg3); border: 1px solid var(--border2);
+    font-size: 11px; font-weight: 500; color: var(--gray2);
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .etapa-node.selected .etapa-num { color: var(--info-text); border-color: var(--info-border); }
-  .etapa-label { font-size: 13px; color: var(--text); font-weight: 500; flex: 1; }
-  .etapa-arrow { width: 2px; height: 14px; background: var(--border2); margin: 0 auto; }
+  .etapa-node.selected .etapa-num { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .etapa-label { font-size: 13px; color: var(--black); font-weight: 500; flex: 1; }
+  .etapa-node.selected .etapa-label { color: var(--brand); }
+  .etapa-arrow { width: 1px; height: 14px; background: var(--border2); margin: 0 auto; }
   .etapa-arrow-head {
     width: 0; height: 0;
-    border-left: 5px solid transparent; border-right: 5px solid transparent;
-    border-top: 6px solid var(--border2); margin: 0 auto;
+    border-left: 4px solid transparent; border-right: 4px solid transparent;
+    border-top: 5px solid var(--border2); margin: 0 auto;
   }
 
-  /* DETAIL */
+  /* ── DETAIL ── */
   .flow-detail {
     width: 270px; flex-shrink: 0; padding: 20px;
     overflow-y: auto; background: var(--bg2);
+    border-left: 1px solid var(--border2);
   }
   .detail-empty {
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     height: 100%; min-height: 400px;
-    text-align: center; gap: 10px;
-    color: var(--text3); font-size: 13px; line-height: 1.5;
+    text-align: center; gap: 10px; color: var(--gray3); font-size: 13px; line-height: 1.5;
   }
-  .detail-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .detail-title {
+    font-family: var(--font-display); font-size: 18px; font-weight: 700;
+    color: var(--black); letter-spacing: 0.02em; margin-bottom: 4px;
+  }
   .detail-tag {
     display: inline-flex; align-items: center; font-size: 11px;
-    background: var(--success-bg); color: var(--success-text);
-    border-radius: var(--radius-md); padding: 3px 8px; margin-bottom: 14px; font-weight: 500;
+    background: var(--brand-light); color: var(--brand);
+    border-radius: var(--radius-sm); padding: 3px 8px;
+    margin-bottom: 14px; font-weight: 500; border: 1px solid var(--brand-border);
   }
   .detail-section-title {
-    font-size: 11px; font-weight: 500; color: var(--text2);
-    text-transform: uppercase; letter-spacing: 0.04em;
+    font-size: 10px; font-weight: 500; color: var(--brand);
+    text-transform: uppercase; letter-spacing: 0.08em;
     margin-bottom: 8px; margin-top: 16px;
   }
   .detail-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
-  .detail-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border2); margin-top: 6px; flex-shrink: 0; }
-  .detail-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .detail-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--brand); margin-top: 7px; flex-shrink: 0; opacity: 0.4;
+  }
+  .detail-dot.solid { opacity: 1; }
+  .detail-dot.gray { background: var(--gray3); opacity: 1; }
+  .detail-text { font-size: 13px; color: var(--gray1); line-height: 1.5; }
+  .detail-text.muted { color: var(--gray2); }
   .alert-item {
-    background: var(--warning-bg); border: 0.5px solid var(--warning-border);
+    background: var(--warning-bg); border: 1px solid var(--warning-border);
     border-radius: var(--radius-md); padding: 8px 12px;
     font-size: 12px; color: var(--warning-text); margin-bottom: 6px; line-height: 1.5;
   }
   .suggest-btn {
     width: 100%; margin-top: 20px; padding: 10px;
-    border: 0.5px dashed var(--border2); border-radius: var(--radius-md);
-    background: none; font-size: 13px; color: var(--text2); cursor: pointer;
+    border: 1px dashed var(--brand-border); border-radius: var(--radius-md);
+    background: none; font-size: 13px; color: var(--brand); cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 6px;
-    transition: background 0.15s;
+    transition: background 0.15s; font-family: var(--font-body);
   }
-  .suggest-btn:hover { background: var(--bg3); }
+  .suggest-btn:hover { background: var(--brand-light); }
 
-  /* PENDING */
-  .pending-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+  /* ── PENDING ── */
+  .pending-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); }
   .pending-card {
-    background: var(--bg); border: 0.5px solid var(--border);
+    background: var(--bg2); border: 1px solid var(--border2);
     border-radius: var(--radius-lg); padding: 14px 16px;
   }
   .pending-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-  .pending-card-meta { font-size: 11px; color: var(--text2); }
+  .pending-card-meta { font-size: 11px; color: var(--gray2); }
   .pending-card-tag {
     font-size: 11px; background: var(--warning-bg); color: var(--warning-text);
-    border-radius: var(--radius-md); padding: 2px 8px; font-weight: 500;
+    border-radius: var(--radius-sm); padding: 2px 8px; font-weight: 500;
+    border: 1px solid var(--warning-border);
   }
-  .pending-card-etapa { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .pending-card-etapa {
+    font-family: var(--font-display); font-size: 16px; font-weight: 700;
+    color: var(--black); margin-bottom: 6px;
+  }
   .pending-card-suggestion {
-    font-size: 13px; color: var(--text2); line-height: 1.5;
-    background: var(--bg2); border-radius: var(--radius-md);
-    padding: 8px 10px; margin-bottom: 10px;
+    font-size: 13px; color: var(--gray2); line-height: 1.5;
+    background: var(--bg); border: 1px solid var(--border2);
+    border-radius: var(--radius-md); padding: 8px 10px; margin-bottom: 10px;
   }
   .pending-card-actions { display: flex; gap: 8px; }
   .btn-approve {
     flex: 1; padding: 7px; background: var(--success-bg);
-    border: 0.5px solid var(--success-border); border-radius: var(--radius-md);
+    border: 1px solid var(--success-border); border-radius: var(--radius-sm);
     font-size: 12px; font-weight: 500; color: var(--success-text);
-    cursor: pointer; transition: opacity 0.15s;
+    cursor: pointer; transition: opacity 0.15s; font-family: var(--font-body);
   }
   .btn-approve:hover { opacity: 0.8; }
   .btn-reject {
-    padding: 7px 14px; border: 0.5px solid var(--danger-border);
-    border-radius: var(--radius-md); background: none;
-    font-size: 12px; color: var(--danger-text); cursor: pointer; transition: background 0.15s;
+    padding: 7px 14px; border: 1px solid var(--danger-border);
+    border-radius: var(--radius-sm); background: none;
+    font-size: 12px; color: var(--danger-text); cursor: pointer;
+    transition: background 0.15s; font-family: var(--font-body);
   }
   .btn-reject:hover { background: var(--danger-bg); }
-  .empty-pending { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 13px; }
+  .empty-pending { text-align: center; padding: 40px 20px; color: var(--gray3); font-size: 13px; }
 
-  /* MODAL */
+  /* ── MODAL ── */
   .modal-overlay {
     display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45); z-index: 100;
+    background: rgba(0,0,0,0.35); z-index: 100;
     align-items: center; justify-content: center; padding: 20px;
   }
   .modal-overlay.open { display: flex; }
   .modal {
     background: var(--bg); border-radius: var(--radius-lg);
-    border: 0.5px solid var(--border); padding: 24px;
-    width: 100%; max-width: 400px;
+    border: 1px solid var(--border2); padding: 24px; width: 100%; max-width: 400px;
   }
-  .modal-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
-  .modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 16px; line-height: 1.5; }
+  .modal-title {
+    font-family: var(--font-display); font-size: 20px; font-weight: 700;
+    color: var(--black); letter-spacing: 0.02em; margin-bottom: 6px;
+  }
+  .modal-sub { font-size: 13px; color: var(--gray2); margin-bottom: 16px; line-height: 1.5; }
   .modal textarea {
-    width: 100%; border: 0.5px solid var(--border2); border-radius: var(--radius-md);
-    padding: 10px 12px; font-size: 13px; background: var(--bg2); color: var(--text);
-    resize: vertical; min-height: 90px; font-family: inherit; line-height: 1.5;
+    width: 100%; border: 1px solid var(--border2); border-radius: var(--radius-md);
+    padding: 10px 12px; font-size: 13px; background: var(--bg2); color: var(--black);
+    resize: vertical; min-height: 90px; font-family: var(--font-body); line-height: 1.5;
   }
+  .modal textarea:focus { outline: none; border-color: var(--brand); }
   .modal-actions { display: flex; gap: 8px; margin-top: 14px; }
   .btn-primary {
-    flex: 1; padding: 9px; background: var(--text); color: var(--bg);
+    flex: 1; padding: 9px; background: var(--brand); color: #fff;
     border: none; border-radius: var(--radius-md);
-    font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity 0.15s;
+    font-family: var(--font-display); font-size: 15px; font-weight: 700;
+    letter-spacing: 0.03em; cursor: pointer; transition: background 0.15s;
   }
-  .btn-primary:hover { opacity: 0.85; }
+  .btn-primary:hover { background: var(--brand-dark); }
   .btn-cancel {
-    padding: 9px 16px; border: 0.5px solid var(--border2);
-    border-radius: var(--radius-md); background: none;
-    font-size: 13px; color: var(--text2); cursor: pointer; transition: background 0.15s;
+    padding: 9px 16px; border: 1px solid var(--border2); border-radius: var(--radius-md);
+    background: none; font-size: 13px; color: var(--gray2); cursor: pointer;
+    transition: background 0.15s; font-family: var(--font-body);
   }
   .btn-cancel:hover { background: var(--bg2); }
 
   @media (max-width: 520px) {
     .flow-body { flex-direction: column; }
-    .flow-detail { width: 100%; border-right: none; border-top: 0.5px solid var(--border); }
+    .flow-detail { width: 100%; border-left: none; border-top: 1px solid var(--border2); }
     .bem-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 <div class="app">
-  <h1 class="sr-only">Guia interativo de processos — Pós-contemplação de consórcio</h1>
+  <h1 class="sr-only">Guia interativo de processos — Pós-contemplação Porto Vale Consórcio</h1>
 
   <!-- LOGIN -->
   <div id="screen-login" class="screen active">
     <div class="login-wrap">
-      <div class="login-logo"><i class="ti ti-file-description" aria-hidden="true"></i></div>
-      <div class="login-title">Guia de processos</div>
-      <div class="login-sub">Pós-contemplação · Consórcio</div>
+      <div class="login-logo-wrap">
+        <img src="data:image/png;base64,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" alt="Porto Vale Consórcio">
+      </div>
+      <div class="login-divider"></div>
+      <div class="login-title">Guia de Processos</div>
+      <div class="login-sub">Pós-contemplação · Departamento interno</div>
       <div class="login-card">
         <div class="field">
           <label for="inp-user">Usuário</label>
@@ -328,9 +404,13 @@
   <!-- HOME -->
   <div id="screen-home" class="screen">
     <div class="header">
-      <div>
-        <div class="header-title">Guia de processos</div>
-        <div class="header-sub">Pós-contemplação · Consórcio</div>
+      <div class="header-brand">
+        <img src="data:image/png;base64,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" alt="Porto Vale Consórcio">
+        <div class="header-divider"></div>
+        <div>
+          <div class="header-title">Guia de Processos</div>
+          <div class="header-sub">Pós-contemplação</div>
+        </div>
       </div>
       <div class="header-right">
         <span class="perfil-badge" id="perfil-badge"></span>
@@ -341,17 +421,18 @@
     </div>
     <div class="home-content">
       <div class="home-greeting" id="home-greeting">Olá</div>
-      <div class="home-desc">Selecione o tipo de bem para consultar as etapas do processo e orientações de cada fase.</div>
+      <div class="home-desc">Selecione o tipo de bem para consultar as etapas do processo e as orientações de cada fase.</div>
+      <div class="section-label">Tipo de bem</div>
       <div class="bem-grid">
         <div class="bem-card" onclick="showFlow('aut')">
           <div class="bem-icon"><i class="ti ti-car" aria-hidden="true"></i></div>
           <div class="bem-title">Automóvel</div>
-          <div class="bem-desc">Aquisição AUTO · 4 etapas</div>
+          <div class="bem-count">4 etapas</div>
         </div>
         <div class="bem-card" onclick="showFlow('imv')">
           <div class="bem-icon"><i class="ti ti-building" aria-hidden="true"></i></div>
           <div class="bem-title">Imóvel</div>
-          <div class="bem-desc">Aquisição IMV · 7 etapas</div>
+          <div class="bem-count">7 etapas</div>
         </div>
       </div>
       <div class="pending-banner" id="pending-banner" onclick="showPending()" style="display:none">
@@ -384,7 +465,7 @@
       </div>
       <div class="flow-detail" id="aut-detail">
         <div class="detail-empty">
-          <i class="ti ti-hand-click" style="font-size:28px;opacity:0.4" aria-hidden="true"></i>
+          <i class="ti ti-hand-click" style="font-size:28px;color:var(--brand);opacity:0.5" aria-hidden="true"></i>
           <span>Selecione uma etapa ao lado para ver orientações, prazos e alertas</span>
         </div>
       </div>
@@ -410,7 +491,7 @@
       </div>
       <div class="flow-detail" id="imv-detail">
         <div class="detail-empty">
-          <i class="ti ti-hand-click" style="font-size:28px;opacity:0.4" aria-hidden="true"></i>
+          <i class="ti ti-hand-click" style="font-size:28px;color:var(--brand);opacity:0.5" aria-hidden="true"></i>
           <span>Selecione uma etapa ao lado para ver orientações, prazos e alertas</span>
         </div>
       </div>
@@ -437,7 +518,7 @@
       <textarea id="suggest-text" placeholder="Descreva a nova informação ou correção que descobriu durante o atendimento..."></textarea>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-        <button class="btn-primary" onclick="submitSuggestion()">Enviar sugestão</button>
+        <button class="btn-primary" onclick="submitSuggestion()">Enviar</button>
       </div>
     </div>
   </div>
@@ -445,19 +526,15 @@
   <!-- MODAL CONFIRMAÇÃO -->
   <div class="modal-overlay" id="confirm-modal">
     <div class="modal" style="text-align:center">
-      <i class="ti ti-circle-check" style="font-size:36px;color:var(--success-text);margin-bottom:12px;display:block" aria-hidden="true"></i>
+      <i class="ti ti-circle-check" style="font-size:40px;color:var(--brand);margin-bottom:12px;display:block" aria-hidden="true"></i>
       <div class="modal-title">Sugestão enviada</div>
-      <div class="modal-sub">Sua sugestão foi encaminhada ao coordenador para revisão. Quando aprovada, ela será publicada no guia.</div>
-      <button class="btn-primary" style="margin-top:16px" onclick="closeConfirm()">Entendido</button>
+      <div class="modal-sub">Sua sugestão foi encaminhada ao coordenador para revisão. Quando aprovada, será publicada no guia.</div>
+      <button class="btn-primary" style="margin-top:16px;max-width:180px;margin-left:auto;margin-right:auto;display:block" onclick="closeConfirm()">Entendido</button>
     </div>
   </div>
 
 </div>
 <script>
-/* ══ CREDENCIAIS ══
-   Para alterar: edite usuario e senha abaixo.
-   Perfis: "atendente" | "coordenador"
-*/
 const USUARIOS = [
   { usuario: "PortoVale@2026", senha: "1234", perfil: "atendente",   nome: "Atendente"   },
   { usuario: "Coordenador",    senha: "1234", perfil: "coordenador", nome: "Coordenador" }
@@ -468,7 +545,6 @@ let currentBem = null;
 let currentSuggestEtapa = null;
 let pendingSuggestions = [];
 
-/* ── Login / Logout ── */
 function doLogin() {
   const u = document.getElementById('inp-user').value.trim();
   const p = document.getElementById('inp-pass').value;
@@ -493,7 +569,6 @@ function doLogout() {
   document.getElementById('screen-login').classList.add('active');
 }
 
-/* ── Navegação ── */
 function showHome() {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-home').classList.add('active');
@@ -512,7 +587,6 @@ function showPending() {
   renderPending();
 }
 
-/* ── Etapas ── */
 function renderEtapas(bem) {
   const container = document.getElementById(bem + '-etapas');
   container.innerHTML = '';
@@ -520,7 +594,7 @@ function renderEtapas(bem) {
     const node = document.createElement('div');
     node.className = 'etapa-node';
     node.id = bem + '-node-' + i;
-    node.innerHTML = `<div class="etapa-num">${i+1}</div><div class="etapa-label">${etapa.label}</div><i class="ti ti-chevron-right" style="font-size:14px;color:var(--text3)" aria-hidden="true"></i>`;
+    node.innerHTML = '<div class="etapa-num">' + (i+1) + '</div><div class="etapa-label">' + etapa.label + '</div><i class="ti ti-chevron-right" style="font-size:14px;color:var(--gray3)" aria-hidden="true"></i>';
     node.onclick = () => selectEtapa(bem, i);
     container.appendChild(node);
     if (i < DATA[bem].length - 1) {
@@ -531,36 +605,31 @@ function renderEtapas(bem) {
   });
 }
 function selectEtapa(bem, idx) {
-  document.querySelectorAll(`[id^="${bem}-node-"]`).forEach(n => n.classList.remove('selected'));
+  document.querySelectorAll('[id^="' + bem + '-node-"]').forEach(n => n.classList.remove('selected'));
   document.getElementById(bem + '-node-' + idx).classList.add('selected');
   renderDetail(bem, idx);
 }
 function renderDetail(bem, idx) {
   const etapa = DATA[bem][idx];
   const isCoordenador = perfilAtivo?.perfil === 'coordenador';
-  document.getElementById(bem + '-detail').innerHTML = `
-    <div class="detail-title">${etapa.label}</div>
-    <div class="detail-tag"><i class="ti ti-check" style="font-size:11px;margin-right:4px" aria-hidden="true"></i>Etapa ativa</div>
-    <div class="detail-section-title">Orientações</div>
-    ${etapa.orientacoes.map(o => `<div class="detail-item"><div class="detail-dot"></div><div class="detail-text">${o}</div></div>`).join('')}
-    <div class="detail-section-title">Prazos</div>
-    ${etapa.prazos.map(p => `<div class="detail-item"><div class="detail-dot" style="background:var(--info-text)"></div><div class="detail-text">${p}</div></div>`).join('')}
-    <div class="detail-section-title">Atenção</div>
-    ${etapa.alertas.map(a => `<div class="alert-item"><i class="ti ti-alert-triangle" style="font-size:12px;margin-right:4px" aria-hidden="true"></i>${a}</div>`).join('')}
-    <div class="detail-section-title">Situações comuns</div>
-    ${etapa.situacoes.map(s => `<div class="detail-item"><div class="detail-dot" style="background:var(--border2)"></div><div class="detail-text" style="color:var(--text2)">${s}</div></div>`).join('')}
-    ${!isCoordenador ? `<button class="suggest-btn" onclick="openSuggest('${etapa.label}')"><i class="ti ti-edit" style="font-size:14px" aria-hidden="true"></i>Sugerir atualização</button>` : ''}
-  `;
+  document.getElementById(bem + '-detail').innerHTML =
+    '<div class="detail-title">' + etapa.label + '</div>' +
+    '<div class="detail-tag"><i class="ti ti-check" style="font-size:11px;margin-right:4px" aria-hidden="true"></i>Etapa ativa</div>' +
+    '<div class="detail-section-title">Orientações</div>' +
+    etapa.orientacoes.map(o => '<div class="detail-item"><div class="detail-dot solid"></div><div class="detail-text">' + o + '</div></div>').join('') +
+    '<div class="detail-section-title">Prazos</div>' +
+    etapa.prazos.map(p => '<div class="detail-item"><div class="detail-dot"></div><div class="detail-text">' + p + '</div></div>').join('') +
+    '<div class="detail-section-title">Atenção</div>' +
+    etapa.alertas.map(a => '<div class="alert-item"><i class="ti ti-alert-triangle" style="font-size:12px;margin-right:4px" aria-hidden="true"></i>' + a + '</div>').join('') +
+    '<div class="detail-section-title">Situações comuns</div>' +
+    etapa.situacoes.map(s => '<div class="detail-item"><div class="detail-dot gray"></div><div class="detail-text muted">' + s + '</div></div>').join('') +
+    (!isCoordenador ? '<button class="suggest-btn" onclick="openSuggest(\'' + etapa.label + '\')"><i class="ti ti-edit" style="font-size:14px" aria-hidden="true"></i>Sugerir atualização</button>' : '');
 }
 function resetDetail(bem) {
-  document.getElementById(bem + '-detail').innerHTML = `
-    <div class="detail-empty">
-      <i class="ti ti-hand-click" style="font-size:28px;opacity:0.4" aria-hidden="true"></i>
-      <span>Selecione uma etapa ao lado para ver orientações, prazos e alertas</span>
-    </div>`;
+  document.getElementById(bem + '-detail').innerHTML =
+    '<div class="detail-empty"><i class="ti ti-hand-click" style="font-size:28px;color:var(--brand);opacity:0.5" aria-hidden="true"></i><span>Selecione uma etapa ao lado para ver orientações, prazos e alertas</span></div>';
 }
 
-/* ── Sugestões ── */
 function openSuggest(etapaName) {
   currentSuggestEtapa = etapaName;
   document.getElementById('suggest-etapa-name').textContent = 'Etapa: ' + etapaName;
@@ -586,23 +655,19 @@ function updatePendingCount() {
 function renderPending() {
   const list = document.getElementById('pending-list');
   if (pendingSuggestions.length === 0) {
-    list.innerHTML = `<div class="empty-pending"><i class="ti ti-circle-check" style="font-size:32px;opacity:0.4;display:block;margin-bottom:8px" aria-hidden="true"></i>Nenhuma sugestão pendente no momento</div>`;
+    list.innerHTML = '<div class="empty-pending"><i class="ti ti-circle-check" style="font-size:32px;color:var(--brand);opacity:0.4;display:block;margin-bottom:8px" aria-hidden="true"></i>Nenhuma sugestão pendente no momento</div>';
     return;
   }
-  list.innerHTML = pendingSuggestions.map(s => `
-    <div class="pending-card" id="pending-${s.id}">
-      <div class="pending-card-header">
-        <div class="pending-card-meta">${s.tipo} · por ${s.atendente} · ${s.data}</div>
-        <span class="pending-card-tag">Pendente</span>
-      </div>
-      <div class="pending-card-etapa">${s.etapa}</div>
-      <div class="pending-card-suggestion">${s.texto}</div>
-      <div class="pending-card-actions">
-        <button class="btn-approve" onclick="approveSuggestion(${s.id})"><i class="ti ti-check" aria-hidden="true"></i> Aprovar e publicar</button>
-        <button class="btn-reject" onclick="rejectSuggestion(${s.id})"><i class="ti ti-x" aria-hidden="true"></i> Rejeitar</button>
-      </div>
-    </div>
-  `).join('');
+  list.innerHTML = pendingSuggestions.map(s =>
+    '<div class="pending-card" id="pending-' + s.id + '">' +
+    '<div class="pending-card-header"><div class="pending-card-meta">' + s.tipo + ' · por ' + s.atendente + ' · ' + s.data + '</div><span class="pending-card-tag">Pendente</span></div>' +
+    '<div class="pending-card-etapa">' + s.etapa + '</div>' +
+    '<div class="pending-card-suggestion">' + s.texto + '</div>' +
+    '<div class="pending-card-actions">' +
+    '<button class="btn-approve" onclick="approveSuggestion(' + s.id + ')"><i class="ti ti-check" aria-hidden="true"></i> Aprovar e publicar</button>' +
+    '<button class="btn-reject" onclick="rejectSuggestion(' + s.id + ')"><i class="ti ti-x" aria-hidden="true"></i> Rejeitar</button>' +
+    '</div></div>'
+  ).join('');
 }
 function approveSuggestion(id) {
   pendingSuggestions = pendingSuggestions.filter(s => s.id !== id);
@@ -613,204 +678,65 @@ function rejectSuggestion(id) {
   renderPending(); updatePendingCount();
 }
 
-/* ══ DADOS
-   Para atualizar o conteúdo de uma etapa, localize pelo campo "label"
-   e edite os arrays: orientacoes, prazos, alertas e situacoes.
-══ */
 const DATA = {
   aut: [
-    {
-      label: "Documentação",
-      situacoes: ["Aguardando retorno do cliente", "Pendência do cliente", "Tratativa pro e-mail"],
-      orientacoes: [
-        "Solicitar RG, CPF, CNH e comprovante de residência",
-        "Verificar validade dos documentos (mínimo 90 dias)",
-        "Confirmar se há fiador — solicitar documentos do fiador também",
-        "Registrar recebimento no sistema com data e hora"
-      ],
-      prazos: [
-        "Prazo padrão: 5 dias úteis para entrega pelo cliente",
-        "Reenviar lembrete após 2 dias sem retorno"
-      ],
-      alertas: [
-        "Documentos fora da validade invalidam a etapa — não avançar sem corrigir",
-        "Crédito 'Vencido': acionar gerente se não houver retorno em 3 dias"
-      ]
-    },
-    {
-      label: "Faturamento",
-      situacoes: ["Tratar analista", "Aguardando retorno da Porto", "Tratativa pro e-mail"],
-      orientacoes: [
-        "Verificar se todos os documentos anteriores estão aprovados",
-        "Acionar o analista responsável na administradora",
-        "Acompanhar o andamento via sistema da Porto",
-        "Registrar cada contato realizado com data e resultado"
-      ],
-      prazos: [
-        "Prazo interno de análise: até 5 dias úteis",
-        "Escalar para gerente se prazo for ultrapassado"
-      ],
-      alertas: [
-        "Manter registro de todos os contatos com a administradora",
-        "Pendência devolvida: identificar o motivo antes de reenviar"
-      ]
-    },
-    {
-      label: "Contrato de Alienação",
-      situacoes: ["Acompanhar processo", "Retornar para o cliente", "Aguardando retorno do cliente"],
-      orientacoes: [
-        "Confirmar dados do veículo: marca, modelo, ano, cor e RENAVAM",
-        "Verificar se o valor do bem está dentro do crédito aprovado",
-        "Enviar contrato de alienação para assinatura do cliente",
-        "Aguardar assinatura de todas as partes antes de avançar"
-      ],
-      prazos: [
-        "Contrato deve ser assinado em até 10 dias corridos após emissão",
-        "Após assinatura, registrar no sistema em até 24h"
-      ],
-      alertas: [
-        "Não liberar crédito sem contrato de alienação devidamente assinado",
-        "Verificar se consta cláusula de fiador quando aplicável"
-      ]
-    },
-    {
-      label: "Pagamento ao vendedor",
-      situacoes: ["Tratar analista", "Aguardando retorno do cliente", "Pendência do cliente"],
-      orientacoes: [
-        "Confirmar dados bancários do vendedor com o cadastrado no contrato",
-        "Solicitar nota fiscal do veículo em nome do consorciado",
-        "Verificar se o DETRAN aceitou a transferência quando aplicável",
-        "Registrar data e valor do pagamento no sistema"
-      ],
-      prazos: [
-        "Pagamento ao vendedor em até 3 dias úteis após aprovação do faturamento"
-      ],
-      alertas: [
-        "Nunca liberar pagamento com dados bancários divergentes do contrato",
-        "Nota fiscal obrigatória antes da liberação"
-      ]
-    }
+    { label: "Documentação",
+      situacoes: ["Aguardando retorno do cliente","Pendência do cliente","Tratativa pro e-mail"],
+      orientacoes: ["Solicitar RG, CPF, CNH e comprovante de residência","Verificar validade dos documentos (mínimo 90 dias)","Confirmar se há fiador — solicitar documentos do fiador também","Registrar recebimento no sistema com data e hora"],
+      prazos: ["Prazo padrão: 5 dias úteis para entrega pelo cliente","Reenviar lembrete após 2 dias sem retorno"],
+      alertas: ["Documentos fora da validade invalidam a etapa — não avançar sem corrigir","Crédito Vencido: acionar gerente se não houver retorno em 3 dias"] },
+    { label: "Faturamento",
+      situacoes: ["Tratar analista","Aguardando retorno da Porto","Tratativa pro e-mail"],
+      orientacoes: ["Verificar se todos os documentos anteriores estão aprovados","Acionar o analista responsável na administradora","Acompanhar o andamento via sistema da Porto","Registrar cada contato realizado com data e resultado"],
+      prazos: ["Prazo interno de análise: até 5 dias úteis","Escalar para gerente se prazo for ultrapassado"],
+      alertas: ["Manter registro de todos os contatos com a administradora","Pendência devolvida: identificar o motivo antes de reenviar"] },
+    { label: "Contrato de Alienação",
+      situacoes: ["Acompanhar processo","Retornar para o cliente","Aguardando retorno do cliente"],
+      orientacoes: ["Confirmar dados do veículo: marca, modelo, ano, cor e RENAVAM","Verificar se o valor do bem está dentro do crédito aprovado","Enviar contrato de alienação para assinatura do cliente","Aguardar assinatura de todas as partes antes de avançar"],
+      prazos: ["Contrato deve ser assinado em até 10 dias corridos após emissão","Após assinatura, registrar no sistema em até 24h"],
+      alertas: ["Não liberar crédito sem contrato de alienação devidamente assinado","Verificar se consta cláusula de fiador quando aplicável"] },
+    { label: "Pagamento ao vendedor",
+      situacoes: ["Tratar analista","Aguardando retorno do cliente","Pendência do cliente"],
+      orientacoes: ["Confirmar dados bancários do vendedor com o cadastrado no contrato","Solicitar nota fiscal do veículo em nome do consorciado","Verificar se o DETRAN aceitou a transferência quando aplicável","Registrar data e valor do pagamento no sistema"],
+      prazos: ["Pagamento ao vendedor em até 3 dias úteis após aprovação do faturamento"],
+      alertas: ["Nunca liberar pagamento com dados bancários divergentes do contrato","Nota fiscal obrigatória antes da liberação"] }
   ],
   imv: [
-    {
-      label: "Documentação",
-      situacoes: ["Aguardando retorno do cliente", "Pendência do cliente", "Tratar analista"],
-      orientacoes: [
-        "Solicitar matrícula atualizada do imóvel (máx. 30 dias)",
-        "Verificar certidões negativas de débitos municipais e federais",
-        "Confirmar IPTU em dia",
-        "Solicitar documentos pessoais de todos os proprietários"
-      ],
-      prazos: [
-        "Matrícula com mais de 30 dias não é aceita pela administradora",
-        "Prazo para entrega: 7 dias úteis após solicitação"
-      ],
-      alertas: [
-        "Imóvel com ônus registrado na matrícula exige análise jurídica",
-        "Verificar se há usufruto ou inventário em aberto"
-      ]
-    },
-    {
-      label: "Minuta",
-      situacoes: ["Tratar", "Retornar para o cliente", "Pendência do cliente"],
-      orientacoes: [
-        "Enviar minuta do contrato para revisão do cliente e do vendedor",
-        "Verificar se todos os dados do imóvel estão corretos na minuta",
-        "Aguardar aceite formal antes de prosseguir",
-        "Registrar data de envio e aceite no sistema"
-      ],
-      prazos: [
-        "Prazo de revisão: até 5 dias úteis para retorno do cliente"
-      ],
-      alertas: [
-        "Qualquer alteração solicitada deve ser validada com o jurídico antes de aplicar"
-      ]
-    },
-    {
-      label: "Certificado",
-      situacoes: ["Fase de const/ref", "Tratativa pro e-mail", "Aguardando retorno do cliente"],
-      orientacoes: [
-        "Solicitar certificado de conclusão de obra ou habite-se quando aplicável",
-        "Verificar se o certificado é emitido pelo órgão municipal competente",
-        "Anexar junto com o laudo de avaliação do imóvel",
-        "Confirmar com o analista se o documento atende os requisitos"
-      ],
-      prazos: [
-        "Prazo do habite-se varia por município — orientar o cliente com antecedência"
-      ],
-      alertas: [
-        "Sem habite-se, imóvel novo fica bloqueado — acionar gerente"
-      ]
-    },
-    {
-      label: "Contrato Físico",
-      situacoes: ["Acompanhar processo", "Fase de const/ref"],
-      orientacoes: [
-        "Imprimir e encaminhar para assinatura presencial com firmas reconhecidas",
-        "Conferir assinatura de todas as partes",
-        "Digitalizar e anexar no sistema após assinatura",
-        "Guardar original físico conforme protocolo do departamento"
-      ],
-      prazos: [
-        "Assinatura em até 7 dias corridos após emissão do contrato"
-      ],
-      alertas: [
-        "Contrato com rasura não é aceito — emitir novamente",
-        "Firmas reconhecidas obrigatórias para imóveis acima de 200 salários mínimos"
-      ]
-    },
-    {
-      label: "Contrato Digital",
-      situacoes: ["Fase de const/ref", "Tratar"],
-      orientacoes: [
-        "Enviar link de assinatura digital para o e-mail cadastrado do cliente",
-        "Confirmar identidade via biometria ou token conforme plataforma",
-        "Acompanhar status da assinatura em tempo real no sistema",
-        "Registrar conclusão após todas as partes assinarem"
-      ],
-      prazos: [
-        "Link de assinatura expira em 72 horas — reenviar se necessário"
-      ],
-      alertas: [
-        "Se o cliente tiver dificuldade, oferecer alternativa de contrato físico"
-      ]
-    },
-    {
-      label: "Guia de ITBI",
-      situacoes: ["Aguardando retorno do cliente", "Pendência do cliente", "Acompanhar processo"],
-      orientacoes: [
-        "Orientar o cliente a solicitar o guia de ITBI junto à prefeitura do município do imóvel",
-        "Verificar se o valor base de cálculo do ITBI está de acordo com o contrato",
-        "Solicitar comprovante de pagamento do ITBI ao cliente",
-        "Anexar comprovante no processo antes de avançar para o cartório"
-      ],
-      prazos: [
-        "Prazo de emissão do guia varia por município — orientar o cliente a solicitar com antecedência",
-        "Comprovante de pagamento deve ser entregue em até 3 dias úteis após o vencimento do guia"
-      ],
-      alertas: [
-        "Sem comprovante de pagamento do ITBI, o cartório não registra o imóvel",
-        "Alíquota do ITBI varia por município — confirmar o valor antes de orientar o cliente"
-      ]
-    },
-    {
-      label: "Cartório",
-      situacoes: ["Fase de const/ref", "Aguardando retorno do cliente", "Acompanhar processo"],
-      orientacoes: [
-        "Encaminhar contrato para registro no cartório de imóveis competente",
-        "Verificar qual cartório é responsável pela circunscrição do imóvel",
-        "Protocolar o número de apresentação e acompanhar o prazo",
-        "Solicitar certidão de matrícula atualizada após o registro"
-      ],
-      prazos: [
-        "Prazo médio de registro: 15 a 30 dias corridos",
-        "Atualizar o sistema semanalmente com o status"
-      ],
-      alertas: [
-        "Custas cartorárias são do cliente — confirmar pagamento antes de protocolar",
-        "Conferir se o ITBI foi pago antes de protocolar — cartório exige o comprovante"
-      ]
-    }
+    { label: "Documentação",
+      situacoes: ["Aguardando retorno do cliente","Pendência do cliente","Tratar analista"],
+      orientacoes: ["Solicitar matrícula atualizada do imóvel (máx. 30 dias)","Verificar certidões negativas de débitos municipais e federais","Confirmar IPTU em dia","Solicitar documentos pessoais de todos os proprietários"],
+      prazos: ["Matrícula com mais de 30 dias não é aceita pela administradora","Prazo para entrega: 7 dias úteis após solicitação"],
+      alertas: ["Imóvel com ônus registrado na matrícula exige análise jurídica","Verificar se há usufruto ou inventário em aberto"] },
+    { label: "Minuta",
+      situacoes: ["Tratar","Retornar para o cliente","Pendência do cliente"],
+      orientacoes: ["Enviar minuta do contrato para revisão do cliente e do vendedor","Verificar se todos os dados do imóvel estão corretos","Aguardar aceite formal antes de prosseguir","Registrar data de envio e aceite no sistema"],
+      prazos: ["Prazo de revisão: até 5 dias úteis para retorno do cliente"],
+      alertas: ["Qualquer alteração solicitada deve ser validada com o jurídico antes de aplicar"] },
+    { label: "Certificado",
+      situacoes: ["Fase de const/ref","Tratativa pro e-mail","Aguardando retorno do cliente"],
+      orientacoes: ["Solicitar certificado de conclusão de obra ou habite-se quando aplicável","Verificar se o certificado é emitido pelo órgão municipal competente","Anexar junto com o laudo de avaliação do imóvel","Confirmar com o analista se o documento atende os requisitos"],
+      prazos: ["Prazo do habite-se varia por município — orientar o cliente com antecedência"],
+      alertas: ["Sem habite-se, imóvel novo fica bloqueado — acionar gerente"] },
+    { label: "Contrato Físico",
+      situacoes: ["Acompanhar processo","Fase de const/ref"],
+      orientacoes: ["Imprimir e encaminhar para assinatura presencial com firmas reconhecidas","Conferir assinatura de todas as partes","Digitalizar e anexar no sistema após assinatura","Guardar original físico conforme protocolo do departamento"],
+      prazos: ["Assinatura em até 7 dias corridos após emissão do contrato"],
+      alertas: ["Contrato com rasura não é aceito — emitir novamente","Firmas reconhecidas obrigatórias para imóveis acima de 200 salários mínimos"] },
+    { label: "Contrato Digital",
+      situacoes: ["Fase de const/ref","Tratar"],
+      orientacoes: ["Enviar link de assinatura digital para o e-mail cadastrado do cliente","Confirmar identidade via biometria ou token conforme plataforma","Acompanhar status da assinatura em tempo real no sistema","Registrar conclusão após todas as partes assinarem"],
+      prazos: ["Link de assinatura expira em 72 horas — reenviar se necessário"],
+      alertas: ["Se o cliente tiver dificuldade, oferecer alternativa de contrato físico"] },
+    { label: "Guia de ITBI",
+      situacoes: ["Aguardando retorno do cliente","Pendência do cliente","Acompanhar processo"],
+      orientacoes: ["Orientar o cliente a solicitar o guia de ITBI junto à prefeitura do município","Verificar se o valor base de cálculo está de acordo com o contrato","Solicitar comprovante de pagamento do ITBI ao cliente","Anexar comprovante no processo antes de avançar para o cartório"],
+      prazos: ["Prazo de emissão do guia varia por município — solicitar com antecedência","Comprovante de pagamento deve ser entregue em até 3 dias úteis após o vencimento"],
+      alertas: ["Sem comprovante de pagamento do ITBI, o cartório não registra o imóvel","Alíquota do ITBI varia por município — confirmar o valor antes de orientar o cliente"] },
+    { label: "Cartório",
+      situacoes: ["Fase de const/ref","Aguardando retorno do cliente","Acompanhar processo"],
+      orientacoes: ["Encaminhar contrato para registro no cartório de imóveis competente","Verificar qual cartório é responsável pela circunscrição do imóvel","Protocolar o número de apresentação e acompanhar o prazo","Solicitar certidão de matrícula atualizada após o registro"],
+      prazos: ["Prazo médio de registro: 15 a 30 dias corridos","Atualizar o sistema semanalmente com o status"],
+      alertas: ["Custas cartorárias são do cliente — confirmar pagamento antes de protocolar","Conferir se o ITBI foi pago antes de protocolar — cartório exige o comprovante"] }
   ]
 };
 </script>

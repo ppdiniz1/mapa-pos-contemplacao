@@ -98,6 +98,8 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
 .btn-ok:hover{opacity:.8;}
 .btn-no{padding:8px 16px;border:1px solid var(--danger-border);border-radius:var(--r-sm);background:none;font-size:13px;color:var(--danger-text);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--fb);}
 .btn-no:hover{background:var(--danger-bg);}
+.dempty{font-size:12px;color:var(--gray3);font-style:italic;padding:4px 0 2px 0;}
+.dmsg{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;background:var(--brand-light);border:1px solid var(--brand-border);border-radius:var(--r-md);padding:8px 10px;}
 .empty{text-align:center;padding:60px 20px;color:var(--gray3);font-size:14px;line-height:1.8;}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;align-items:center;justify-content:center;padding:20px;}
 .modal-bg.open{display:flex;}
@@ -293,7 +295,8 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
     warn:  '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.871l-8.106 -13.534a1.914 1.914 0 0 0 -3.274 0z"/><path d="M12 16h.01"/></svg>',
     edit:  '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/><path d="M16 5l3 3"/></svg>',
     right: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6l-6 6"/></svg>',
-    sig:   '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18l0 -3"/><path d="M10 18l0 -6"/><path d="M14 18l0 -9"/><path d="M18 18l0 -12"/></svg>'
+    sig:   '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18l0 -3"/><path d="M10 18l0 -6"/><path d="M14 18l0 -9"/><path d="M18 18l0 -12"/></svg>',
+    msg:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/></svg>'
   };
 
   // ── NAVEGAÇÃO ──
@@ -365,20 +368,47 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
 
   function renderDetail(bem, idx) {
     var e = DATA[bem][idx];
-    var coord = perfilAtivo && perfilAtivo.perfil === 'coordenador';
-    var html = '<div class="dtitle">' + e.label + '</div>';
-    html += '<div class="dtag"><span class="icon">' + IC.check + '</span>Etapa ativa</div>';
-    html += '<div class="dsec">Orientações</div>';
-    e.orientacoes.forEach(function(o) { html += '<div class="ditem"><div class="ddot s"></div><div class="dtext">' + o + '</div></div>'; });
-    html += '<div class="dsec">Prazos</div>';
-    e.prazos.forEach(function(p) { html += '<div class="ditem"><div class="ddot"></div><div class="dtext">' + p + '</div></div>'; });
-    html += '<div class="dsec">Atenção</div>';
-    e.alertas.forEach(function(a) { html += '<div class="dalert"><span class="icon">' + IC.warn + '</span>' + a + '</div>'; });
-    html += '<div class="dsec">Situações comuns</div>';
-    e.situacoes.forEach(function(s) { html += '<div class="ditem"><div class="ddot g"></div><div class="dtext m">' + s + '</div></div>'; });
-    html += '<button class="suggest-btn" id="btn-suggest-etapa"><span class="icon">' + IC.edit + '</span>Sugerir atualização</button>';
+    var h = '<div class="dtitle">' + e.label + '</div>';
+    h += '<div class="dtag"><span class="icon">' + IC.check + '</span>Etapa ativa</div>';
+
+    h += '<div class="dsec">Gatilho</div>';
+    if (e.gatilho && e.gatilho.length) {
+      e.gatilho.forEach(function(g) { h += '<div class="ditem"><div class="ddot s"></div><div class="dtext">' + g + '</div></div>'; });
+    } else {
+      h += '<div class="dempty">Nenhum gatilho cadastrado ainda.</div>';
+    }
+
+    h += '<div class="dsec">Mensagens rápidas</div>';
+    if (e.mensagens && e.mensagens.length) {
+      e.mensagens.forEach(function(m) { h += '<div class="dmsg"><span class="icon" style="color:var(--brand);flex-shrink:0">' + IC.msg + '</span><div class="dtext">' + m + '</div></div>'; });
+    } else {
+      h += '<div class="dempty">Nenhuma mensagem rápida cadastrada ainda.</div>';
+    }
+
+    h += '<div class="dsec">Prazos</div>';
+    if (e.prazos && e.prazos.length) {
+      e.prazos.forEach(function(p) { h += '<div class="ditem"><div class="ddot"></div><div class="dtext">' + p + '</div></div>'; });
+    } else {
+      h += '<div class="dempty">Nenhum prazo cadastrado ainda.</div>';
+    }
+
+    h += '<div class="dsec">Atenção</div>';
+    if (e.alertas && e.alertas.length) {
+      e.alertas.forEach(function(a) { h += '<div class="dalert"><span class="icon">' + IC.warn + '</span>' + a + '</div>'; });
+    } else {
+      h += '<div class="dempty">Nenhum alerta cadastrado ainda.</div>';
+    }
+
+    h += '<div class="dsec">Situações comuns</div>';
+    if (e.situacoes && e.situacoes.length) {
+      e.situacoes.forEach(function(s) { h += '<div class="ditem"><div class="ddot g"></div><div class="dtext m">' + s + '</div></div>'; });
+    } else {
+      h += '<div class="dempty">Nenhuma situação cadastrada ainda.</div>';
+    }
+
+    h += '<button class="suggest-btn" id="btn-suggest-etapa"><span class="icon">' + IC.edit + '</span>Sugerir atualização</button>';
     var detail = document.getElementById(bem + '-detail');
-    detail.innerHTML = html;
+    detail.innerHTML = h;
     var btn = document.getElementById('btn-suggest-etapa');
     if (btn) {
       var etapaLabel = e.label;
@@ -491,19 +521,19 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
   // ── DADOS ──
   var DATA = {
     aut: [
-      { label: 'Documentação', situacoes: ['Aguardando retorno do cliente','Pendência do cliente','Tratativa pro e-mail'], orientacoes: ['Solicitar RG, CPF, CNH e comprovante de residência','Verificar validade dos documentos (mínimo 90 dias)','Confirmar se há fiador — solicitar documentos do fiador também','Registrar recebimento no sistema com data e hora'], prazos: ['Prazo padrão: 5 dias úteis para entrega pelo cliente','Reenviar lembrete após 2 dias sem retorno'], alertas: ['Documentos fora da validade invalidam a etapa — não avançar sem corrigir','Crédito Vencido: acionar gerente se não houver retorno em 3 dias'] },
-      { label: 'Faturamento', situacoes: ['Tratar analista','Aguardando retorno da Porto','Tratativa pro e-mail'], orientacoes: ['Verificar se todos os documentos anteriores estão aprovados','Acionar o analista responsável na administradora','Acompanhar o andamento via sistema da Porto','Registrar cada contato realizado com data e resultado'], prazos: ['Prazo interno de análise: até 5 dias úteis','Escalar para gerente se prazo for ultrapassado'], alertas: ['Manter registro de todos os contatos com a administradora','Pendência devolvida: identificar o motivo antes de reenviar'] },
-      { label: 'Contrato de Alienação', situacoes: ['Acompanhar processo','Retornar para o cliente','Aguardando retorno do cliente'], orientacoes: ['Confirmar dados do veículo: marca, modelo, ano, cor e RENAVAM','Verificar se o valor do bem está dentro do crédito aprovado','Enviar contrato de alienação para assinatura do cliente','Aguardar assinatura de todas as partes antes de avançar'], prazos: ['Contrato deve ser assinado em até 10 dias corridos após emissão','Após assinatura, registrar no sistema em até 24h'], alertas: ['Não liberar crédito sem contrato de alienação devidamente assinado','Verificar se consta cláusula de fiador quando aplicável'] },
-      { label: 'Pagamento ao vendedor', situacoes: ['Tratar analista','Aguardando retorno do cliente','Pendência do cliente'], orientacoes: ['Confirmar dados bancários do vendedor com o cadastrado no contrato','Solicitar nota fiscal do veículo em nome do consorciado','Verificar se o DETRAN aceitou a transferência quando aplicável','Registrar data e valor do pagamento no sistema'], prazos: ['Pagamento ao vendedor em até 3 dias úteis após aprovação do faturamento'], alertas: ['Nunca liberar pagamento com dados bancários divergentes do contrato','Nota fiscal obrigatória antes da liberação'] }
+      { label: 'Documentação',          gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
+      { label: 'Faturamento',           gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
+      { label: 'Contrato de Alienação', gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
+      { label: 'Pagamento ao vendedor', gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] }
     ],
     imv: [
-      { label: 'Documentação', situacoes: ['Aguardando retorno do cliente','Pendência do cliente','Tratar analista'], orientacoes: ['Solicitar matrícula atualizada do imóvel (máx. 30 dias)','Verificar certidões negativas de débitos municipais e federais','Confirmar IPTU em dia','Solicitar documentos pessoais de todos os proprietários'], prazos: ['Matrícula com mais de 30 dias não é aceita pela administradora','Prazo para entrega: 7 dias úteis após solicitação'], alertas: ['Imóvel com ônus registrado na matrícula exige análise jurídica','Verificar se há usufruto ou inventário em aberto'] },
-      { label: 'Minuta', situacoes: ['Tratar','Retornar para o cliente','Pendência do cliente'], orientacoes: ['Enviar minuta do contrato para revisão do cliente e do vendedor','Verificar se todos os dados do imóvel estão corretos','Aguardar aceite formal antes de prosseguir','Registrar data de envio e aceite no sistema'], prazos: ['Prazo de revisão: até 5 dias úteis para retorno do cliente'], alertas: ['Qualquer alteração solicitada deve ser validada com o jurídico antes de aplicar'] },
-      { label: 'Certificado', situacoes: ['Fase de const/ref','Tratativa pro e-mail','Aguardando retorno do cliente'], orientacoes: ['Solicitar certificado de conclusão de obra ou habite-se quando aplicável','Verificar se o certificado é emitido pelo órgão municipal competente','Anexar junto com o laudo de avaliação do imóvel','Confirmar com o analista se o documento atende os requisitos'], prazos: ['Prazo do habite-se varia por município — orientar o cliente com antecedência'], alertas: ['Sem habite-se, imóvel novo fica bloqueado — acionar gerente'] },
-      { label: 'Contrato Físico', situacoes: ['Acompanhar processo','Fase de const/ref'], orientacoes: ['Imprimir e encaminhar para assinatura presencial com firmas reconhecidas','Conferir assinatura de todas as partes','Digitalizar e anexar no sistema após assinatura','Guardar original físico conforme protocolo do departamento'], prazos: ['Assinatura em até 7 dias corridos após emissão do contrato'], alertas: ['Contrato com rasura não é aceito — emitir novamente','Firmas reconhecidas obrigatórias para imóveis acima de 200 salários mínimos'] },
-      { label: 'Contrato Digital', situacoes: ['Fase de const/ref','Tratar'], orientacoes: ['Enviar link de assinatura digital para o e-mail cadastrado do cliente','Confirmar identidade via biometria ou token conforme plataforma','Acompanhar status da assinatura em tempo real no sistema','Registrar conclusão após todas as partes assinarem'], prazos: ['Link de assinatura expira em 72 horas — reenviar se necessário'], alertas: ['Se o cliente tiver dificuldade, oferecer alternativa de contrato físico'] },
-      { label: 'Guia de ITBI', situacoes: ['Aguardando retorno do cliente','Pendência do cliente','Acompanhar processo'], orientacoes: ['Orientar o cliente a solicitar o guia de ITBI junto à prefeitura do município','Verificar se o valor base de cálculo está de acordo com o contrato','Solicitar comprovante de pagamento do ITBI ao cliente','Anexar comprovante no processo antes de avançar para o cartório'], prazos: ['Prazo de emissão do guia varia por município — solicitar com antecedência','Comprovante de pagamento deve ser entregue em até 3 dias úteis após o vencimento'], alertas: ['Sem comprovante de pagamento do ITBI, o cartório não registra o imóvel','Alíquota do ITBI varia por município — confirmar o valor antes de orientar o cliente'] },
-      { label: 'Cartório', situacoes: ['Fase de const/ref','Aguardando retorno do cliente','Acompanhar processo'], orientacoes: ['Encaminhar contrato para registro no cartório de imóveis competente','Verificar qual cartório é responsável pela circunscrição do imóvel','Protocolar o número de apresentação e acompanhar o prazo','Solicitar certidão de matrícula atualizada após o registro'], prazos: ['Prazo médio de registro: 15 a 30 dias corridos','Atualizar o sistema semanalmente com o status'], alertas: ['Custas cartorárias são do cliente — confirmar pagamento antes de protocolar','Conferir se o ITBI foi pago antes de protocolar — cartório exige o comprovante'] }
+      { label: 'Documentação',          gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
+      { label: 'Minuta',                gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
+      { label: 'Certificado',           gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
+      { label: 'Contrato Físico',       gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
+      { label: 'Contrato Digital',      gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
+      { label: 'Guia de ITBI',          gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
+      { label: 'Cartório',              gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] }
     ]
   };
 

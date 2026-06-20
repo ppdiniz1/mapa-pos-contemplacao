@@ -71,7 +71,7 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
 .enode.selected .elabel{color:var(--brand);}
 .earrow{width:1px;height:14px;background:var(--border2);margin:0 auto;}
 .earrow-h{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--border2);margin:0 auto;}
-.detail{width:300px;flex-shrink:0;padding:22px;overflow-y:auto;background:var(--bg2);}
+.detail{width:420px;flex-shrink:0;padding:22px;overflow-y:auto;background:var(--bg2);}
 .detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:12px;color:var(--gray3);font-size:13px;line-height:1.6;}
 .dtitle{font-family:var(--fd);font-size:20px;font-weight:700;color:var(--black);margin-bottom:4px;}
 .dtag{display:inline-flex;align-items:center;gap:4px;font-size:11px;background:var(--brand-light);color:var(--brand);border-radius:var(--r-sm);padding:3px 8px;margin-bottom:14px;font-weight:500;border:1px solid var(--brand-border);}
@@ -376,18 +376,14 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
     e.alertas.forEach(function(a) { html += '<div class="dalert"><span class="icon">' + IC.warn + '</span>' + a + '</div>'; });
     html += '<div class="dsec">Situações comuns</div>';
     e.situacoes.forEach(function(s) { html += '<div class="ditem"><div class="ddot g"></div><div class="dtext m">' + s + '</div></div>'; });
-    if (!coord) {
-      html += '<button class="suggest-btn" id="btn-suggest-etapa"><span class="icon">' + IC.edit + '</span>Sugerir atualização</button>';
-    }
+    html += '<button class="suggest-btn" id="btn-suggest-etapa"><span class="icon">' + IC.edit + '</span>Sugerir atualização</button>';
     var detail = document.getElementById(bem + '-detail');
     detail.innerHTML = html;
-    if (!coord) {
-      var btn = document.getElementById('btn-suggest-etapa');
-      if (btn) {
-        var etapaLabel = e.label;
-        var bemUp = bem.toUpperCase();
-        btn.addEventListener('click', function() { openSuggest(etapaLabel, bemUp); });
-      }
+    var btn = document.getElementById('btn-suggest-etapa');
+    if (btn) {
+      var etapaLabel = e.label;
+      var bemUp = bem.toUpperCase();
+      btn.addEventListener('click', function() { openSuggest(etapaLabel, bemUp); });
     }
   }
 

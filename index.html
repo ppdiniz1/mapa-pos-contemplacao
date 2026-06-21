@@ -349,40 +349,69 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
 <div id="screen-history" class="screen">
   <div class="header">
     <button class="btn-icon" id="back-history"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l14 0"/><path d="M5 12l6 6"/><path d="M5 12l6 -6"/></svg> Voltar</button>
-    <div><div class="header-title">Histórico de mudanças</div><div class="header-sub">Atualizações aprovadas pelo coordenador</div></div>
+    <div><div class="header-title">Historico de mudancas</div><div class="header-sub">Atualizacoes aprovadas pelo coordenador</div></div><div class="header-right"><button class="btn-icon" id="btn-clear-history" style="display:none;color:var(--danger-text);border-color:var(--danger-border)">Limpar historico</button></div>
   </div>
   <div class="list-body" id="history-list"></div>
 </div>
 
 <!-- MODAL SUGESTÃO -->
 <div class="modal-bg" id="modal-suggest">
-  <div class="modal">
+  <div class="modal" style="max-width:460px">
     <div class="modal-title">Sugerir atualização</div>
-    <div class="modal-sub">Preencha os dados da mudança identificada.</div>
-    <div class="field"><label>Data em que a mudança foi informada</label><input type="date" id="sug-date"></div>
-    <div class="field"><label>Canal onde foi descoberta</label>
-      <select id="sug-channel"><option value="">Selecione</option><option>Central</option><option>Suporte</option><option>Concierge</option></select>
+    <div class="modal-sub">Descreva a mudança identificada. O coordenador irá definir onde e como será aplicada.</div>
+    <div class="field"><label>Fluxo e Etapa</label><input type="text" id="sug-etapa" readonly style="background:var(--bg2);color:var(--gray2)"></div>
+    <div class="field"><label>Canal onde identificou a mudança</label>
+      <select id="sug-channel"><option value="">Selecione o canal</option><option value="Central">Central</option><option value="Concierge">Concierge</option><option value="Suporte">Suporte</option><option value="Esteira">Esteira</option></select>
     </div>
-    <div class="field"><label>Tipo de bem</label>
-      <select id="sug-bem"><option value="">Selecione</option><option value="AUT">Automóvel (AUT)</option><option value="IMV">Imóvel (IMV)</option></select>
+    <div class="field"><label>Tipo de alteração</label>
+      <select id="sug-tipo"><option value="">Selecione</option><option value="adicionar">Adicionar algo ao fluxo</option><option value="alterar">Alterar algo existente</option><option value="alterar_mensagem">Sugerir nova mensagem rápida</option></select>
     </div>
-    <div class="field"><label>Etapa onde foi notada</label><input type="text" id="sug-etapa" readonly style="background:var(--bg2);color:var(--gray2)"></div>
-    <div class="field"><label>Descrição da mudança</label><textarea id="sug-text" placeholder="Descreva o que mudou..."></textarea></div>
-    <div id="sug-error" style="display:none;font-size:12px;color:var(--danger-text);margin-bottom:8px">Preencha todos os campos.</div>
-    <div class="modal-acts">
-      <button class="btn-cancel" id="btn-cancel-suggest">Cancelar</button>
-      <button class="btn-primary" id="btn-send-suggest">Enviar sugestão</button>
-    </div>
+    <div class="field"><label>Descrição da mudança</label><textarea id="sug-text" placeholder="Descreva o que mudou ou o que precisa ser adicionado..." style="min-height:90px"></textarea></div>
+    <div class="field"><label>Justificativa</label><textarea id="sug-justificativa" placeholder="Por que essa mudança é necessária?" style="min-height:60px"></textarea></div>
+    <div id="sug-error" style="display:none;font-size:12px;color:var(--danger-text);margin-bottom:8px">Preencha todos os campos obrigatórios.</div>
+    <div class="modal-acts"><button class="btn-cancel" id="btn-cancel-suggest">Cancelar</button><button class="btn-primary" id="btn-send-suggest">Enviar sugestão</button></div>
   </div>
 </div>
 
-<!-- MODAL CONFIRMAÇÃO -->
+<!-- MODAL CONFIRMACAO -->
 <div class="modal-bg" id="modal-confirm">
   <div class="modal" style="text-align:center">
     <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--brand);display:block;margin:0 auto 12px"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M9 12l2 2l4 -4"/></svg>
-    <div class="modal-title">Sugestão enviada</div>
-    <div class="modal-sub">Encaminhada ao coordenador. Quando aprovada, será registrada no histórico.</div>
+    <div class="modal-title">Sugestao enviada</div>
+    <div class="modal-sub">Encaminhada ao coordenador. Quando aprovada, sera aplicada automaticamente ao fluxo.</div>
     <button class="btn-primary" id="btn-confirm-ok" style="margin-top:16px;max-width:180px;margin-left:auto;margin-right:auto;display:block">Entendido</button>
+  </div>
+</div>
+
+<!-- MODAL EDITAR SUGESTAO -->
+<div class="modal-bg" id="modal-edit-suggest">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-title">Revisar e aplicar sugestão</div>
+    <div class="modal-sub">Defina como a sugestão do atendente será aplicada ao fluxo.</div>
+    <input type="hidden" id="edit-sug-id">
+    <!-- Contexto da sugestão (somente leitura) -->
+    <div id="edit-context-box" style="background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;margin-bottom:16px;">
+      <div style="font-size:10px;font-weight:600;color:var(--gray2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Sugestão do atendente</div>
+      <div id="edit-context-tipo" style="font-size:11px;margin-bottom:4px;"></div>
+      <div id="edit-context-desc" style="font-size:13px;color:var(--black);line-height:1.5;margin-bottom:6px;"></div>
+      <div id="edit-justificativa-box" style="display:none;padding:8px 10px;background:#fff8ee;border:1px solid #e8a020;border-radius:6px;">
+        <div style="font-size:10px;font-weight:600;color:#7a4500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Justificativa</div>
+        <div id="edit-justificativa-text" style="font-size:12px;color:#5a3200;line-height:1.5;"></div>
+      </div>
+    </div>
+    <!-- Decisões do coordenador -->
+    <div class="field"><label>Tipo de alteração</label>
+      <select id="edit-tipo-acao"><option value="">Selecione</option><option value="adicionar">Adicionar novo passo</option><option value="adicionar_card">Adicionar card em passo existente</option><option value="alterar_passo">Alterar passo existente</option><option value="alterar_mensagem">Alterar mensagem rápida</option></select>
+    </div>
+    <div id="edit-campo-passo-ref" class="field" style="display:none"><label id="edit-label-passo-ref">Qual passo?</label><select id="edit-passo-ref"><option value="">Selecione o passo</option></select></div>
+    <div id="edit-campo-card-ref" class="field" style="display:none"><label id="edit-label-card-ref">Qual card?</label><select id="edit-card-ref"><option value="">Selecione o card</option></select></div>
+    <div id="edit-campo-passo-pos" class="field" style="display:none"><label>Após qual passo inserir?</label><select id="edit-passo-pos"><option value="">No final</option></select></div>
+    <div id="edit-campo-tipo-passo" class="field" style="display:none"><label>Tipo do passo</label>
+      <select id="edit-tipo-passo"><option value="">Selecione</option><option value="Gatilho">Gatilho</option><option value="Ação">Ação</option><option value="Aguardar">Aguardar</option><option value="Mensagem">Mensagem</option></select>
+    </div>
+    <div id="edit-campo-titulo" class="field" style="display:none"><label>Título do passo ou card</label><input type="text" id="edit-sug-titulo" placeholder="Título resumido"></div>
+    <div class="field"><label>Descrição aprovada</label><textarea id="edit-sug-text" style="min-height:80px"></textarea></div>
+    <div class="modal-acts"><button class="btn-cancel" id="btn-cancel-edit">Cancelar</button><button class="btn-primary" id="btn-approve-edit">Aprovar e aplicar</button></div>
   </div>
 </div>
 
@@ -412,7 +441,7 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
   function showHome()    { go('home'); updateCount(); }
   function showFlow(bem) { currentBem=bem; go(bem); renderEtapas(bem); resetDetail(bem); }
   function showPending() { go('pending'); renderPending(); }
-  function showHistory() { go('history'); renderHistory(); }
+  function showHistory(){go('history');renderHistory();var bc=document.getElementById('btn-clear-history');if(bc)bc.style.display=(perfilAtivo&&perfilAtivo.perfil==='coordenador')?'flex':'none';}
 
   function doLogin() {
     var u=document.getElementById('inp-user').value.trim(), p=document.getElementById('inp-pass').value, found=null;
@@ -640,68 +669,260 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
     document.body.removeChild(ta);
   }
 
+  function storageGet(k){return window.storage?window.storage.get(k,true):Promise.resolve(null);}
+  function storageSet(k,v){return window.storage?window.storage.set(k,v,true):Promise.resolve(null);}
+  function getStepTitles(bem,etapa){var k=bem.toLowerCase();if(!DATA[k])return[];var e=DATA[k].find(function(x){return x.label===etapa;});if(!e||!e.arvore)return[];var t=[],src=e.arvore,m='vc-title">',p=0;while(true){var i=src.indexOf(m,p);if(i===-1)break;var s=i+m.length,en=src.indexOf('<',s);t.push(src.slice(s,en).trim());p=en;}return t;}
+  function getCardLabels(bem,etapa,passo){var k=bem.toLowerCase();if(!DATA[k])return[];var e=DATA[k].find(function(x){return x.label===etapa;});if(!e||!e.arvore)return[];var src=e.arvore,m='vc-title">',p=0,bs=-1;while(true){var i=src.indexOf(m,p);if(i===-1)break;var s=i+m.length,en=src.indexOf('<',s);if(src.slice(s,en).trim()===passo){bs=i;break;}p=en;}if(bs===-1)return[];var ns=src.indexOf(m,bs+m.length),block=ns!==-1?src.slice(bs,ns):src.slice(bs);var labels=[],lm='vc-opcao-label">',lp=0;while(true){var li=block.indexOf(lm,lp);if(li===-1)break;var ls=li+lm.length,le=block.indexOf('<',ls);labels.push(block.slice(ls,le).trim());lp=le;}return labels;}
+  function populateSelect(id,items){var sel=document.getElementById(id);if(!sel)return;sel.innerHTML='<option value="">Selecione</option>';items.forEach(function(t){var o=document.createElement('option');o.value=t;o.textContent=t;sel.appendChild(o);});}
+  var _sugEtapa='',_sugBem='';
+  function toggleSugFields(){var tipo=document.getElementById('sug-tipo').value;var show=function(id,v){var el=document.getElementById(id);if(el)el.style.display=v?'block':'none';};show('sug-campo-ref',tipo==='alterar_passo'||tipo==='adicionar_card');show('sug-campo-card',false);show('sug-campo-pos',tipo==='adicionar');show('sug-campo-tipo-passo',tipo!=='alterar_mensagem'&&tipo!=='');show('sug-campo-titulo',tipo!=='alterar_mensagem'&&tipo!=='');var lRef=document.getElementById('sug-label-ref');var lCont=document.getElementById('sug-content-label');if(lRef)lRef.textContent=tipo==='adicionar_card'?'Em qual passo adicionar o card?':'Qual passo deseja alterar?';if(lCont)lCont.textContent=tipo==='alterar_mensagem'?'Nova mensagem r\u00e1pida':'Descri\u00e7\u00e3o';if(tipo==='alterar_passo'||tipo==='adicionar_card'){populateSelect('sug-passo-ref',getStepTitles(_sugBem,_sugEtapa));document.getElementById('sug-passo-ref').onchange=onPassoRefChange;}if(tipo==='adicionar')populateSelect('sug-passo-pos',getStepTitles(_sugBem,_sugEtapa));document.getElementById('sug-card-ref').innerHTML='<option value="">Selecione o card</option>';}
+  function onPassoRefChange(){var tipo=document.getElementById('sug-tipo').value;var passo=document.getElementById('sug-passo-ref').value;var cc=document.getElementById('sug-campo-card');var lc=document.getElementById('sug-label-card');if(!passo){cc.style.display='none';return;}var labels=getCardLabels(_sugBem,_sugEtapa,passo);if(labels.length>0){populateSelect('sug-card-ref',labels);if(lc)lc.textContent=tipo==='adicionar_card'?'Ap\u00f3s qual card inserir? (opcional)':'Qual card deseja alterar?';cc.style.display='block';}else{cc.style.display='none';}}
+  function onSugTipoChange(){
+    var tipo=document.getElementById('sug-tipo').value;
+    var ta=document.getElementById('sug-text');
+    var lbl=document.querySelector('label[for="sug-text"]');
+    if(tipo==='alterar_mensagem'){
+      if(ta) ta.placeholder='Escreva aqui o novo texto da mensagem rápida sugerida...';
+    } else if(tipo==='adicionar'){
+      if(ta) ta.placeholder='Descreva o que precisa ser adicionado ao fluxo...';
+    } else {
+      if(ta) ta.placeholder='Descreva o que mudou ou precisa ser alterado...';
+    }
+  }
+
   function openSuggest(etapa,bem){
-    document.getElementById('sug-etapa').value=etapa;
-    document.getElementById('sug-bem').value=bem;
-    document.getElementById('sug-date').value=new Date().toISOString().split('T')[0];
-    document.getElementById('sug-channel').value='';
-    document.getElementById('sug-text').value='';
+    _sugEtapa=etapa;_sugBem=bem;
+    document.getElementById('sug-etapa').value=bem+' · '+etapa;
+    ['sug-channel','sug-tipo'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    ['sug-text','sug-justificativa'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    var ta=document.getElementById('sug-text');
+    if(ta) ta.placeholder='Descreva a mudança identificada...';
     document.getElementById('sug-error').style.display='none';
+    document.getElementById('sug-tipo').onchange=onSugTipoChange;
     document.getElementById('modal-suggest').classList.add('open');
   }
+
+  function submitSuggestion(){
+    var channel=document.getElementById('sug-channel').value;
+    var tipo=document.getElementById('sug-tipo').value;
+    var text=document.getElementById('sug-text').value.trim();
+    var just=document.getElementById('sug-justificativa').value.trim();
+    var errEl=document.getElementById('sug-error');
+    if(!channel||!tipo||!text){errEl.style.display='block';return;}
+    errEl.style.display='none';
+    var sug={id:Date.now(),etapa:_sugEtapa,bem:_sugBem,channel:channel,tipo:tipo,texto:text,justificativa:just,atendente:perfilAtivo?perfilAtivo.nome:'Atendente',submittedAt:new Date().toLocaleDateString('pt-BR')};
+    pending.push(sug);
+    storageSet('pv_pending',JSON.stringify(pending));
+    updateCount();
+    document.getElementById('modal-suggest').classList.remove('open');
+    document.getElementById('modal-confirm').classList.add('open');
+  }
+
+  function savePending(){storageSet('pv_pending',JSON.stringify(pending));}
+  function saveHist(){storageSet('pv_history',JSON.stringify(hist));}
+  function loadFromStorage(){storageGet('pv_pending').then(function(r){if(r&&r.value){try{pending=JSON.parse(r.value);}catch(e){}updateCount();}}).catch(function(){});storageGet('pv_history').then(function(r){if(r&&r.value){try{hist=JSON.parse(r.value);}catch(e){};}}).catch(function(){});storageGet('pv_data').then(function(r){if(r&&r.value){try{var saved=JSON.parse(r.value);Object.keys(saved).forEach(function(bem){if(!DATA[bem])return;saved[bem].forEach(function(se){var et=DATA[bem].find(function(e){return e.label===se.label;});if(et){if(se.arvore!==null)et.arvore=se.arvore;if(se.mensagemRapida!==null)et.mensagemRapida=se.mensagemRapida;if(se.passos&&se.passos.length)et.passos=se.passos;}});});}catch(e){}}}).catch(function(){});}
+  function clearAllData(){if(!confirm('Limpar todo o hist\u00f3rico e redefinir os fluxos para o padr\u00e3o?'))return;hist=[];pending=[];storageSet('pv_history',JSON.stringify([]));storageSet('pv_pending',JSON.stringify([]));storageSet('pv_data',JSON.stringify({}));updateCount();renderHistory();}
   function updateCount(){var el=document.getElementById('pending-count');if(el)el.textContent=pending.length;}
   function renderPending(){
     var list=document.getElementById('pending-list');
     if(!pending.length){list.innerHTML='<div class="empty">Nenhuma sugestão pendente</div>';return;}
     list.innerHTML='';
+    var tm={'adicionar':'Adicionar algo ao fluxo','alterar':'Alterar algo existente','alterar_mensagem':'Sugestão de mensagem rápida'};
     pending.forEach(function(s){
       var div=document.createElement('div');div.className='pcard';
-      div.innerHTML='<div class="pcard-hdr"><div class="pcard-meta">'+s.bem+' · por '+s.atendente+' · '+s.submittedAt+'</div><span class="ptag pending">Pendente</span></div><div class="pcard-etapa">'+s.etapa+'</div><div class="pcard-ch"><span class="icon">'+IC.sig+'</span>Canal: '+s.channel+' · '+fd(s.date)+'</div><div class="pcard-txt">'+s.texto+'</div><div class="pcard-acts"><button class="btn-ok" data-id="'+s.id+'">'+IC.check+' Aprovar</button><button class="btn-no" data-id="'+s.id+'">'+IC.x+' Rejeitar</button></div>';
+      div.innerHTML=
+        '<div class="pcard-hdr"><div class="pcard-meta">por '+s.atendente+' · '+s.submittedAt+'</div><span class="ptag pending">Pendente</span></div>'+
+        '<div style="margin-bottom:8px"><div style="font-family:var(--fd);font-size:15px;font-weight:700;color:var(--black);margin-bottom:4px">'+s.bem.toUpperCase()+' · '+s.etapa+'</div>'+
+        '<span style="background:#f2f2f2;border:1px solid #ddd;border-radius:4px;padding:2px 8px;font-size:11px;">'+(tm[s.tipo]||s.tipo)+'</span></div>'+
+        '<div class="pcard-ch"><span class="icon">'+IC.sig+'</span>Canal: '+s.channel+'</div>'+
+        (s.justificativa?'<div style="margin-top:8px;padding:8px 12px;background:#fff8ee;border:1px solid #e8a020;border-radius:6px;font-size:12px;color:#7a4500;"><strong>Justificativa:</strong> '+s.justificativa+'</div>':'')+
+        '<div class="pcard-txt" style="margin-top:8px">'+s.texto+'</div>'+
+        '<div class="pcard-acts"><button class="btn-ok" data-id="'+s.id+'">'+IC.check+' Revisar e aprovar</button><button class="btn-no" data-id="'+s.id+'">'+IC.x+' Rejeitar</button></div>';
       list.appendChild(div);
     });
-    list.querySelectorAll('.btn-ok').forEach(function(b){b.addEventListener('click',function(){approve(parseInt(b.dataset.id));});});
-    list.querySelectorAll('.btn-no').forEach(function(b){b.addEventListener('click',function(){reject(parseInt(b.dataset.id));});});
+    list.querySelectorAll('.btn-ok').forEach(function(b){b.addEventListener('click',function(){openEditModal(parseInt(b.dataset.id));});});
+    list.querySelectorAll('.btn-no').forEach(function(b){b.addEventListener('click',function(){rejectSug(parseInt(b.dataset.id));});});
   }
-  function approve(id){var s=pending.find(function(x){return x.id===id;});if(s){s.approvedAt=new Date().toLocaleDateString('pt-BR');hist.unshift(s);}pending=pending.filter(function(x){return x.id!==id;});renderPending();updateCount();}
-  function reject(id){pending=pending.filter(function(x){return x.id!==id;});renderPending();updateCount();}
-  function renderHistory(){
-    var list=document.getElementById('history-list');
-    if(!hist.length){list.innerHTML='<div class="empty">Nenhuma mudança registrada ainda.</div>';return;}
-    list.innerHTML='';
-    hist.forEach(function(s){var div=document.createElement('div');div.className='pcard';div.innerHTML='<div class="pcard-hdr"><div class="pcard-meta">'+s.bem+' · por '+s.atendente+' · aprovado em '+s.approvedAt+'</div><span class="ptag approved">Aprovado</span></div><div class="pcard-etapa">'+s.etapa+'</div><div class="pcard-ch"><span class="icon">'+IC.sig+'</span>Canal: '+s.channel+' · '+fd(s.date)+'</div><div class="pcard-txt">'+s.texto+'</div>';list.appendChild(div);});
-  }
-  function fd(d){if(!d)return'-';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
 
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('btn-login').addEventListener('click', doLogin);
-    document.getElementById('inp-pass').addEventListener('keydown', function(e){if(e.key==='Enter')doLogin();});
-    document.getElementById('btn-logout').addEventListener('click', doLogout);
-    document.getElementById('btn-inicial').addEventListener('click', function(){showFlow('inicial');});
-    document.getElementById('btn-aut').addEventListener('click', function(){showFlow('aut');});
-    document.getElementById('btn-imv').addEventListener('click', function(){showFlow('imv');});
-    document.getElementById('btn-history').addEventListener('click', showHistory);
-    document.getElementById('btn-pending').addEventListener('click', showPending);
-    document.getElementById('back-tree').addEventListener('click', function(){ go(window._treeBem||'inicial'); });
-    document.getElementById('back-inicial').addEventListener('click', showHome);
-    document.getElementById('back-aut').addEventListener('click', showHome);
-    document.getElementById('back-imv').addEventListener('click', showHome);
-    document.getElementById('back-pending').addEventListener('click', showHome);
-    document.getElementById('back-history').addEventListener('click', showHome);
-    document.getElementById('btn-cancel-suggest').addEventListener('click', function(){document.getElementById('modal-suggest').classList.remove('open');});
-    document.getElementById('btn-confirm-ok').addEventListener('click', function(){document.getElementById('modal-confirm').classList.remove('open');});
-    document.getElementById('btn-send-suggest').addEventListener('click', function(){
-      var date=document.getElementById('sug-date').value, channel=document.getElementById('sug-channel').value,
-          bem=document.getElementById('sug-bem').value, etapa=document.getElementById('sug-etapa').value,
-          text=document.getElementById('sug-text').value.trim();
-      if(!date||!channel||!bem||!etapa||!text){document.getElementById('sug-error').style.display='block';return;}
-      document.getElementById('sug-error').style.display='none';
-      pending.push({id:Date.now(),date:date,channel:channel,bem:bem,etapa:etapa,atendente:perfilAtivo?perfilAtivo.nome:'Atendente',texto:text,submittedAt:new Date().toLocaleDateString('pt-BR')});
-      document.getElementById('modal-suggest').classList.remove('open');
-      document.getElementById('modal-confirm').classList.add('open');
+    function toggleEditFields(){
+    var tipo=document.getElementById('edit-tipo-acao').value;
+    var show=function(id,v){var el=document.getElementById(id);if(el)el.style.display=v?'block':'none';};
+    show('edit-campo-passo-ref', tipo==='alterar_passo'||tipo==='adicionar_card');
+    show('edit-campo-card-ref',  false);
+    show('edit-campo-passo-pos', tipo==='adicionar');
+    show('edit-campo-tipo-passo',tipo!==''&&tipo!=='alterar_mensagem');
+    show('edit-campo-titulo',    tipo!==''&&tipo!=='alterar_mensagem');
+    // Label da textarea muda conforme tipo
+    var editTa=document.getElementById('edit-sug-text');
+    if(editTa) editTa.placeholder=tipo==='alterar_mensagem'?'Novo texto da mensagem rápida...':'Descrição aprovada do passo ou card';
+    var lRef=document.getElementById('edit-label-passo-ref');
+    if(lRef)lRef.textContent=tipo==='adicionar_card'?'Em qual passo adicionar o card?':'Qual passo deseja alterar?';
+    if(tipo==='alterar_passo'||tipo==='adicionar_card'){
+      populateSelect('edit-passo-ref',getStepTitles(_editBem,_editEtapa));
+      document.getElementById('edit-passo-ref').onchange=onEditPassoRefChange;
+    }
+    if(tipo==='adicionar'){
+      populateSelect('edit-passo-pos',getStepTitles(_editBem,_editEtapa));
+    }
+    document.getElementById('edit-card-ref').innerHTML='<option value="">Selecione o card</option>';
+  }
+
+  function onEditPassoRefChange(){
+    var tipo=document.getElementById('edit-tipo-acao').value;
+    var passo=document.getElementById('edit-passo-ref').value;
+    var cc=document.getElementById('edit-campo-card-ref');
+    var lc=document.getElementById('edit-label-card-ref');
+    if(!passo){cc.style.display='none';return;}
+    var labels=getCardLabels(_editBem,_editEtapa,passo);
+    if(labels.length>0){
+      populateSelect('edit-card-ref',labels);
+      if(lc)lc.textContent=tipo==='adicionar_card'?'Após qual card inserir? (opcional)':'Qual card deseja alterar?';
+      cc.style.display='block';
+    }else{cc.style.display='none';}
+  }
+
+  var _editBem='',_editEtapa='';
+
+  function openEditModal(id){
+    var s=pending.find(function(x){return x.id===id;});if(!s)return;
+    _editBem=s.bem;_editEtapa=s.etapa;
+    document.getElementById('edit-sug-id').value=id;
+    document.getElementById('edit-sug-text').value=s.texto;
+    document.getElementById('edit-sug-titulo').value='';
+    document.getElementById('edit-tipo-acao').value=s.tipo==='alterar_mensagem'?'alterar_mensagem':'';
+    document.getElementById('edit-tipo-passo').value='';
+    if(s.tipo==='alterar_mensagem') setTimeout(toggleEditFields,0);
+    // Contexto somente leitura
+    var tm={'adicionar':'Adicionar algo ao fluxo','alterar':'Alterar algo existente','alterar_mensagem':'Sugestão de mensagem rápida'};
+    var ctxTipo=document.getElementById('edit-context-tipo');
+    if(ctxTipo)ctxTipo.innerHTML='<span style="background:#f2f2f2;border:1px solid #ddd;border-radius:4px;padding:2px 8px;font-size:11px;margin-right:6px;">'+(tm[s.tipo]||s.tipo)+'</span><span style="font-size:11px;color:var(--gray2);">Canal: '+s.channel+'</span>';
+    var ctxDesc=document.getElementById('edit-context-desc');
+    if(ctxDesc)ctxDesc.textContent=s.texto;
+    var jb=document.getElementById('edit-justificativa-box');
+    var jt=document.getElementById('edit-justificativa-text');
+    if(jb&&jt){if(s.justificativa){jt.textContent=s.justificativa;jb.style.display='block';}else{jb.style.display='none';}}
+    // Reset campos do coordenador
+    ['edit-campo-passo-ref','edit-campo-card-ref','edit-campo-passo-pos','edit-campo-tipo-passo','edit-campo-titulo'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});
+    document.getElementById('edit-tipo-acao').onchange=toggleEditFields;
+    document.getElementById('modal-edit-suggest').classList.add('open');
+  }
+
+  function buildCardHTML(tp,texto,titulo){var bm={'Gatilho':{bg:'#fff8ee',c:'#7a4500',b:'#e8a020'},'A\u00e7\u00e3o':{bg:'#e6f6fd',c:'#0079aa',b:'#009BDB'},'Aguardar':{bg:'#eaf3de',c:'#2e5a0e',b:'#3b8d5a'},'Mensagem':{bg:'#f5f0ff',c:'#6a3cb5',b:'#b39ddb'}};var s=bm[tp]||bm['A\u00e7\u00e3o'];return '<div class="vc-step"><div class="vc-step-header"><span class="vc-badge" style="background:'+s.bg+';color:'+s.c+';border:1px solid '+s.b+'">'+tp+'</span><span class="vc-title">Passo 0 \u2014 '+(titulo||texto.substring(0,50))+'</span></div><div class="vc-body">'+texto+'</div></div>';}
+  function renumberSteps(arvore){var count=0,marker='<span class="vc-title">',result='',pos=0;while(true){var i=arvore.indexOf(marker,pos);if(i===-1){result+=arvore.slice(pos);break;}result+=arvore.slice(pos,i+marker.length);var ci=arvore.indexOf('</span>',i+marker.length);if(ci===-1){result+=arvore.slice(i+marker.length);break;}var raw=arvore.slice(i+marker.length,ci);var clean=raw.replace(/^Passo \d+ \u2014 /,'').replace(/^Passo \d+ - /,'');count++;result+='Passo '+count+' \u2014 '+clean;pos=ci;}return result;}
+  function applyToFlow(s){var key=s.bem.toLowerCase();if(!DATA[key])return;var etapaObj=DATA[key].find(function(e){return e.label===s.etapa;});if(!etapaObj||!etapaObj.arvore)return;var arvore=etapaObj.arvore;var sep='<div class="vc-connector">\u2193</div>';if(s.tipo==='adicionar'){var newCard=sep+buildCardHTML(s.tipoPasso,s.texto,s.titulo);var ins=arvore.lastIndexOf('</div>');if(s.passoPos){var pi=arvore.toLowerCase().indexOf(s.passoPos.toLowerCase());if(pi!==-1){var ns=arvore.indexOf(sep,pi);ins=ns!==-1?ns:ins;}}arvore=arvore.slice(0,ins)+newCard+arvore.slice(ins);etapaObj.arvore=renumberSteps(arvore);}else if(s.tipo==='adicionar_card'&&s.passoRef){var sm='vc-title">',sp=0,bS=-1,bE=-1;while(true){var si=arvore.indexOf(sm,sp);if(si===-1)break;var ts=si+sm.length,te=arvore.indexOf('<',ts);if(arvore.slice(ts,te).trim()===s.passoRef){bS=si;var ns2=arvore.indexOf('<div class="vc-step">',si+10);bE=ns2!==-1?ns2:arvore.lastIndexOf('</div>');break;}sp=te;}if(bS!==-1&&bE!==-1){var block=arvore.slice(bS,bE);var im={'Gatilho':'ic-amber','A\u00e7\u00e3o':'ic-blue','Aguardar':'ic-green','Mensagem':'ic-blue'};var ic2={'ic-amber':'\u25f7','ic-blue':'\u25b6','ic-green':'\u2713'}[im[s.tipoPasso]||'ic-blue']||'\u25b6';var newOp='<div class="vc-opcao"><div class="vc-icon '+(im[s.tipoPasso]||'ic-blue')+'">'+ic2+'</div><div><div class="vc-opcao-label">'+(s.titulo||s.tipoPasso)+'</div><div class="vc-opcao-desc">'+s.texto+'</div></div></div>';var insIdx=block.lastIndexOf('</div></div>')+12;if(s.cardRef){var ci3=block.indexOf(s.cardRef);if(ci3!==-1){var ae=block.indexOf('</div></div>',ci3)+12;insIdx=ae;}}block=block.slice(0,insIdx)+newOp+block.slice(insIdx);etapaObj.arvore=arvore.slice(0,bS)+block+arvore.slice(bE);}}else if(s.tipo==='alterar_passo'&&s.passoRef){var st=s.cardRef||s.passoRef;var ri=arvore.toLowerCase().indexOf(st.toLowerCase());if(ri!==-1){if(s.cardRef){var os=arvore.lastIndexOf('<div class="vc-opcao">',ri);var oe=arvore.indexOf('</div></div>',ri)+12;if(os!==-1&&oe!==-1){var im2={'Gatilho':'ic-amber','A\u00e7\u00e3o':'ic-blue','Aguardar':'ic-green','Mensagem':'ic-blue'};var ic3={'ic-amber':'\u25f7','ic-blue':'\u25b6','ic-green':'\u2713'}[im2[s.tipoPasso]||'ic-blue']||'\u25b6';etapaObj.arvore=arvore.slice(0,os)+'<div class="vc-opcao"><div class="vc-icon '+(im2[s.tipoPasso]||'ic-blue')+'">'+ic3+'</div><div><div class="vc-opcao-label">'+(s.titulo||s.cardRef)+'</div><div class="vc-opcao-desc">'+s.texto+'</div></div></div>'+arvore.slice(oe);}}else{var cs=arvore.lastIndexOf('<div class="vc-step">',ri);var ce=arvore.indexOf('</div>',ri),ce2=arvore.indexOf('</div>',ce+6)+6;if(cs!==-1&&ce2!==-1)etapaObj.arvore=renumberSteps(arvore.slice(0,cs)+buildCardHTML(s.tipoPasso||'A\u00e7\u00e3o',s.texto,s.titulo)+arvore.slice(ce2));}}}else if(s.tipo==='alterar_mensagem'){etapaObj.mensagemRapida=s.texto;}var cd={};Object.keys(DATA).forEach(function(bem){cd[bem]=DATA[bem].map(function(e){return{label:e.label,arvore:e.arvore||null,mensagemRapida:e.mensagemRapida||null,passos:e.passos||[]};});});storageSet('pv_data',JSON.stringify(cd));}
+  function approveSug(){
+    var id=parseInt(document.getElementById('edit-sug-id').value);
+    var text=document.getElementById('edit-sug-text').value.trim();
+    var titulo=document.getElementById('edit-sug-titulo').value.trim();
+    var tipoAcao=document.getElementById('edit-tipo-acao').value;
+    var tipoPasso=document.getElementById('edit-tipo-passo').value;
+    var passoRef=document.getElementById('edit-passo-ref').value;
+    var cardRef=document.getElementById('edit-card-ref').value;
+    var passoPos=document.getElementById('edit-passo-pos').value;
+    if(!text||!tipoAcao)return;
+    var s=pending.find(function(x){return x.id===id;});if(!s)return;
+    s.texto=text;s.titulo=titulo;
+    s.tipo=tipoAcao;s.tipoPasso=tipoPasso;
+    s.passoRef=passoRef;s.cardRef=cardRef;s.passoPos=passoPos;
+    s.approvedAt=new Date().toLocaleDateString('pt-BR');
+    applyToFlow(s);
+    hist.unshift(s);
+    pending=pending.filter(function(x){return x.id!==id;});
+    savePending();saveHist();updateCount();renderPending();
+    document.getElementById('modal-edit-suggest').classList.remove('open');
+    var fb=document.createElement('div');fb.style.cssText='position:fixed;bottom:24px;right:24px;background:#2e5a0e;color:#fff;padding:12px 20px;border-radius:8px;font-family:Inter,sans-serif;font-size:13px;font-weight:500;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.2)';
+    fb.textContent='✓ Sugestão aprovada e aplicada ao fluxo!';
+    document.body.appendChild(fb);setTimeout(function(){document.body.removeChild(fb);},3000);
+  }
+
+  function rejectSug(id){pending=pending.filter(function(x){return x.id!==id;});savePending();updateCount();renderPending();}
+
+  function undoSug(id){
+    var s=hist.find(function(x){return x.id===id;});
+    if(!s)return;
+    var key=s.bem.toLowerCase();
+    if(!DATA[key])return;
+    var etapaObj=DATA[key].find(function(e){return e.label===s.etapa;});
+    if(!etapaObj||!etapaObj.arvore)return;
+    var arvore=etapaObj.arvore;
+
+    if(s.tipo==='adicionar'){
+      // Remover o passo adicionado — localizar pelo titulo
+      var sep='<div class="vc-connector">\u2193</div>';
+      var titleToFind=(s.titulo||s.texto.substring(0,50)).toLowerCase();
+      var ti=arvore.toLowerCase().indexOf(titleToFind);
+      if(ti!==-1){
+        // Encontrar o vc-step que contém esse título
+        var stepStart=arvore.lastIndexOf('<div class="vc-step">',ti);
+        var stepEnd=arvore.indexOf('</div>\n  </div>',ti);
+        if(stepEnd===-1) stepEnd=arvore.indexOf('</div></div>',ti);
+        if(stepEnd!==-1) stepEnd=arvore.indexOf('</div>',stepEnd+6)+6;
+        // Remover também o conector anterior
+        var connBefore=arvore.lastIndexOf(sep,stepStart);
+        if(connBefore!==-1&&stepStart!==-1&&stepEnd!==-1){
+          etapaObj.arvore=renumberSteps(arvore.slice(0,connBefore)+arvore.slice(stepEnd));
+        }
+      }
+
+    }else if(s.tipo==='adicionar_card'&&s.passoRef){
+      // Remover o card adicionado — localizar pelo label
+      var labelToFind=(s.titulo||s.tipoPasso).toLowerCase();
+      var li=arvore.toLowerCase().indexOf(labelToFind);
+      if(li!==-1){
+        var opcaoStart=arvore.lastIndexOf('<div class="vc-opcao">',li);
+        var opcaoEnd=arvore.indexOf('</div></div>',li)+12;
+        if(opcaoStart!==-1&&opcaoEnd!==-1){
+          etapaObj.arvore=arvore.slice(0,opcaoStart)+arvore.slice(opcaoEnd);
+        }
+      }
+
+    }else if(s.tipo==='alterar_mensagem'){
+      // Não há como reverter mensagem automaticamente sem o valor anterior
+      // Apenas remove do histórico
+    }
+    // alterar_passo: sem valor anterior salvo, apenas remove do histórico
+
+    // Salvar DATA atualizado
+    var cd={};
+    Object.keys(DATA).forEach(function(bem){
+      cd[bem]=DATA[bem].map(function(e){
+        return{label:e.label,arvore:e.arvore||null,mensagemRapida:e.mensagemRapida||null,passos:e.passos||[]};
+      });
     });
-  });
+    storageSet('pv_data',JSON.stringify(cd));
 
-  var DATA = {
+    // Remover do histórico
+    hist=hist.filter(function(x){return x.id!==id;});
+    saveHist();
+    renderHistory();
+  }
+  function renderHistory(){var list=document.getElementById('history-list');if(!hist.length){list.innerHTML='<div class="empty">Nenhuma mudan\u00e7a registrada ainda.</div>';return;}list.innerHTML='';var tm={'adicionar':'Novo passo','adicionar_card':'Novo card em passo','alterar_passo':'Alterar passo','alterar_mensagem':'Alterar mensagem r\u00e1pida'};hist.forEach(function(s){var div=document.createElement('div');div.className='pcard';var canUndo=s.tipo==='adicionar'||s.tipo==='adicionar_card';div.innerHTML='<div class="pcard-hdr"><div class="pcard-meta">'+s.bem+' \u00b7 '+s.etapa+' \u00b7 por '+s.atendente+' \u00b7 aprovado em '+s.approvedAt+'</div><span class="ptag approved">Aprovado</span></div>'+'<span style="background:#f2f2f2;border:1px solid #ddd;border-radius:4px;padding:2px 8px;font-size:11px;margin-right:6px;">'+(tm[s.tipo]||s.tipo)+'</span>'+(s.tipoPasso?'<span style="background:#e6f6fd;border:1px solid #009BDB;border-radius:4px;padding:2px 8px;font-size:11px;color:#0079aa;">'+s.tipoPasso+'</span>':'')+'<div class="pcard-ch" style="margin-top:6px"><span class="icon">'+IC.sig+'</span>Canal: '+s.channel+'</div>'+'<div class="pcard-txt" style="margin-top:8px">'+s.texto+'</div>'+(canUndo?'<div class="pcard-acts"><button class="btn-no undo-btn" data-id="'+s.id+'">'+IC.x+' Desfazer</button></div>':'');list.appendChild(div);});list.querySelectorAll('.undo-btn').forEach(function(b){b.addEventListener('click',function(){undoSug(parseInt(b.dataset.id));});});}
+    function fd(d){if(!d)return'-';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+  document.addEventListener('DOMContentLoaded',function(){
+    loadFromStorage();
+    document.getElementById('btn-login').addEventListener('click',doLogin);
+    document.getElementById('inp-pass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+    document.getElementById('btn-logout').addEventListener('click',doLogout);
+    document.getElementById('btn-inicial').addEventListener('click',function(){showFlow('inicial');});
+    document.getElementById('btn-aut').addEventListener('click',function(){showFlow('aut');});
+    document.getElementById('btn-imv').addEventListener('click',function(){showFlow('imv');});
+    document.getElementById('btn-history').addEventListener('click',showHistory);
+    document.getElementById('btn-pending').addEventListener('click',showPending);
+    document.getElementById('back-tree').addEventListener('click',function(){go(window._treeBem||'inicial');});
+    document.getElementById('back-inicial').addEventListener('click',showHome);
+    document.getElementById('back-aut').addEventListener('click',showHome);
+    document.getElementById('back-imv').addEventListener('click',showHome);
+    document.getElementById('back-pending').addEventListener('click',showHome);
+    document.getElementById('back-history').addEventListener('click',showHome);
+    document.getElementById('btn-cancel-suggest').addEventListener('click',function(){document.getElementById('modal-suggest').classList.remove('open');});
+    document.getElementById('btn-confirm-ok').addEventListener('click',function(){document.getElementById('modal-confirm').classList.remove('open');});
+    document.getElementById('btn-send-suggest').addEventListener('click',submitSuggestion);
+    document.getElementById('btn-cancel-edit').addEventListener('click',function(){document.getElementById('modal-edit-suggest').classList.remove('open');});
+    document.getElementById('btn-approve-edit').addEventListener('click',approveSug);
+    var btnClear=document.getElementById('btn-clear-history');
+    if(btnClear)btnClear.addEventListener('click',clearAllData);
+  });
+    var DATA = {
     inicial: [
       { label: 'Boas-vindas', arvore: "<style>\n.vc-flow{font-family:Inter,sans-serif;padding:20px;max-width:860px;margin:0 auto;}\n.vc-step{border:1px solid #e0e0e0;border-radius:10px;padding:16px 20px;margin-bottom:8px;background:#fff;}\n.vc-step-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}\n.vc-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;text-transform:uppercase;letter-spacing:.06em;}\n.vc-badge-amber{background:#fff8ee;color:#7a4500;border:1px solid #e8a020;}\n.vc-badge-blue{background:#e6f6fd;color:#0079aa;border:1px solid #009BDB;}\n.vc-badge-green{background:#eaf3de;color:#2e5a0e;border:1px solid #3b8d5a;}\n.vc-badge-gray{background:#f2f2f2;color:#555;border:1px solid #ccc;}\n.vc-title{font-size:14px;font-weight:500;color:#111;}\n.vc-body{font-size:13px;color:#555;line-height:1.6;}\n.vc-connector{text-align:center;color:#bbb;font-size:20px;line-height:1;margin:4px 0;}\n.vc-copy-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:4px 10px;border:1px solid #009BDB;border-radius:12px;background:#e6f6fd;color:#0079aa;font-size:11px;font-weight:500;cursor:pointer;font-family:Inter,sans-serif;transition:background .15s;}\n.vc-copy-btn:hover{background:#c8eaf8;}\n</style>\n<div class=\"vc-flow\">\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-amber\">Gatilho</span>\n      <span class=\"vc-title\">Passo 1 \u2014 Primeiro contato</span>\n    </div>\n    <div class=\"vc-body\">Cliente entra em contato diretamente, ou um vendedor envia o contato de um cliente que deseja iniciar um processo de aquisi\u00e7\u00e3o.</div>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-blue\">A\u00e7\u00e3o</span>\n      <span class=\"vc-title\">Passo 2 \u2014 Enviar boas-vindas</span>\n    </div>\n    <div class=\"vc-body\">\n      Dar as boas-vindas ao cliente:<ul style=\"margin:6px 0 0 4px;padding-left:16px;line-height:1.8;\"><li>Apresentar o atendente respons\u00e1vel</li><li>Solicitar nome completo e grupo/cota</li><li>Informar que o canal \u00e9 exclusivo para WhatsApp</li></ul>\n    </div>\n    <button class=\"vc-copy-btn\" id=\"copy-icon\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>\n      Copiar mensagem de boas-vindas\n    </button>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-green\">Aguardar</span>\n      <span class=\"vc-title\">Passo 3 \u2014 Aguardar resposta</span>\n    </div>\n    <div class=\"vc-body\">Aguardar o cliente responder com o nome completo e o grupo/cota. Quando receber, avan\u00e7ar para a etapa de verifica\u00e7\u00e3o do cliente.</div>\n    <button id=\"btn-next-etapa\" style=\"margin-top:12px;width:100%;padding:11px;background:#009BDB;color:#fff;border:none;border-radius:8px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\"><path d=\"M5 12l14 0\"/><path d=\"M15 6l6 6l-6 6\"/></svg>\n      Avan\u00e7ar para Verifica\u00e7\u00e3o do cliente\n    </button>\n  </div>\n\n</div>", mensagemRapida: 'Olá! Tudo bem? 😊\n\nSou [Seu nome], da Porto Vale, corretor da Porto Seguro responsável pelo seu consórcio.\n\nPara iniciarmos seu atendimento, por favor, envie:\n* Nome completo do consorciado\n* Grupo e cota\n\nEstamos aqui para auxiliá-lo no processo de aquisição do bem após a contemplação do seu consórcio. Caso precise de alguma orientação, fique à vontade para nos informar os detalhes.\n\n⚠️ Importante:\nEste número é exclusivo para mensagens via WhatsApp; não realizamos atendimentos por chamadas de voz ou grupos.\n\nAgradecemos pela compreensão e estamos à disposição para ajudá-lo!' },
       { label: 'Verificação do cliente', arvore: "\n<style>\n.vc-flow{font-family:Inter,sans-serif;padding:20px;max-width:860px;margin:0 auto;}\n.vc-step{border:1px solid #e0e0e0;border-radius:10px;padding:16px 20px;margin-bottom:8px;background:#fff;}\n.vc-step-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}\n.vc-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;text-transform:uppercase;letter-spacing:.06em;}\n.vc-badge-amber{background:#fff8ee;color:#7a4500;border:1px solid #e8a020;}\n.vc-badge-blue{background:#e6f6fd;color:#0079aa;border:1px solid #009BDB;}\n.vc-badge-gray{background:#f2f2f2;color:#555;border:1px solid #ccc;}\n.vc-badge-green{background:#eaf3de;color:#2e5a0e;border:1px solid #3b8d5a;}\n.vc-title{font-size:14px;font-weight:500;color:#111;}\n.vc-body{font-size:13px;color:#555;line-height:1.6;}\n.vc-connector{text-align:center;color:#bbb;font-size:20px;line-height:1;margin:4px 0;}\n.vc-opcoes{display:flex;flex-direction:column;gap:8px;margin-top:8px;}\n.vc-opcao{border:1px solid #e0e0e0;border-radius:8px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px;background:#fafafa;}\n.vc-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;margin-top:1px;}\n.ic-red{background:#fff0f0;color:#a32d2d;}\n.ic-green{background:#eaf3de;color:#2e5a0e;}\n.ic-amber{background:#fff8ee;color:#7a4500;}\n.ic-blue{background:#e6f6fd;color:#0079aa;}\n.vc-opcao-label{font-size:13px;font-weight:500;color:#111;margin-bottom:4px;}\n.vc-opcao-desc{font-size:12px;color:#555;line-height:1.5;}\n.vc-prazo{font-size:11px;color:#888;margin-top:5px;font-style:italic;}\n.vc-loop{font-size:11px;color:#a32d2d;background:#fff0f0;border:1px solid #f09595;border-radius:6px;padding:5px 10px;margin-top:6px;display:flex;align-items:center;gap:6px;}\n.vc-copy-btn{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:4px 10px;border:1px solid #009BDB;border-radius:12px;background:#e6f6fd;color:#0079aa;font-size:11px;font-weight:500;cursor:pointer;font-family:Inter,sans-serif;transition:background .15s;}\n.vc-copy-btn:hover{background:#c8eaf8;}\n.vc-copy-btn svg{flex-shrink:0;}\n</style>\n<div class=\"vc-flow\">\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-amber\">Gatilho</span>\n      <span class=\"vc-title\">Passo 1 \u2014 In\u00edcio da verifica\u00e7\u00e3o</span>\n    </div>\n    <div class=\"vc-body\">Cliente enviou o nome completo e o grupo/cota do cons\u00f3rcio.</div>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-blue\">A\u00e7\u00e3o</span>\n      <span class=\"vc-title\">Passo 2 \u2014 Verificar no sistema</span>\n    </div>\n    <div class=\"vc-body\"><ul style=\"margin:4px 0 0 4px;padding-left:16px;line-height:1.8;\"><li>Abrir ticket de verifica\u00e7\u00e3o de cr\u00e9dito no Portal interno</li><li>Verificar a an\u00e1lise de cr\u00e9dito no chat da Central</li></ul><em style=\"color:#0079aa;font-size:12px;margin-top:4px;display:block;\">Aguardar retorno antes de prosseguir.</em></div>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-gray\">Decis\u00e3o</span>\n      <span class=\"vc-title\">Passo 3 \u2014 \u00c9 cliente da Porto Vale?</span>\n    </div>\n    <div class=\"vc-opcoes\">\n      <div class=\"vc-opcao\">\n        <div class=\"vc-icon ic-red\">\u2715</div>\n        <div>\n          <div class=\"vc-opcao-label\">N\u00e3o \u00e9 da Porto Vale</div>\n          <div class=\"vc-opcao-desc\">Enviar mensagem de redirecionamento para os canais da administradora. Encerrar o atendimento.</div>\n          <button class=\"vc-copy-btn\" id=\"copy-p1\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>Copiar mensagem</button>\n        </div>\n      </div>\n      <div class=\"vc-opcao\">\n        <div class=\"vc-icon ic-green\">\u2713</div>\n        <div>\n          <div class=\"vc-opcao-label\">Sim, \u00e9 da Porto Vale</div>\n          <div class=\"vc-opcao-desc\">Avan\u00e7ar para verificar o status da an\u00e1lise de cr\u00e9dito.</div>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-gray\">Decis\u00e3o</span>\n      <span class=\"vc-title\">Passo 4 \u2014 Status da an\u00e1lise de cr\u00e9dito?</span>\n    </div>\n    <div class=\"vc-opcoes\">\n      <div class=\"vc-opcao\">\n        <div class=\"vc-icon ic-amber\">\u25f7</div>\n        <div>\n          <div class=\"vc-opcao-label\">Contemplado por sorteio \u2014 an\u00e1lise em andamento</div>\n          <div class=\"vc-opcao-desc\"><ul style=\"margin:4px 0 0 4px;padding-left:16px;line-height:1.8;\"><li>Enviar mensagem para cliente contemplado por sorteio aguardando an\u00e1lise</li><li>Acompanhar o andamento via ticket</li></ul></div>\n          <button class=\"vc-copy-btn\" id=\"copy-p2\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>Copiar mensagem</button>\n          <div class=\"vc-prazo\">Prazo: 3 dias \u00fateis ap\u00f3s a contempla\u00e7\u00e3o.</div>\n        </div>\n      </div>\n      <div class=\"vc-opcao\">\n        <div class=\"vc-icon ic-amber\">\u25f7</div>\n        <div>\n          <div class=\"vc-opcao-label\">Contemplado por lance \u2014 an\u00e1lise em andamento</div>\n          <div class=\"vc-opcao-desc\"><ul style=\"margin:4px 0 0 4px;padding-left:16px;line-height:1.8;\"><li>Enviar mensagem para cliente contemplado por lance aguardando an\u00e1lise</li><li>Acompanhar o andamento via ticket</li></ul></div>\n          <button class=\"vc-copy-btn\" id=\"copy-p3\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>Copiar mensagem</button>\n          <div class=\"vc-prazo\">Prazo: 2 dias \u00fateis para baixa do lance + 3 dias para an\u00e1lise.</div>\n        </div>\n      </div>\n      <div class=\"vc-opcao\">\n        <div class=\"vc-icon ic-red\">\u2715</div>\n        <div>\n          <div class=\"vc-opcao-label\">An\u00e1lise negada</div>\n          <div class=\"vc-opcao-desc\"><ul style=\"margin:4px 0 0 4px;padding-left:16px;line-height:1.8;\"><li>Enviar mensagem de fiador ou rean\u00e1lise</li><li>Cliente escolhe: apresentar um fiador ou solicitar rean\u00e1lise em seu nome</li></ul></div>\n          <button class=\"vc-copy-btn\" id=\"copy-p5\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>Copiar mensagem</button>\n          <div class=\"vc-prazo\">Prazo: at\u00e9 3 dias \u00fateis para rean\u00e1lise ou an\u00e1lise do fiador.</div>\n          <div class=\"vc-loop\">&#8635; Se negado novamente \u2192 reenviar esta mensagem</div>\n        </div>\n      </div>\n      <div class=\"vc-opcao\">\n        <div class=\"vc-icon ic-green\">\u2713</div>\n        <div>\n          <div class=\"vc-opcao-label\">An\u00e1lise aprovada (sorteio ou lance)</div>\n          <div class=\"vc-opcao-desc\"><ul style=\"margin:4px 0 0 4px;padding-left:16px;line-height:1.8;\"><li>Finalizar o ticket aberto no Portal</li><li>Registrar a data de aprova\u00e7\u00e3o nas observa\u00e7\u00f5es da conversa com o cliente</li><li>Perguntar se o cliente deseja iniciar o processo</li><li>Enviar a mensagem de abertura de protocolo com os documentos complementares</li></ul></div>\n          <button class=\"vc-copy-btn\" id=\"copy-p4\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>Copiar mensagem</button>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-green\">Avan\u00e7ar</span>\n      <span class=\"vc-title\">Passo 5 \u2014 Abertura do processo</span>\n    </div>\n    <div class=\"vc-body\">Cliente aprovado e pronto para iniciar. Seguir para o fluxo de aquisi\u00e7\u00e3o correspondente.</div>\n    <button id=\"btn-next-etapa\" style=\"margin-top:12px;width:100%;padding:11px;background:#009BDB;color:#fff;border:none;border-radius:8px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\"><path d=\"M5 12l14 0\"/><path d=\"M15 6l6 6l-6 6\"/></svg>\n      Avan\u00e7ar para Abertura do processo\n    </button>\n  </div>\n\n</div>\n" },

@@ -11,8 +11,8 @@
 :root{--brand:#009BDB;--brand-dark:#0079aa;--brand-light:#f0faff;--brand-border:rgba(0,155,219,0.2);--bg:#fff;--bg2:#f8f8f8;--bg3:#f2f2f2;--black:#111;--gray1:#333;--gray2:#666;--gray3:#999;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);--success-bg:#eaf3de;--success-text:#2e5a0e;--success-border:rgba(46,90,14,0.2);--warning-bg:#fff8ee;--warning-text:#7a4500;--warning-border:rgba(122,69,0,0.2);--danger-bg:#fff0f0;--danger-text:#9b2020;--danger-border:rgba(155,32,32,0.2);--r-sm:6px;--r-md:8px;--r-lg:12px;--fd:"Barlow Condensed",sans-serif;--fb:"Inter",sans-serif;}
 *{box-sizing:border-box;margin:0;padding:0;}html,body{height:100%;}
 body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:16px;}
-.app{background:var(--bg);border-radius:var(--r-lg);border:1px solid var(--border2);width:100%;max-width:980px;min-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden;}
-.screen{display:none;flex:1;flex-direction:column;}.screen.active{display:flex;}
+.app{background:var(--bg);border-radius:var(--r-lg);border:1px solid var(--border2);width:100%;max-width:1200px;min-height:calc(100vh - 32px);height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden;}
+.screen{display:none;flex:1;flex-direction:column;min-height:0;}.screen.active{display:flex;flex:1;min-height:0;}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
 .icon{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;}
 .login-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;}
@@ -59,7 +59,7 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
 .acard-sub{font-size:12px;color:var(--gray2);margin-top:2px;}
 .abadge{margin-left:auto;background:var(--warning-bg);color:var(--warning-text);border:1px solid var(--warning-border);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;}
 .ftag{display:inline-flex;align-items:center;gap:6px;background:var(--brand-light);border-radius:var(--r-sm);padding:3px 10px;font-size:12px;color:var(--brand);font-weight:500;border:1px solid var(--brand-border);}
-.flow-body{flex:1;display:flex;overflow:hidden;}
+.flow-body{flex:1;display:flex;overflow:hidden;min-height:0;}
 .flow-map{flex:1;padding:22px;overflow-y:auto;border-right:1px solid var(--border2);}
 .fmap-title{font-size:11px;color:var(--brand);margin-bottom:16px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;}
 .etapa-row{display:flex;flex-direction:column;align-items:center;}
@@ -71,7 +71,7 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
 .enode.selected .elabel{color:var(--brand);}
 .earrow{width:1px;height:14px;background:var(--border2);margin:0 auto;}
 .earrow-h{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--border2);margin:0 auto;}
-.detail{width:420px;flex-shrink:0;padding:22px;overflow-y:auto;background:var(--bg2);}
+.detail{width:580px;flex-shrink:0;padding:16px;overflow-y:auto;background:var(--bg2);}
 .detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:12px;color:var(--gray3);font-size:13px;line-height:1.6;}
 .dtitle{font-family:var(--fd);font-size:20px;font-weight:700;color:var(--black);margin-bottom:4px;}
 .dtag{display:inline-flex;align-items:center;gap:4px;font-size:11px;background:var(--brand-light);color:var(--brand);border-radius:var(--r-sm);padding:3px 8px;margin-bottom:14px;font-weight:500;border:1px solid var(--brand-border);}
@@ -139,6 +139,34 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
 .btn-cancel{padding:10px 18px;border:1px solid var(--border2);border-radius:var(--r-md);background:none;font-size:13px;color:var(--gray2);cursor:pointer;font-family:var(--fb);}
 .btn-cancel:hover{background:var(--bg2);}
 @media(max-width:600px){body{padding:0;}.app{border-radius:0;min-height:100vh;}.flow-body{flex-direction:column;}.detail{width:100%;}.grid2{grid-template-columns:1fr;}}
+
+.copy-tooltip {
+  position:absolute;
+  background:#1a1a19;
+  color:#fff;
+  font-family:Inter,sans-serif;
+  font-size:11px;
+  font-weight:500;
+  padding:5px 10px;
+  border-radius:6px;
+  white-space:nowrap;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 0.15s;
+  z-index:200;
+}
+.copy-tooltip::after {
+  content:'';
+  position:absolute;
+  top:50%;
+  right:100%;
+  transform:translateY(-50%);
+  border:5px solid transparent;
+  border-right-color:#1a1a19;
+}
+.copy-tooltip.visible { opacity:1; }
+
+#tree-content svg { display: block; max-width: 100%; height: auto; }
 </style>
 </head>
 <body>
@@ -189,7 +217,7 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
         <div style="color:var(--brand);flex-shrink:0"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/></svg></div>
         <div>
           <div class="card-title" style="font-size:17px">Atendimento Inicial</div>
-          <div class="card-sub">5 etapas · Identificação e direcionamento</div>
+          <div class="card-sub">3 etapas · Identificação e direcionamento</div>
         </div>
         <div style="margin-left:auto;color:var(--gray3)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6l-6 6"/></svg></div>
       </div>
@@ -291,6 +319,23 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
   </div>
 </div>
 
+<!-- VISÃO DEDICADA DA ÁRVORE -->
+<div id="screen-tree" class="screen">
+  <div class="header">
+    <button class="btn-icon" id="back-tree">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l14 0"/><path d="M5 12l6 6"/><path d="M5 12l6 -6"/></svg>
+      Voltar
+    </button>
+    <div>
+      <div class="header-title" id="tree-title"></div>
+      <div class="header-sub" id="tree-sub"></div>
+    </div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:24px;background:var(--bg);">
+    <div id="tree-content"></div>
+  </div>
+</div>
+
 <!-- PENDÊNCIAS -->
 <div id="screen-pending" class="screen">
   <div class="header">
@@ -344,20 +389,12 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
 </div><!-- .app -->
 <script>
 (function() {
-  // ── CREDENCIAIS ──
   var USUARIOS = [
     { usuario: 'PortoVale@2026', senha: '1234', perfil: 'atendente',   nome: 'Atendente'   },
     { usuario: 'Coordenador',    senha: '1234', perfil: 'coordenador', nome: 'Coordenador' }
   ];
+  var perfilAtivo = null, currentBem = null, pending = [], hist = [];
 
-  var perfilAtivo = null;
-  var currentBem  = null;
-  var pending     = [];
-  var history     = [];
-  var sugEtapa    = '';
-  var sugBem      = '';
-
-  // ── ÍCONES ──
   var IC = {
     check: '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5l10 -10"/></svg>',
     x:     '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></svg>',
@@ -365,263 +402,316 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
     edit:  '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/><path d="M16 5l3 3"/></svg>',
     right: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6l-6 6"/></svg>',
     sig:   '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18l0 -3"/><path d="M10 18l0 -6"/><path d="M14 18l0 -9"/><path d="M18 18l0 -12"/></svg>',
-    msg:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/></svg>',
     iGatilho:     '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/></svg>',
     iAcao:        '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 8l-4 4l4 4"/><path d="M17 8l4 4l-4 4"/><path d="M14 4l-4 16"/></svg>',
     iVerificacao: '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5l10 -10"/></svg>',
     iMensagem:    '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/></svg>'
   };
 
-  // ── NAVEGAÇÃO ──
-  function go(id) {
-    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
-    document.getElementById('screen-' + id).classList.add('active');
-  }
+  function go(id) { document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');}); document.getElementById('screen-'+id).classList.add('active'); }
   function showHome()    { go('home'); updateCount(); }
-  function showFlow(bem) { currentBem = bem; go(bem); renderEtapas(bem); resetDetail(bem); }
+  function showFlow(bem) { currentBem=bem; go(bem); renderEtapas(bem); resetDetail(bem); }
   function showPending() { go('pending'); renderPending(); }
   function showHistory() { go('history'); renderHistory(); }
 
-  // ── LOGIN ──
   function doLogin() {
-    var u = document.getElementById('inp-user').value.trim();
-    var p = document.getElementById('inp-pass').value;
-    var found = null;
-    for (var i = 0; i < USUARIOS.length; i++) {
-      if (USUARIOS[i].usuario === u && USUARIOS[i].senha === p) { found = USUARIOS[i]; break; }
-    }
-    if (!found) {
-      document.getElementById('login-error').classList.add('visible');
-      return;
-    }
+    var u=document.getElementById('inp-user').value.trim(), p=document.getElementById('inp-pass').value, found=null;
+    for(var i=0;i<USUARIOS.length;i++){if(USUARIOS[i].usuario===u&&USUARIOS[i].senha===p){found=USUARIOS[i];break;}}
+    if(!found){document.getElementById('login-error').classList.add('visible');return;}
     document.getElementById('login-error').classList.remove('visible');
-    perfilAtivo = found;
-    document.getElementById('home-greeting').textContent = 'Olá, ' + found.nome;
-    var badge = document.getElementById('perfil-badge');
-    badge.textContent = found.perfil === 'coordenador' ? 'Coordenador' : 'Atendente';
-    badge.className = 'perfil-badge ' + found.perfil;
-    document.getElementById('btn-pending').style.display = found.perfil === 'coordenador' ? 'flex' : 'none';
+    perfilAtivo=found;
+    document.getElementById('home-greeting').textContent='Olá, '+found.nome;
+    var badge=document.getElementById('perfil-badge');
+    badge.textContent=found.perfil==='coordenador'?'Coordenador':'Atendente';
+    badge.className='perfil-badge '+found.perfil;
+    document.getElementById('btn-pending').style.display=found.perfil==='coordenador'?'flex':'none';
     showHome();
   }
+  function doLogout(){perfilAtivo=null;document.getElementById('inp-user').value='';document.getElementById('inp-pass').value='';go('login');}
 
-  function doLogout() {
-    perfilAtivo = null;
-    document.getElementById('inp-user').value = '';
-    document.getElementById('inp-pass').value = '';
-    go('login');
-  }
-
-  // ── ETAPAS ──
-  function renderEtapas(bem) {
-    var container = document.getElementById(bem + '-etapas');
-    container.innerHTML = '';
-    var etapas = DATA[bem];
-    for (var i = 0; i < etapas.length; i++) {
-      (function(idx) {
-        var node = document.createElement('div');
-        node.className = 'enode';
-        node.id = bem + '-node-' + idx;
-        node.innerHTML = '<div class="enum">' + (idx + 1) + '</div><div class="elabel">' + etapas[idx].label + '</div><span class="icon" style="color:var(--gray3)">' + IC.right + '</span>';
-        node.addEventListener('click', function() { selectEtapa(bem, idx); });
-        container.appendChild(node);
-        if (idx < etapas.length - 1) {
-          var a1 = document.createElement('div'); a1.className = 'earrow'; container.appendChild(a1);
-          var ah = document.createElement('div'); ah.className = 'earrow-h'; container.appendChild(ah);
-          var a2 = document.createElement('div'); a2.className = 'earrow'; container.appendChild(a2);
-        }
+  function renderEtapas(bem){
+    var c=document.getElementById(bem+'-etapas'); c.innerHTML='';
+    DATA[bem].forEach(function(e,i){
+      (function(idx){
+        var n=document.createElement('div'); n.className='enode'; n.id=bem+'-node-'+idx;
+        n.innerHTML='<div class="enum">'+(idx+1)+'</div><div class="elabel">'+DATA[bem][idx].label+'</div><span class="icon" style="color:var(--gray3)">'+IC.right+'</span>';
+        n.addEventListener('click',function(){selectEtapa(bem,idx);});
+        c.appendChild(n);
+        if(idx<DATA[bem].length-1){['earrow','earrow-h','earrow'].forEach(function(cl){var el=document.createElement('div');el.className=cl;c.appendChild(el);});}
       })(i);
-    }
+    });
+  }
+  function selectEtapa(bem,idx){
+    document.querySelectorAll('[id^="'+bem+'-node-"]').forEach(function(n){n.classList.remove('selected');});
+    document.getElementById(bem+'-node-'+idx).classList.add('selected');
+    renderDetail(bem,idx);
   }
 
-  function selectEtapa(bem, idx) {
-    document.querySelectorAll('[id^="' + bem + '-node-"]').forEach(function(n) { n.classList.remove('selected'); });
-    document.getElementById(bem + '-node-' + idx).classList.add('selected');
-    renderDetail(bem, idx);
-  }
-
-  var STEP_META = {
-    gatilho:     { label: 'Gatilho',      cls: 'gatilho',     icon: 'iGatilho'     },
-    acao:        { label: 'Ação',         cls: 'acao',        icon: 'iAcao'        },
-    verificacao: { label: 'Verificação',  cls: 'verificacao', icon: 'iVerificacao' },
-    mensagem:    { label: 'Mensagem',     cls: 'mensagem',    icon: 'iMensagem'    }
+  var STEP_META={
+    gatilho:{label:'Gatilho',cls:'gatilho',icon:'iGatilho'},
+    acao:{label:'Ação',cls:'acao',icon:'iAcao'},
+    verificacao:{label:'Verificação',cls:'verificacao',icon:'iVerificacao'},
+    mensagem:{label:'Mensagem',cls:'mensagem',icon:'iMensagem'}
   };
 
-  function renderDetail(bem, idx) {
+  function showTree(bem, idx) {
     var e = DATA[bem][idx];
-    var h = '<div class="dtitle">' + e.label + '</div>';
-    h += '<div class="dtag"><span class="icon">' + IC.check + '</span>Etapa ativa</div>';
-    h += '<div class="dsec" style="margin-top:4px">Passo a passo</div>';
-
-    if (e.passos && e.passos.length) {
-      h += '<div class="flow-steps">';
-      e.passos.forEach(function(passo, i) {
-        var meta = STEP_META[passo.tipo] || { label: passo.tipo, cls: 'acao', icon: 'iAcao' };
-        h += '<div class="fstep ' + meta.cls + '">';
-        h += '<div class="fstep-header"><div class="fstep-icon">' + IC[meta.icon] + '</div><span class="fstep-type">' + meta.label + '</span></div>';
-        h += '<div class="fstep-text">' + passo.texto + '</div>';
-        h += '</div>';
-        if (i < e.passos.length - 1) {
-          h += '<div class="fconnector"><div class="fconn-line"></div><div class="fconn-arrow"></div><div class="fconn-line"></div></div>';
+    document.getElementById('tree-title').textContent = e.label;
+    document.getElementById('tree-sub').textContent = 'Fluxo da etapa · clique nos botões para copiar mensagens';
+    var content = document.getElementById('tree-content');
+    content.innerHTML = e.arvore;
+    window._treeBem = bem;
+    go('tree');
+    // Listeners dos ícones de copiar
+    var copyIds = ['copy-p1','copy-p2','copy-p3','copy-p4','copy-p5'];
+    copyIds.forEach(function(cid, pi) {
+      var cel = document.getElementById(cid);
+      if (!cel) return;
+      var msgs = e.mensagensRapidas || [];
+      var msg = msgs[pi] || '';
+      cel.addEventListener('click', function() {
+        if (msg) {
+          copyMsgBtn(cel, msg);
+        } else {
+          cel.textContent = 'Mensagem não cadastrada ainda.';
+          setTimeout(function() {
+            cel.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copiar mensagem';
+          }, 2000);
         }
       });
-      h += '</div>';
+    });
+    // Botão avançar para próxima etapa
+    var btnNext = document.getElementById('btn-next-etapa');
+    if (btnNext) {
+      btnNext.addEventListener('click', function() {
+        var nextIdx = idx + 1;
+        if (nextIdx < DATA[bem].length) {
+          go(bem);
+          document.querySelectorAll('[id^="'+bem+'-node-"]').forEach(function(n){n.classList.remove('selected');});
+          var nextNode = document.getElementById(bem+'-node-'+nextIdx);
+          if (nextNode) { nextNode.classList.add('selected'); nextNode.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+          renderDetail(bem, nextIdx);
+        }
+      });
+    }
+  }
+
+  function showTooltip(el, msg) {
+    var tt = document.createElement('div');
+    tt.className = 'copy-tooltip';
+    tt.textContent = msg;
+    var container = document.getElementById('tree-content');
+    container.style.position = 'relative';
+    container.appendChild(tt);
+    var cr = el.getBoundingClientRect(), pr = container.getBoundingClientRect();
+    tt.style.top  = (cr.top  - pr.top  + cr.height/2 - 10) + 'px';
+    tt.style.left = (cr.right - pr.left + 10) + 'px';
+    requestAnimationFrame(function(){ tt.classList.add('visible'); });
+    setTimeout(function(){
+      tt.classList.remove('visible');
+      setTimeout(function(){ if(tt.parentNode) tt.parentNode.removeChild(tt); }, 200);
+    }, 2000);
+  }
+
+  function renderDetail(bem,idx){
+    var e=DATA[bem][idx];
+    var h='<div class="dtitle">'+e.label+'</div><div class="dtag"><span class="icon">'+IC.check+'</span>Etapa ativa</div>';
+    if(e.arvore && e.useTree){
+      h+='<div class="dsec" style="margin-top:4px">Fluxo da etapa</div>';
+      h+='<div style="margin-top:12px"><button id="btn-open-tree" style="width:100%;padding:12px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-family:Inter,sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4"/><path d="M21 3h-4"/><path d="M21 9V5a2 2 0 0 0-2-2"/><path d="M3 15v4a2 2 0 0 0 2 2h4"/><path d="M15 21h4a2 2 0 0 0 2-2v-4"/></svg> Ver fluxo completo da etapa</button></div>';
+    } else if(e.arvore) {
+      h+='<div class="dsec" style="margin-top:4px">Fluxo da etapa</div>';
+      h+='<div style="margin-top:8px">'+e.arvore+'</div>';
     } else {
-      h += '<div class="fstep-empty"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.4;display:block;margin:0 auto 8px"><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"/><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"/><path d="M9 12h6"/><path d="M9 16h4"/></svg>Nenhum passo cadastrado ainda.<br>Os passos aparecerão aqui em sequência.</div>';
+      h+='<div class="dsec" style="margin-top:4px">Passo a passo</div>';
+      if(e.passos&&e.passos.length){
+        h+='<div class="flow-steps">';
+        e.passos.forEach(function(passo,i){
+          var meta=STEP_META[passo.tipo]||{label:passo.tipo,cls:'acao',icon:'iAcao'};
+          h+='<div class="fstep '+meta.cls+'"><div class="fstep-header"><div class="fstep-icon">'+IC[meta.icon]+'</div><span class="fstep-type">'+meta.label+'</span></div><div class="fstep-text">'+passo.texto+'</div></div>';
+          if(i<e.passos.length-1){h+='<div class="fconnector"><div class="fconn-line"></div><div class="fconn-arrow"></div><div class="fconn-line"></div></div>';}
+        });
+        h+='</div>';
+      } else {
+        h+='<div class="fstep-empty">Nenhum passo cadastrado ainda.</div>';
+      }
+    }
+    h+='<button class="suggest-btn" id="btn-suggest-etapa"><span class="icon">'+IC.edit+'</span>Sugerir atualização</button>';
+    var detail=document.getElementById(bem+'-detail');
+    detail.innerHTML=h;
+    var btn=document.getElementById('btn-suggest-etapa');
+    if(btn){var el=e.label,bu=bem.toUpperCase();btn.addEventListener('click',function(){openSuggest(el,bu);});}
+    var btnTree=document.getElementById('btn-open-tree');
+    if(btnTree){(function(b,i){btnTree.addEventListener('click',function(){showTree(b,i);});})(bem,idx);}
+    if(e.mensagemRapida){
+      var ci=document.getElementById('copy-icon');
+      if(ci){
+        var msg=e.mensagemRapida;
+        ci.addEventListener('click',function(){
+          if(ci.tagName==='BUTTON'){copyMsgBtn(ci,msg);}
+          else{copyMsg(msg);}
+        });
+      }
+    }
+    var ciAp=document.getElementById('copy-icon-ap');
+    if(ciAp&&e.mensagemRapida){(function(b,m){b.addEventListener('click',function(){copyMsgBtn(b,m);});})(ciAp,e.mensagemRapida);}
+    var btnAut=document.getElementById('btn-flow-aut');
+    if(btnAut){btnAut.addEventListener('click',function(){showFlow('aut');});}
+    var btnImv=document.getElementById('btn-flow-imv');
+    if(btnImv){btnImv.addEventListener('click',function(){showFlow('imv');});}
+    var btnNext=document.getElementById('btn-next-etapa');
+    if(btnNext){
+      btnNext.addEventListener('click',function(){
+        var nextIdx=idx+1;
+        if(nextIdx<DATA[bem].length){
+          document.querySelectorAll('[id^="'+bem+'-node-"]').forEach(function(n){n.classList.remove('selected');});
+          var nextNode=document.getElementById(bem+'-node-'+nextIdx);
+          if(nextNode){nextNode.classList.add('selected');nextNode.scrollIntoView({behavior:'smooth',block:'nearest'});}
+          renderDetail(bem,nextIdx);
+        }
+      });
     }
 
-    h += '<button class="suggest-btn" id="btn-suggest-etapa"><span class="icon">' + IC.edit + '</span>Sugerir atualização</button>';
-    var detail = document.getElementById(bem + '-detail');
-    detail.innerHTML = h;
-    var btn = document.getElementById('btn-suggest-etapa');
-    if (btn) {
-      var etapaLabel = e.label;
-      var bemUp = bem.toUpperCase();
-      btn.addEventListener('click', function() { openSuggest(etapaLabel, bemUp); });
+  }
+  function resetDetail(bem){document.getElementById(bem+'-detail').innerHTML='<div class="detail-empty"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--brand);opacity:.5"><path d="M8 13v-7.5a1.5 1.5 0 0 1 3 0v6.5"/><path d="M11 5.5v-2a1.5 1.5 0 1 1 3 0v2"/><path d="M14 5.5a1.5 1.5 0 1 1 3 0v1.5"/><path d="M17 7.5a1.5 1.5 0 1 1 3 0v8.5a6 6 0 0 1 -6 6h-2a7 7 0 0 1 -7 -7v-1c0 -1 .5 -2 1.5 -2.5s1.5 -.5 2.5 -1c1 -.5 1 -1 1 -2"/></svg><span>Selecione uma etapa ao lado</span></div>';}
+
+  function copyMsgBtn(btn, msg) {
+    var txt = msg.replace(/\\n/g,'\n');
+    var original = btn.innerHTML;
+    function ok() {
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5l10-10"/></svg> Copiado!';
+      btn.style.background = '#eaf3de';
+      btn.style.borderColor = '#3b8d5a';
+      btn.style.color = '#2e5a0e';
+      setTimeout(function(){
+        btn.innerHTML = original;
+        btn.style.background = '#e6f6fd';
+        btn.style.borderColor = '#009BDB';
+        btn.style.color = '#0079aa';
+      }, 2500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(ok).catch(function(){ fallbackCopy(txt); ok(); });
+    } else { fallbackCopy(txt); ok(); }
+  }
+
+  function copyMsg(msg){
+    var ci=document.getElementById('copy-icon');
+    function showFeedback(){
+      if(!ci)return;
+      var rect=ci.querySelector('rect');
+      if(rect)rect.setAttribute('fill','#3b8d5a');
+      var svgEl=ci.closest('svg');
+      var container=svgEl?svgEl.parentElement:null;
+      if(container){
+        var tt=document.createElement('div');
+        tt.className='copy-tooltip';
+        tt.textContent='Mensagem copiada!';
+        container.style.position='relative';
+        container.appendChild(tt);
+        var ciRect=ci.getBoundingClientRect();
+        var ctRect=container.getBoundingClientRect();
+        tt.style.top=(ciRect.top-ctRect.top+(ciRect.height/2)-10)+'px';
+        tt.style.left=(ciRect.right-ctRect.left+10)+'px';
+        requestAnimationFrame(function(){ tt.classList.add('visible'); });
+        setTimeout(function(){
+          tt.classList.remove('visible');
+          setTimeout(function(){ if(tt.parentNode)tt.parentNode.removeChild(tt); },200);
+          if(rect)rect.setAttribute('fill','#009BDB');
+        },2500);
+      }
+    }
+    var txt=msg.replace(/\\n/g,'\n');
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(showFeedback).catch(function(){
+        fallbackCopy(txt);showFeedback();
+      });
+    } else {
+      fallbackCopy(txt);showFeedback();
     }
   }
-
-  function resetDetail(bem) {
-    document.getElementById(bem + '-detail').innerHTML = '<div class="detail-empty"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--brand);opacity:.5"><path d="M8 13v-7.5a1.5 1.5 0 0 1 3 0v6.5"/><path d="M11 5.5v-2a1.5 1.5 0 1 1 3 0v2"/><path d="M14 5.5a1.5 1.5 0 1 1 3 0v1.5"/><path d="M17 7.5a1.5 1.5 0 1 1 3 0v8.5a6 6 0 0 1 -6 6h-2a7 7 0 0 1 -7 -7v-1c0 -1 .5 -2 1.5 -2.5s1.5 -.5 2.5 -1c1 -.5 1 -1 1 -2"/></svg><span>Selecione uma etapa ao lado</span></div>';
+  function fallbackCopy(txt){
+    var ta=document.createElement('textarea');
+    ta.value=txt;
+    ta.style.cssText='position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+    document.body.appendChild(ta);
+    ta.focus();ta.select();
+    try{document.execCommand('copy');}catch(e){}
+    document.body.removeChild(ta);
   }
 
-  // ── SUGESTÕES ──
-  function openSuggest(etapa, bem) {
-    sugEtapa = etapa; sugBem = bem;
-    document.getElementById('sug-etapa').value = etapa;
-    document.getElementById('sug-bem').value = bem;
-    document.getElementById('sug-date').value = new Date().toISOString().split('T')[0];
-    document.getElementById('sug-channel').value = '';
-    document.getElementById('sug-text').value = '';
-    document.getElementById('sug-error').style.display = 'none';
+  function openSuggest(etapa,bem){
+    document.getElementById('sug-etapa').value=etapa;
+    document.getElementById('sug-bem').value=bem;
+    document.getElementById('sug-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('sug-channel').value='';
+    document.getElementById('sug-text').value='';
+    document.getElementById('sug-error').style.display='none';
     document.getElementById('modal-suggest').classList.add('open');
   }
-
-  function updateCount() {
-    var el = document.getElementById('pending-count');
-    if (el) el.textContent = pending.length;
-  }
-
-  function renderPending() {
-    var list = document.getElementById('pending-list');
-    if (!pending.length) {
-      list.innerHTML = '<div class="empty"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--brand);opacity:.4;display:block;margin:0 auto 12px"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M9 12l2 2l4 -4"/></svg>Nenhuma sugestão pendente</div>';
-      return;
-    }
-    list.innerHTML = '';
-    pending.forEach(function(s) {
-      var div = document.createElement('div');
-      div.className = 'pcard';
-      div.innerHTML = '<div class="pcard-hdr"><div class="pcard-meta">' + s.bem + ' · por ' + s.atendente + ' · ' + s.submittedAt + '</div><span class="ptag pending">Pendente</span></div><div class="pcard-etapa">' + s.etapa + '</div><div class="pcard-ch"><span class="icon">' + IC.sig + '</span>Canal: ' + s.channel + ' · ' + fd(s.date) + '</div><div class="pcard-txt">' + s.texto + '</div><div class="pcard-acts"><button class="btn-ok" data-id="' + s.id + '">' + IC.check + ' Aprovar</button><button class="btn-no" data-id="' + s.id + '">' + IC.x + ' Rejeitar</button></div>';
+  function updateCount(){var el=document.getElementById('pending-count');if(el)el.textContent=pending.length;}
+  function renderPending(){
+    var list=document.getElementById('pending-list');
+    if(!pending.length){list.innerHTML='<div class="empty">Nenhuma sugestão pendente</div>';return;}
+    list.innerHTML='';
+    pending.forEach(function(s){
+      var div=document.createElement('div');div.className='pcard';
+      div.innerHTML='<div class="pcard-hdr"><div class="pcard-meta">'+s.bem+' · por '+s.atendente+' · '+s.submittedAt+'</div><span class="ptag pending">Pendente</span></div><div class="pcard-etapa">'+s.etapa+'</div><div class="pcard-ch"><span class="icon">'+IC.sig+'</span>Canal: '+s.channel+' · '+fd(s.date)+'</div><div class="pcard-txt">'+s.texto+'</div><div class="pcard-acts"><button class="btn-ok" data-id="'+s.id+'">'+IC.check+' Aprovar</button><button class="btn-no" data-id="'+s.id+'">'+IC.x+' Rejeitar</button></div>';
       list.appendChild(div);
     });
-    list.querySelectorAll('.btn-ok').forEach(function(b) {
-      b.addEventListener('click', function() { approve(parseInt(b.dataset.id)); });
-    });
-    list.querySelectorAll('.btn-no').forEach(function(b) {
-      b.addEventListener('click', function() { reject(parseInt(b.dataset.id)); });
-    });
+    list.querySelectorAll('.btn-ok').forEach(function(b){b.addEventListener('click',function(){approve(parseInt(b.dataset.id));});});
+    list.querySelectorAll('.btn-no').forEach(function(b){b.addEventListener('click',function(){reject(parseInt(b.dataset.id));});});
   }
-
-  function approve(id) {
-    var s = pending.find(function(x) { return x.id === id; });
-    if (s) { s.approvedAt = new Date().toLocaleDateString('pt-BR'); history.unshift(s); }
-    pending = pending.filter(function(x) { return x.id !== id; });
-    renderPending(); updateCount();
+  function approve(id){var s=pending.find(function(x){return x.id===id;});if(s){s.approvedAt=new Date().toLocaleDateString('pt-BR');hist.unshift(s);}pending=pending.filter(function(x){return x.id!==id;});renderPending();updateCount();}
+  function reject(id){pending=pending.filter(function(x){return x.id!==id;});renderPending();updateCount();}
+  function renderHistory(){
+    var list=document.getElementById('history-list');
+    if(!hist.length){list.innerHTML='<div class="empty">Nenhuma mudança registrada ainda.</div>';return;}
+    list.innerHTML='';
+    hist.forEach(function(s){var div=document.createElement('div');div.className='pcard';div.innerHTML='<div class="pcard-hdr"><div class="pcard-meta">'+s.bem+' · por '+s.atendente+' · aprovado em '+s.approvedAt+'</div><span class="ptag approved">Aprovado</span></div><div class="pcard-etapa">'+s.etapa+'</div><div class="pcard-ch"><span class="icon">'+IC.sig+'</span>Canal: '+s.channel+' · '+fd(s.date)+'</div><div class="pcard-txt">'+s.texto+'</div>';list.appendChild(div);});
   }
-  function reject(id) {
-    pending = pending.filter(function(x) { return x.id !== id; });
-    renderPending(); updateCount();
-  }
+  function fd(d){if(!d)return'-';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
 
-  function renderHistory() {
-    var list = document.getElementById('history-list');
-    if (!history.length) {
-      list.innerHTML = '<div class="empty"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--brand);opacity:.4;display:block;margin:0 auto 12px"><path d="M12 8l0 4l2 2"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"/></svg>Nenhuma mudança registrada ainda.</div>';
-      return;
-    }
-    list.innerHTML = '';
-    history.forEach(function(s) {
-      var div = document.createElement('div');
-      div.className = 'pcard';
-      div.innerHTML = '<div class="pcard-hdr"><div class="pcard-meta">' + s.bem + ' · por ' + s.atendente + ' · aprovado em ' + s.approvedAt + '</div><span class="ptag approved">Aprovado</span></div><div class="pcard-etapa">' + s.etapa + '</div><div class="pcard-ch"><span class="icon">' + IC.sig + '</span>Canal: ' + s.channel + ' · ' + fd(s.date) + '</div><div class="pcard-txt">' + s.texto + '</div>';
-      list.appendChild(div);
-    });
-  }
-
-  function fd(d) { if (!d) return '—'; var p = d.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
-
-  // ── BIND DE EVENTOS ──
   document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btn-login').addEventListener('click', doLogin);
-    document.getElementById('inp-pass').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+    document.getElementById('inp-pass').addEventListener('keydown', function(e){if(e.key==='Enter')doLogin();});
     document.getElementById('btn-logout').addEventListener('click', doLogout);
-    document.getElementById('btn-inicial').addEventListener('click', function() { showFlow('inicial'); });
-    document.getElementById('btn-aut').addEventListener('click', function() { showFlow('aut'); });
-    document.getElementById('btn-imv').addEventListener('click', function() { showFlow('imv'); });
+    document.getElementById('btn-inicial').addEventListener('click', function(){showFlow('inicial');});
+    document.getElementById('btn-aut').addEventListener('click', function(){showFlow('aut');});
+    document.getElementById('btn-imv').addEventListener('click', function(){showFlow('imv');});
     document.getElementById('btn-history').addEventListener('click', showHistory);
     document.getElementById('btn-pending').addEventListener('click', showPending);
+    document.getElementById('back-tree').addEventListener('click', function(){ go(window._treeBem||'inicial'); });
     document.getElementById('back-inicial').addEventListener('click', showHome);
     document.getElementById('back-aut').addEventListener('click', showHome);
     document.getElementById('back-imv').addEventListener('click', showHome);
     document.getElementById('back-pending').addEventListener('click', showHome);
     document.getElementById('back-history').addEventListener('click', showHome);
-    document.getElementById('btn-cancel-suggest').addEventListener('click', function() { document.getElementById('modal-suggest').classList.remove('open'); });
-    document.getElementById('btn-confirm-ok').addEventListener('click', function() { document.getElementById('modal-confirm').classList.remove('open'); });
-    document.getElementById('btn-send-suggest').addEventListener('click', function() {
-      var date    = document.getElementById('sug-date').value;
-      var channel = document.getElementById('sug-channel').value;
-      var bem     = document.getElementById('sug-bem').value;
-      var etapa   = document.getElementById('sug-etapa').value;
-      var text    = document.getElementById('sug-text').value.trim();
-      if (!date || !channel || !bem || !etapa || !text) {
-        document.getElementById('sug-error').style.display = 'block'; return;
-      }
-      document.getElementById('sug-error').style.display = 'none';
-      pending.push({ id: Date.now(), date: date, channel: channel, bem: bem, etapa: etapa, atendente: perfilAtivo ? perfilAtivo.nome : 'Atendente', texto: text, submittedAt: new Date().toLocaleDateString('pt-BR') });
+    document.getElementById('btn-cancel-suggest').addEventListener('click', function(){document.getElementById('modal-suggest').classList.remove('open');});
+    document.getElementById('btn-confirm-ok').addEventListener('click', function(){document.getElementById('modal-confirm').classList.remove('open');});
+    document.getElementById('btn-send-suggest').addEventListener('click', function(){
+      var date=document.getElementById('sug-date').value, channel=document.getElementById('sug-channel').value,
+          bem=document.getElementById('sug-bem').value, etapa=document.getElementById('sug-etapa').value,
+          text=document.getElementById('sug-text').value.trim();
+      if(!date||!channel||!bem||!etapa||!text){document.getElementById('sug-error').style.display='block';return;}
+      document.getElementById('sug-error').style.display='none';
+      pending.push({id:Date.now(),date:date,channel:channel,bem:bem,etapa:etapa,atendente:perfilAtivo?perfilAtivo.nome:'Atendente',texto:text,submittedAt:new Date().toLocaleDateString('pt-BR')});
       document.getElementById('modal-suggest').classList.remove('open');
       document.getElementById('modal-confirm').classList.add('open');
     });
   });
 
-  // ── DADOS ──
   var DATA = {
     inicial: [
-      { label: 'Boas-vindas', passos: [
-        { tipo: 'gatilho',     texto: 'Cliente entra em contato diretamente, ou um vendedor envia o contato de um cliente que deseja iniciar um processo de aquisição.' },
-        { tipo: 'mensagem',    texto: 'Enviar mensagem rápida de <strong>Boas-vindas</strong>: apresenta o atendente, dá as boas-vindas e solicita duas informações: (1) nome completo do cliente e (2) grupo e cota do consórcio.' }
-      ]},
-      { label: 'Verificação do cliente', passos: [
-        { tipo: 'gatilho',     texto: 'Cliente responde com nome completo e grupo/cota.' },
-        { tipo: 'acao',        texto: 'Com o grupo e cota em mãos, verificar no sistema se o cliente pertence à corretora e qual é o status atual do crédito.' },
-        { tipo: 'verificacao', texto: 'O cliente é da nossa corretora?' },
-        { tipo: 'mensagem',    texto: '<strong>Se NÃO:</strong> Enviar mensagem rápida de <strong>Cliente não identificado</strong>, informando que não é possível prestar atendimento e compartilhando os canais oficiais da administradora. Encerrar o atendimento.' }
-      ]},
-      { label: 'Status do crédito', passos: [
-        { tipo: 'gatilho',     texto: 'Cliente confirmado como pertencente à corretora. Verificar o status do crédito no sistema.' },
-        { tipo: 'verificacao', texto: 'Qual é o status do crédito do cliente?' },
-        { tipo: 'mensagem',    texto: '<strong>Lance pendente:</strong> Enviar mensagem rápida de <strong>Aguardando baixa do lance</strong>, informando que o pagamento está sendo processado e o prazo de análise de crédito.' },
-        { tipo: 'mensagem',    texto: '<strong>Sorteio pendente:</strong> Enviar mensagem rápida de <strong>Aguardando análise de crédito</strong>, informando o prazo específico para contemplados por sorteio.' },
-        { tipo: 'mensagem',    texto: '<strong>Análise negada:</strong> Informar ao cliente que a análise de crédito foi negada e apresentar as duas opções disponíveis: (1) inclusão de fiador ou (2) reanálise de crédito com envio de documentação de comprovação de renda.' }
-      ]},
-      { label: 'Análise negada', passos: [
-        { tipo: 'gatilho',     texto: 'Cliente opta por fiador ou reanálise de crédito após análise negada.' },
-        { tipo: 'acao',        texto: 'Orientar o cliente a enviar as documentações necessárias diretamente para a administradora conforme a opção escolhida (fiador ou comprovação de renda).' },
-        { tipo: 'verificacao', texto: 'Aguardar o prazo de reanálise da administradora. Acompanhar o sistema para verificar atualização do status do crédito.' },
-        { tipo: 'mensagem',    texto: 'Quando o resultado da reanálise estiver disponível, retornar ao cliente com o novo status. Se aprovado, seguir para abertura do processo de aquisição.' }
-      ]},
-      { label: 'Abertura do processo', passos: [
-        { tipo: 'gatilho',     texto: 'Crédito aprovado e confirmado no sistema — cliente pronto para iniciar o processo de aquisição.' },
-        { tipo: 'verificacao', texto: 'Identificar o tipo de bem da cota do cliente: Automóvel (AUT) ou Imóvel (IMV).' },
-        { tipo: 'mensagem',    texto: '<strong>Automóvel:</strong> Enviar mensagem rápida de <strong>Abertura de processo AUT</strong>, com as instruções iniciais do processo de aquisição de automóvel.' },
-        { tipo: 'mensagem',    texto: '<strong>Imóvel:</strong> Enviar mensagem rápida de <strong>Abertura de processo IMV</strong>, com as instruções iniciais do processo de aquisição de imóvel.' },
-        { tipo: 'acao',        texto: 'Registrar o início do processo no sistema e encaminhar o cliente para o fluxo correspondente (AUT ou IMV).' }
-      ]}
+      { label: 'Boas-vindas', arvore: "<style>\n.vc-flow{font-family:Inter,sans-serif;padding:20px;max-width:860px;margin:0 auto;}\n.vc-step{border:1px solid #e0e0e0;border-radius:10px;padding:16px 20px;margin-bottom:8px;background:#fff;}\n.vc-step-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}\n.vc-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;text-transform:uppercase;letter-spacing:.06em;}\n.vc-badge-amber{background:#fff8ee;color:#7a4500;border:1px solid #e8a020;}\n.vc-badge-blue{background:#e6f6fd;color:#0079aa;border:1px solid #009BDB;}\n.vc-badge-green{background:#eaf3de;color:#2e5a0e;border:1px solid #3b8d5a;}\n.vc-badge-gray{background:#f2f2f2;color:#555;border:1px solid #ccc;}\n.vc-title{font-size:14px;font-weight:500;color:#111;}\n.vc-body{font-size:13px;color:#555;line-height:1.6;}\n.vc-connector{text-align:center;color:#bbb;font-size:20px;line-height:1;margin:4px 0;}\n.vc-copy-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:4px 10px;border:1px solid #009BDB;border-radius:12px;background:#e6f6fd;color:#0079aa;font-size:11px;font-weight:500;cursor:pointer;font-family:Inter,sans-serif;transition:background .15s;}\n.vc-copy-btn:hover{background:#c8eaf8;}\n</style>\n<div class=\"vc-flow\">\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-amber\">Gatilho</span>\n      <span class=\"vc-title\">Passo 1 \u2014 Primeiro contato</span>\n    </div>\n    <div class=\"vc-body\">Cliente entra em contato diretamente, ou um vendedor envia o contato de um cliente que deseja iniciar um processo de aquisi\u00e7\u00e3o.</div>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-blue\">A\u00e7\u00e3o</span>\n      <span class=\"vc-title\">Passo 2 \u2014 Enviar boas-vindas</span>\n    </div>\n    <div class=\"vc-body\">\n      Dar as boas-vindas ao cliente:<ul style=\"margin:6px 0 0 4px;padding-left:16px;line-height:1.8;\"><li>Apresentar o atendente respons\u00e1vel</li><li>Solicitar nome completo e grupo/cota</li><li>Informar que o canal \u00e9 exclusivo para WhatsApp</li></ul>\n    </div>\n    <button class=\"vc-copy-btn\" id=\"copy-icon\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>\n      Copiar mensagem de boas-vindas\n    </button>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-green\">Aguardar</span>\n      <span class=\"vc-title\">Passo 3 \u2014 Aguardar resposta</span>\n    </div>\n    <div class=\"vc-body\">Aguardar o cliente responder com o nome completo e o grupo/cota. Quando receber, avan\u00e7ar para a etapa de verifica\u00e7\u00e3o do cliente.</div>\n    <button id=\"btn-next-etapa\" style=\"margin-top:12px;width:100%;padding:11px;background:#009BDB;color:#fff;border:none;border-radius:8px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\"><path d=\"M5 12l14 0\"/><path d=\"M15 6l6 6l-6 6\"/></svg>\n      Avan\u00e7ar para Verifica\u00e7\u00e3o do cliente\n    </button>\n  </div>\n\n</div>", mensagemRapida: 'Olá! Tudo bem? 😊\n\nSou [Seu nome], da Porto Vale, corretor da Porto Seguro responsável pelo seu consórcio.\n\nPara iniciarmos seu atendimento, por favor, envie:\n* Nome completo do consorciado\n* Grupo e cota\n\nEstamos aqui para auxiliá-lo no processo de aquisição do bem após a contemplação do seu consórcio. Caso precise de alguma orientação, fique à vontade para nos informar os detalhes.\n\n⚠️ Importante:\nEste número é exclusivo para mensagens via WhatsApp; não realizamos atendimentos por chamadas de voz ou grupos.\n\nAgradecemos pela compreensão e estamos à disposição para ajudá-lo!' },
+      { label: 'Verificação do cliente', arvore: "\n<style>\n.vc-flow{font-family:Inter,sans-serif;padding:20px;max-width:860px;margin:0 auto;}\n.vc-step{border:1px solid #e0e0e0;border-radius:10px;padding:16px 20px;margin-bottom:8px;background:#fff;}\n.vc-step-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}\n.vc-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;text-transform:uppercase;letter-spacing:.06em;}\n.vc-badge-amber{background:#fff8ee;color:#7a4500;border:1px solid #e8a020;}\n.vc-badge-blue{background:#e6f6fd;color:#0079aa;border:1px solid #009BDB;}\n.vc-badge-gray{background:#f2f2f2;color:#555;border:1px solid #ccc;}\n.vc-badge-green{background:#eaf3de;color:#2e5a0e;border:1px solid #3b8d5a;}\n.vc-title{font-size:14px;font-weight:500;color:#111;}\n.vc-body{font-size:13px;color:#555;line-height:1.6;}\n.vc-connector{text-align:center;color:#bbb;font-size:20px;line-height:1;margin:4px 0;}\n.vc-opcoes{display:flex;flex-direction:column;gap:8px;margin-top:8px;}\n.vc-opcao{border:1px solid #e0e0e0;border-radius:8px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px;background:#fafafa;}\n.vc-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;margin-top:1px;}\n.ic-red{background:#fff0f0;color:#a32d2d;}\n.ic-green{background:#eaf3de;color:#2e5a0e;}\n.ic-amber{background:#fff8ee;color:#7a4500;}\n.ic-blue{background:#e6f6fd;color:#0079aa;}\n.vc-opcao-label{font-size:13px;font-weight:500;color:#111;margin-bottom:4px;}\n.vc-opcao-desc{font-size:12px;color:#555;line-height:1.5;}\n.vc-prazo{font-size:11px;color:#888;margin-top:5px;font-style:italic;}\n.vc-loop{font-size:11px;color:#a32d2d;background:#fff0f0;border:1px solid #f09595;border-radius:6px;padding:5px 10px;margin-top:6px;display:flex;align-items:center;gap:6px;}\n.vc-copy-btn{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:4px 10px;border:1px solid #009BDB;border-radius:12px;background:#e6f6fd;color:#0079aa;font-size:11px;font-weight:500;cursor:pointer;font-family:Inter,sans-serif;transition:background .15s;}\n.vc-copy-btn:hover{background:#c8eaf8;}\n.vc-copy-btn svg{flex-shrink:0;}\n</style>\n<div class=\"vc-flow\">\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-amber\">Gatilho</span>\n      <span class=\"vc-title\">Passo 1 \u2014 In\u00edcio da verifica\u00e7\u00e3o</span>\n    </div>\n    <div class=\"vc-body\">Cliente enviou o nome completo e o grupo/cota do cons\u00f3rcio.</div>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-blue\">A\u00e7\u00e3o</span>\n      <span class=\"vc-title\">Passo 2 \u2014 Verificar no sistema</span>\n    </div>\n    <div class=\"vc-body\"><ul style=\"margin:4px 0 0 4px;padding-left:16px;line-height:1.8;\"><li>Abrir ticket de verifica\u00e7\u00e3o de cr\u00e9dito no Portal interno</li><li>Verificar a an\u00e1lise de cr\u00e9dito no chat da Central</li></ul><em style=\"color:#0079aa;font-size:12px;margin-top:4px;display:block;\">Aguardar retorno antes de prosseguir.</em></div>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-gray\">Decis\u00e3o</span>\n      <span class=\"vc-title\">Passo 3 \u2014 \u00c9 cliente da Porto Vale?</span>\n    </div>\n    <div class=\"vc-opcoes\">\n      <div class=\"vc-opcao\">\n        <div class=\"vc-icon ic-red\">\u2715</div>\n        <div>\n          <div class=\"vc-opcao-label\">N\u00e3o \u00e9 da Porto Vale</div>\n          <div class=\"vc-opcao-desc\">Enviar mensagem de redirecionamento para os canais da administradora. Encerrar o atendimento.</div>\n          <button class=\"vc-copy-btn\" id=\"copy-p1\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>Copiar mensagem</button>\n        </div>\n      </div>\n      <div class=\"vc-opcao\">\n        <div class=\"vc-icon ic-green\">\u2713</div>\n        <div>\n          <div class=\"vc-opcao-label\">Sim, \u00e9 da Porto Vale</div>\n          <div class=\"vc-opcao-desc\">Avan\u00e7ar para verificar o status da an\u00e1lise de cr\u00e9dito.</div>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-gray\">Decis\u00e3o</span>\n      <span class=\"vc-title\">Passo 4 \u2014 Status da an\u00e1lise de cr\u00e9dito?</span>\n    </div>\n    <div class=\"vc-opcoes\">\n      <div class=\"vc-opcao\">\n        <div class=\"vc-icon ic-amber\">\u25f7</div>\n        <div>\n          <div class=\"vc-opcao-label\">Contemplado por sorteio \u2014 an\u00e1lise em andamento</div>\n          <div class=\"vc-opcao-desc\"><ul style=\"margin:4px 0 0 4px;padding-left:16px;line-height:1.8;\"><li>Enviar mensagem para cliente contemplado por sorteio aguardando an\u00e1lise</li><li>Acompanhar o andamento via ticket</li></ul></div>\n          <button class=\"vc-copy-btn\" id=\"copy-p2\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>Copiar mensagem</button>\n          <div class=\"vc-prazo\">Prazo: 3 dias \u00fateis ap\u00f3s a contempla\u00e7\u00e3o.</div>\n        </div>\n      </div>\n      <div class=\"vc-opcao\">\n        <div class=\"vc-icon ic-amber\">\u25f7</div>\n        <div>\n          <div class=\"vc-opcao-label\">Contemplado por lance \u2014 an\u00e1lise em andamento</div>\n          <div class=\"vc-opcao-desc\"><ul style=\"margin:4px 0 0 4px;padding-left:16px;line-height:1.8;\"><li>Enviar mensagem para cliente contemplado por lance aguardando an\u00e1lise</li><li>Acompanhar o andamento via ticket</li></ul></div>\n          <button class=\"vc-copy-btn\" id=\"copy-p3\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>Copiar mensagem</button>\n          <div class=\"vc-prazo\">Prazo: 2 dias \u00fateis para baixa do lance + 3 dias para an\u00e1lise.</div>\n        </div>\n      </div>\n      <div class=\"vc-opcao\">\n        <div class=\"vc-icon ic-red\">\u2715</div>\n        <div>\n          <div class=\"vc-opcao-label\">An\u00e1lise negada</div>\n          <div class=\"vc-opcao-desc\"><ul style=\"margin:4px 0 0 4px;padding-left:16px;line-height:1.8;\"><li>Enviar mensagem de fiador ou rean\u00e1lise</li><li>Cliente escolhe: apresentar um fiador ou solicitar rean\u00e1lise em seu nome</li></ul></div>\n          <button class=\"vc-copy-btn\" id=\"copy-p5\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>Copiar mensagem</button>\n          <div class=\"vc-prazo\">Prazo: at\u00e9 3 dias \u00fateis para rean\u00e1lise ou an\u00e1lise do fiador.</div>\n          <div class=\"vc-loop\">&#8635; Se negado novamente \u2192 reenviar esta mensagem</div>\n        </div>\n      </div>\n      <div class=\"vc-opcao\">\n        <div class=\"vc-icon ic-green\">\u2713</div>\n        <div>\n          <div class=\"vc-opcao-label\">An\u00e1lise aprovada (sorteio ou lance)</div>\n          <div class=\"vc-opcao-desc\"><ul style=\"margin:4px 0 0 4px;padding-left:16px;line-height:1.8;\"><li>Finalizar o ticket aberto no Portal</li><li>Registrar a data de aprova\u00e7\u00e3o nas observa\u00e7\u00f5es da conversa com o cliente</li><li>Perguntar se o cliente deseja iniciar o processo</li><li>Enviar a mensagem de abertura de protocolo com os documentos complementares</li></ul></div>\n          <button class=\"vc-copy-btn\" id=\"copy-p4\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>Copiar mensagem</button>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-green\">Avan\u00e7ar</span>\n      <span class=\"vc-title\">Passo 5 \u2014 Abertura do processo</span>\n    </div>\n    <div class=\"vc-body\">Cliente aprovado e pronto para iniciar. Seguir para o fluxo de aquisi\u00e7\u00e3o correspondente.</div>\n    <button id=\"btn-next-etapa\" style=\"margin-top:12px;width:100%;padding:11px;background:#009BDB;color:#fff;border:none;border-radius:8px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\"><path d=\"M5 12l14 0\"/><path d=\"M15 6l6 6l-6 6\"/></svg>\n      Avan\u00e7ar para Abertura do processo\n    </button>\n  </div>\n\n</div>\n" },
+      { label: 'Abertura do processo', arvore: "<style>\n.vc-flow{font-family:Inter,sans-serif;padding:20px;max-width:860px;margin:0 auto;}\n.vc-step{border:1px solid #e0e0e0;border-radius:10px;padding:16px 20px;margin-bottom:8px;background:#fff;}\n.vc-step-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}\n.vc-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;text-transform:uppercase;letter-spacing:.06em;}\n.vc-badge-amber{background:#fff8ee;color:#7a4500;border:1px solid #e8a020;}\n.vc-badge-blue{background:#e6f6fd;color:#0079aa;border:1px solid #009BDB;}\n.vc-badge-green{background:#eaf3de;color:#2e5a0e;border:1px solid #3b8d5a;}\n.vc-badge-gray{background:#f2f2f2;color:#555;border:1px solid #ccc;}\n.vc-title{font-size:14px;font-weight:500;color:#111;}\n.vc-body{font-size:13px;color:#555;line-height:1.6;}\n.vc-connector{text-align:center;color:#bbb;font-size:20px;line-height:1;margin:4px 0;}\n.vc-copy-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:4px 10px;border:1px solid #009BDB;border-radius:12px;background:#e6f6fd;color:#0079aa;font-size:11px;font-weight:500;cursor:pointer;font-family:Inter,sans-serif;transition:background .15s;}\n.vc-copy-btn:hover{background:#c8eaf8;}\n.vc-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px;}\n.vc-table td{padding:5px 8px;border:1px solid #e8e8e8;color:#444;vertical-align:top;}\n.vc-table td:first-child{font-weight:500;color:#111;background:#f8f8f8;white-space:nowrap;width:44%;}\n.vc-nav-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}\n.vc-nav-btn{padding:12px;border:none;border-radius:8px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s;}\n.vc-nav-btn:hover{opacity:.85;}\n.btn-aut{background:#009BDB;color:#fff;}\n.btn-imv{background:#2e5a0e;color:#fff;}\n</style>\n<div class=\"vc-flow\">\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-amber\">Gatilho</span>\n      <span class=\"vc-title\">Passo 1 \u2014 Cliente abriu o protocolo</span>\n    </div>\n    <div class=\"vc-body\">Ap\u00f3s o envio das orienta\u00e7\u00f5es de abertura, o cliente abriu o protocolo junto \u00e0 Porto Seguro e enviou o n\u00famero do protocolo.</div>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-blue\">A\u00e7\u00e3o</span>\n      <span class=\"vc-title\">Passo 2 \u2014 Abrir protocolo no COL</span>\n    </div>\n    <div class=\"vc-body\">Abrir o protocolo no COL (sistema da Porto Seguro) e verificar em qual susep o cliente est\u00e1 cadastrado.</div>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-blue\">A\u00e7\u00e3o</span>\n      <span class=\"vc-title\">Passo 3 \u2014 Abrir protocolo no Syscontrol</span>\n    </div>\n    <div class=\"vc-body\">Abrir o protocolo de acompanhamento no sistema interno (Syscontrol), conferindo se as informa\u00e7\u00f5es batem com o COL:</div>\n    <table class=\"vc-table\">\n      <tr><td>Susep</td><td>Conforme identificado no COL</td></tr>\n      <tr><td>Data de abertura</td><td>Data em que o protocolo foi aberto</td></tr>\n      <tr><td>Nome do cliente</td><td>Conforme cadastro</td></tr>\n      <tr><td>Grupo e cota</td><td>Utilizado naquele processo</td></tr>\n      <tr><td>Tipo de processo</td><td>Autom\u00f3vel ou Im\u00f3vel</td></tr>\n      <tr><td>Etapa</td><td>Etapa atual do processo</td></tr>\n      <tr><td>Data de aprova\u00e7\u00e3o do cr\u00e9dito</td><td>Conforme registrado na verifica\u00e7\u00e3o</td></tr>\n      <tr><td>Cidade do bem</td><td>Cidade onde o bem est\u00e1 sendo adquirido</td></tr>\n      <tr><td>Data de retorno</td><td>1 dia \u00fatil (Autom\u00f3vel) \u00b7 3 dias \u00fateis (Im\u00f3vel)</td></tr>\n    </table>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-blue\">A\u00e7\u00e3o</span>\n      <span class=\"vc-title\">Passo 4 \u2014 Salvar contato e enviar mensagem</span>\n    </div>\n    <div class=\"vc-body\">Ap\u00f3s registrar o protocolo no Syscontrol:</div>\n    <ul style=\"margin:6px 0 0 4px;padding-left:16px;line-height:1.8;font-size:13px;color:#555;\">\n      <li>Salvar o contato do cliente no WhatsApp</li>\n      <li>Enviar a mensagem de atualiza\u00e7\u00e3o do processo, informando o prazo para an\u00e1lise da documenta\u00e7\u00e3o inicial pela Porto Seguro</li>\n    </ul>\n    <button class=\"vc-copy-btn\" id=\"copy-icon-ap\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg>\n      Copiar mensagem de atualiza\u00e7\u00e3o\n    </button>\n  </div>\n\n  <div class=\"vc-connector\">\u2193</div>\n\n  <div class=\"vc-step\">\n    <div class=\"vc-step-header\">\n      <span class=\"vc-badge vc-badge-green\">Avan\u00e7ar</span>\n      <span class=\"vc-title\">Passo 5 \u2014 Ir para o fluxo de aquisi\u00e7\u00e3o</span>\n    </div>\n    <div class=\"vc-body\">Selecione o tipo de bem para continuar o atendimento no fluxo correspondente.</div>\n    <div class=\"vc-nav-grid\">\n      <button class=\"vc-nav-btn btn-aut\" id=\"btn-flow-aut\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0\"/><path d=\"M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0\"/><path d=\"M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6-6h15m-6 0v-5\"/></svg>\n        Fluxo Autom\u00f3vel\n      </button>\n      <button class=\"vc-nav-btn btn-imv\" id=\"btn-flow-imv\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M3 21l18 0\"/><path d=\"M9 8l1 0\"/><path d=\"M9 12l1 0\"/><path d=\"M9 16l1 0\"/><path d=\"M14 8l1 0\"/><path d=\"M14 12l1 0\"/><path d=\"M14 16l1 0\"/><path d=\"M5 21v-16a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16\"/></svg>\n        Fluxo Im\u00f3vel\n      </button>\n    </div>\n  </div>\n\n</div>" }
     ],
     aut: [
       { label: 'Documentação', passos: [
-        { tipo: 'gatilho', texto: 'Exemplo de gatilho — como identificar que o cliente está nessa etapa.' },
+        { tipo: 'gatilho',     texto: 'Exemplo de gatilho — como identificar que o cliente está nessa etapa.' },
         { tipo: 'acao',        texto: 'Exemplo de ação — o que o atendente deve fazer nesse momento.' },
-        { tipo: 'verificacao', texto: 'Exemplo de verificação — o que checar antes de avançar para a próxima etapa.' },
+        { tipo: 'verificacao', texto: 'Exemplo de verificação — o que checar antes de avançar.' },
         { tipo: 'mensagem',    texto: 'Exemplo de mensagem — qual comunicação enviar ao cliente ou vendedor.' }
       ]},
       { label: 'Faturamento',           passos: [] },
@@ -629,13 +719,13 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
       { label: 'Pagamento ao vendedor', passos: [] }
     ],
     imv: [
-      { label: 'Documentação',          passos: [] },
-      { label: 'Minuta',                passos: [] },
-      { label: 'Certificado',           passos: [] },
-      { label: 'Contrato Físico',       passos: [] },
-      { label: 'Contrato Digital',      passos: [] },
-      { label: 'Guia de ITBI',          passos: [] },
-      { label: 'Cartório',              passos: [] }
+      { label: 'Documentação',     passos: [] },
+      { label: 'Minuta',           passos: [] },
+      { label: 'Certificado',      passos: [] },
+      { label: 'Contrato Físico',  passos: [] },
+      { label: 'Contrato Digital', passos: [] },
+      { label: 'Guia de ITBI',     passos: [] },
+      { label: 'Cartório',         passos: [] }
     ]
   };
 

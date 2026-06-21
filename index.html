@@ -100,6 +100,33 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
 .btn-no:hover{background:var(--danger-bg);}
 .dempty{font-size:12px;color:var(--gray3);font-style:italic;padding:4px 0 2px 0;}
 .dmsg{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;background:var(--brand-light);border:1px solid var(--brand-border);border-radius:var(--r-md);padding:8px 10px;}
+/* FLUXOGRAMA */
+.flow-steps{display:flex;flex-direction:column;align-items:stretch;gap:0;}
+.fstep{border-radius:var(--r-md);border:1px solid;padding:10px 12px;position:relative;}
+.fstep-header{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.fstep-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;}
+.fstep-type{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;}
+.fstep-text{font-size:13px;line-height:1.5;margin-top:2px;}
+.fstep.gatilho{background:#fff8ee;border-color:rgba(122,69,0,0.2);}
+.fstep.gatilho .fstep-icon{background:var(--warning-bg);color:var(--warning-text);}
+.fstep.gatilho .fstep-type{color:var(--warning-text);}
+.fstep.gatilho .fstep-text{color:#5a3800;}
+.fstep.acao{background:var(--brand-light);border-color:var(--brand-border);}
+.fstep.acao .fstep-icon{background:rgba(0,155,219,0.15);color:var(--brand);}
+.fstep.acao .fstep-type{color:var(--brand);}
+.fstep.acao .fstep-text{color:#00527a;}
+.fstep.verificacao{background:#eaf3de;border-color:rgba(46,90,14,0.2);}
+.fstep.verificacao .fstep-icon{background:rgba(46,90,14,0.15);color:var(--success-text);}
+.fstep.verificacao .fstep-type{color:var(--success-text);}
+.fstep.verificacao .fstep-text{color:#1e3d09;}
+.fstep.mensagem{background:#f5f0ff;border-color:rgba(100,60,180,0.2);}
+.fstep.mensagem .fstep-icon{background:rgba(100,60,180,0.12);color:#6a3cb5;}
+.fstep.mensagem .fstep-type{color:#6a3cb5;}
+.fstep.mensagem .fstep-text{color:#3d1f7a;}
+.fconnector{display:flex;flex-direction:column;align-items:center;gap:0;padding:2px 0;}
+.fconn-line{width:2px;height:14px;background:var(--border2);}
+.fconn-arrow{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--border2);}
+.fstep-empty{text-align:center;padding:32px 16px;color:var(--gray3);font-size:13px;line-height:1.7;border:1px dashed var(--border2);border-radius:var(--r-md);}
 .empty{text-align:center;padding:60px 20px;color:var(--gray3);font-size:14px;line-height:1.8;}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;align-items:center;justify-content:center;padding:20px;}
 .modal-bg.open{display:flex;}
@@ -156,6 +183,17 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
   <div class="home-body">
     <div class="home-greeting" id="home-greeting">Olá</div>
     <div class="home-desc">Selecione o tipo de bem para consultar as etapas, ou acesse o histórico de mudanças.</div>
+    <div class="slabel">Atendimento inicial</div>
+    <div style="margin-bottom:16px">
+      <div class="card" id="btn-inicial" style="display:flex;align-items:center;gap:16px;padding:18px 22px;">
+        <div style="color:var(--brand);flex-shrink:0"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/></svg></div>
+        <div>
+          <div class="card-title" style="font-size:17px">Atendimento Inicial</div>
+          <div class="card-sub">5 etapas · Identificação e direcionamento</div>
+        </div>
+        <div style="margin-left:auto;color:var(--gray3)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6l-6 6"/></svg></div>
+      </div>
+    </div>
     <div class="slabel">Tipo de bem</div>
     <div class="grid2">
       <div class="card" id="btn-aut">
@@ -219,6 +257,37 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
   <div class="flow-body">
     <div class="flow-map"><div class="fmap-title">Fluxo do processo</div><div class="etapa-row" id="imv-etapas"></div></div>
     <div class="detail" id="imv-detail"><div class="detail-empty"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--brand);opacity:.5"><path d="M8 13v-7.5a1.5 1.5 0 0 1 3 0v6.5"/><path d="M11 5.5v-2a1.5 1.5 0 1 1 3 0v2"/><path d="M14 5.5a1.5 1.5 0 1 1 3 0v1.5"/><path d="M17 7.5a1.5 1.5 0 1 1 3 0v8.5a6 6 0 0 1 -6 6h-2a7 7 0 0 1 -7 -7v-1c0 -1 .5 -2 1.5 -2.5s1.5 -.5 2.5 -1c1 -.5 1 -1 1 -2"/></svg><span>Selecione uma etapa ao lado</span></div></div>
+  </div>
+</div>
+
+<!-- ATENDIMENTO INICIAL -->
+<div id="screen-inicial" class="screen">
+  <div class="header">
+    <button class="btn-icon" id="back-inicial">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l14 0"/><path d="M5 12l6 6"/><path d="M5 12l6 -6"/></svg> Voltar
+    </button>
+    <div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="header-title">Atendimento Inicial</div>
+        <span class="ftag">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/></svg>
+          INICIAL
+        </span>
+      </div>
+      <div class="header-sub">Clique em uma etapa para ver o passo a passo</div>
+    </div>
+  </div>
+  <div class="flow-body">
+    <div class="flow-map">
+      <div class="fmap-title">Fluxo do processo</div>
+      <div class="etapa-row" id="inicial-etapas"></div>
+    </div>
+    <div class="detail" id="inicial-detail">
+      <div class="detail-empty">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--brand);opacity:.5"><path d="M8 13v-7.5a1.5 1.5 0 0 1 3 0v6.5"/><path d="M11 5.5v-2a1.5 1.5 0 1 1 3 0v2"/><path d="M14 5.5a1.5 1.5 0 1 1 3 0v1.5"/><path d="M17 7.5a1.5 1.5 0 1 1 3 0v8.5a6 6 0 0 1 -6 6h-2a7 7 0 0 1 -7 -7v-1c0 -1 .5 -2 1.5 -2.5s1.5 -.5 2.5 -1c1 -.5 1 -1 1 -2"/></svg>
+        <span>Selecione uma etapa ao lado</span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -296,7 +365,11 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
     edit:  '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/><path d="M16 5l3 3"/></svg>',
     right: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6l-6 6"/></svg>',
     sig:   '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18l0 -3"/><path d="M10 18l0 -6"/><path d="M14 18l0 -9"/><path d="M18 18l0 -12"/></svg>',
-    msg:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/></svg>'
+    msg:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/></svg>',
+    iGatilho:     '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/></svg>',
+    iAcao:        '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 8l-4 4l4 4"/><path d="M17 8l4 4l-4 4"/><path d="M14 4l-4 16"/></svg>',
+    iVerificacao: '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5l10 -10"/></svg>',
+    iMensagem:    '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/></svg>'
   };
 
   // ── NAVEGAÇÃO ──
@@ -366,44 +439,34 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
     renderDetail(bem, idx);
   }
 
+  var STEP_META = {
+    gatilho:     { label: 'Gatilho',      cls: 'gatilho',     icon: 'iGatilho'     },
+    acao:        { label: 'Ação',         cls: 'acao',        icon: 'iAcao'        },
+    verificacao: { label: 'Verificação',  cls: 'verificacao', icon: 'iVerificacao' },
+    mensagem:    { label: 'Mensagem',     cls: 'mensagem',    icon: 'iMensagem'    }
+  };
+
   function renderDetail(bem, idx) {
     var e = DATA[bem][idx];
     var h = '<div class="dtitle">' + e.label + '</div>';
     h += '<div class="dtag"><span class="icon">' + IC.check + '</span>Etapa ativa</div>';
+    h += '<div class="dsec" style="margin-top:4px">Passo a passo</div>';
 
-    h += '<div class="dsec">Gatilho</div>';
-    if (e.gatilho && e.gatilho.length) {
-      e.gatilho.forEach(function(g) { h += '<div class="ditem"><div class="ddot s"></div><div class="dtext">' + g + '</div></div>'; });
+    if (e.passos && e.passos.length) {
+      h += '<div class="flow-steps">';
+      e.passos.forEach(function(passo, i) {
+        var meta = STEP_META[passo.tipo] || { label: passo.tipo, cls: 'acao', icon: 'iAcao' };
+        h += '<div class="fstep ' + meta.cls + '">';
+        h += '<div class="fstep-header"><div class="fstep-icon">' + IC[meta.icon] + '</div><span class="fstep-type">' + meta.label + '</span></div>';
+        h += '<div class="fstep-text">' + passo.texto + '</div>';
+        h += '</div>';
+        if (i < e.passos.length - 1) {
+          h += '<div class="fconnector"><div class="fconn-line"></div><div class="fconn-arrow"></div><div class="fconn-line"></div></div>';
+        }
+      });
+      h += '</div>';
     } else {
-      h += '<div class="dempty">Nenhum gatilho cadastrado ainda.</div>';
-    }
-
-    h += '<div class="dsec">Mensagens rápidas</div>';
-    if (e.mensagens && e.mensagens.length) {
-      e.mensagens.forEach(function(m) { h += '<div class="dmsg"><span class="icon" style="color:var(--brand);flex-shrink:0">' + IC.msg + '</span><div class="dtext">' + m + '</div></div>'; });
-    } else {
-      h += '<div class="dempty">Nenhuma mensagem rápida cadastrada ainda.</div>';
-    }
-
-    h += '<div class="dsec">Prazos</div>';
-    if (e.prazos && e.prazos.length) {
-      e.prazos.forEach(function(p) { h += '<div class="ditem"><div class="ddot"></div><div class="dtext">' + p + '</div></div>'; });
-    } else {
-      h += '<div class="dempty">Nenhum prazo cadastrado ainda.</div>';
-    }
-
-    h += '<div class="dsec">Atenção</div>';
-    if (e.alertas && e.alertas.length) {
-      e.alertas.forEach(function(a) { h += '<div class="dalert"><span class="icon">' + IC.warn + '</span>' + a + '</div>'; });
-    } else {
-      h += '<div class="dempty">Nenhum alerta cadastrado ainda.</div>';
-    }
-
-    h += '<div class="dsec">Situações comuns</div>';
-    if (e.situacoes && e.situacoes.length) {
-      e.situacoes.forEach(function(s) { h += '<div class="ditem"><div class="ddot g"></div><div class="dtext m">' + s + '</div></div>'; });
-    } else {
-      h += '<div class="dempty">Nenhuma situação cadastrada ainda.</div>';
+      h += '<div class="fstep-empty"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.4;display:block;margin:0 auto 8px"><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"/><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"/><path d="M9 12h6"/><path d="M9 16h4"/></svg>Nenhum passo cadastrado ainda.<br>Os passos aparecerão aqui em sequência.</div>';
     }
 
     h += '<button class="suggest-btn" id="btn-suggest-etapa"><span class="icon">' + IC.edit + '</span>Sugerir atualização</button>';
@@ -492,10 +555,12 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
     document.getElementById('btn-login').addEventListener('click', doLogin);
     document.getElementById('inp-pass').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
     document.getElementById('btn-logout').addEventListener('click', doLogout);
+    document.getElementById('btn-inicial').addEventListener('click', function() { showFlow('inicial'); });
     document.getElementById('btn-aut').addEventListener('click', function() { showFlow('aut'); });
     document.getElementById('btn-imv').addEventListener('click', function() { showFlow('imv'); });
     document.getElementById('btn-history').addEventListener('click', showHistory);
     document.getElementById('btn-pending').addEventListener('click', showPending);
+    document.getElementById('back-inicial').addEventListener('click', showHome);
     document.getElementById('back-aut').addEventListener('click', showHome);
     document.getElementById('back-imv').addEventListener('click', showHome);
     document.getElementById('back-pending').addEventListener('click', showHome);
@@ -520,20 +585,57 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
 
   // ── DADOS ──
   var DATA = {
+    inicial: [
+      { label: 'Boas-vindas', passos: [
+        { tipo: 'gatilho',     texto: 'Cliente entra em contato diretamente, ou um vendedor envia o contato de um cliente que deseja iniciar um processo de aquisição.' },
+        { tipo: 'mensagem',    texto: 'Enviar mensagem rápida de <strong>Boas-vindas</strong>: apresenta o atendente, dá as boas-vindas e solicita duas informações: (1) nome completo do cliente e (2) grupo e cota do consórcio.' }
+      ]},
+      { label: 'Verificação do cliente', passos: [
+        { tipo: 'gatilho',     texto: 'Cliente responde com nome completo e grupo/cota.' },
+        { tipo: 'acao',        texto: 'Com o grupo e cota em mãos, verificar no sistema se o cliente pertence à corretora e qual é o status atual do crédito.' },
+        { tipo: 'verificacao', texto: 'O cliente é da nossa corretora?' },
+        { tipo: 'mensagem',    texto: '<strong>Se NÃO:</strong> Enviar mensagem rápida de <strong>Cliente não identificado</strong>, informando que não é possível prestar atendimento e compartilhando os canais oficiais da administradora. Encerrar o atendimento.' }
+      ]},
+      { label: 'Status do crédito', passos: [
+        { tipo: 'gatilho',     texto: 'Cliente confirmado como pertencente à corretora. Verificar o status do crédito no sistema.' },
+        { tipo: 'verificacao', texto: 'Qual é o status do crédito do cliente?' },
+        { tipo: 'mensagem',    texto: '<strong>Lance pendente:</strong> Enviar mensagem rápida de <strong>Aguardando baixa do lance</strong>, informando que o pagamento está sendo processado e o prazo de análise de crédito.' },
+        { tipo: 'mensagem',    texto: '<strong>Sorteio pendente:</strong> Enviar mensagem rápida de <strong>Aguardando análise de crédito</strong>, informando o prazo específico para contemplados por sorteio.' },
+        { tipo: 'mensagem',    texto: '<strong>Análise negada:</strong> Informar ao cliente que a análise de crédito foi negada e apresentar as duas opções disponíveis: (1) inclusão de fiador ou (2) reanálise de crédito com envio de documentação de comprovação de renda.' }
+      ]},
+      { label: 'Análise negada', passos: [
+        { tipo: 'gatilho',     texto: 'Cliente opta por fiador ou reanálise de crédito após análise negada.' },
+        { tipo: 'acao',        texto: 'Orientar o cliente a enviar as documentações necessárias diretamente para a administradora conforme a opção escolhida (fiador ou comprovação de renda).' },
+        { tipo: 'verificacao', texto: 'Aguardar o prazo de reanálise da administradora. Acompanhar o sistema para verificar atualização do status do crédito.' },
+        { tipo: 'mensagem',    texto: 'Quando o resultado da reanálise estiver disponível, retornar ao cliente com o novo status. Se aprovado, seguir para abertura do processo de aquisição.' }
+      ]},
+      { label: 'Abertura do processo', passos: [
+        { tipo: 'gatilho',     texto: 'Crédito aprovado e confirmado no sistema — cliente pronto para iniciar o processo de aquisição.' },
+        { tipo: 'verificacao', texto: 'Identificar o tipo de bem da cota do cliente: Automóvel (AUT) ou Imóvel (IMV).' },
+        { tipo: 'mensagem',    texto: '<strong>Automóvel:</strong> Enviar mensagem rápida de <strong>Abertura de processo AUT</strong>, com as instruções iniciais do processo de aquisição de automóvel.' },
+        { tipo: 'mensagem',    texto: '<strong>Imóvel:</strong> Enviar mensagem rápida de <strong>Abertura de processo IMV</strong>, com as instruções iniciais do processo de aquisição de imóvel.' },
+        { tipo: 'acao',        texto: 'Registrar o início do processo no sistema e encaminhar o cliente para o fluxo correspondente (AUT ou IMV).' }
+      ]}
+    ],
     aut: [
-      { label: 'Documentação',          gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
-      { label: 'Faturamento',           gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
-      { label: 'Contrato de Alienação', gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
-      { label: 'Pagamento ao vendedor', gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] }
+      { label: 'Documentação', passos: [
+        { tipo: 'gatilho', texto: 'Exemplo de gatilho — como identificar que o cliente está nessa etapa.' },
+        { tipo: 'acao',        texto: 'Exemplo de ação — o que o atendente deve fazer nesse momento.' },
+        { tipo: 'verificacao', texto: 'Exemplo de verificação — o que checar antes de avançar para a próxima etapa.' },
+        { tipo: 'mensagem',    texto: 'Exemplo de mensagem — qual comunicação enviar ao cliente ou vendedor.' }
+      ]},
+      { label: 'Faturamento',           passos: [] },
+      { label: 'Contrato de Alienação', passos: [] },
+      { label: 'Pagamento ao vendedor', passos: [] }
     ],
     imv: [
-      { label: 'Documentação',          gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
-      { label: 'Minuta',                gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
-      { label: 'Certificado',           gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
-      { label: 'Contrato Físico',       gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
-      { label: 'Contrato Digital',      gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
-      { label: 'Guia de ITBI',          gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] },
-      { label: 'Cartório',              gatilho: [], mensagens: [], prazos: [], alertas: [], situacoes: [] }
+      { label: 'Documentação',          passos: [] },
+      { label: 'Minuta',                passos: [] },
+      { label: 'Certificado',           passos: [] },
+      { label: 'Contrato Físico',       passos: [] },
+      { label: 'Contrato Digital',      passos: [] },
+      { label: 'Guia de ITBI',          passos: [] },
+      { label: 'Cartório',              passos: [] }
     ]
   };
 

@@ -167,6 +167,21 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
 .copy-tooltip.visible { opacity:1; }
 
 #tree-content svg { display: block; max-width: 100%; height: auto; }
+
+.editor-action-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:7px 14px;border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--black);cursor:pointer;font-family:var(--fd);transition:background .15s;}
+.editor-action-btn:hover{background:var(--bg2);}
+.editor-step-card{background:var(--bg);border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;cursor:grab;user-select:none;}
+.editor-step-card.dragging{opacity:.4;cursor:grabbing;}
+.editor-step-card.drag-over{border-color:var(--brand);border-style:dashed;}
+.editor-step-header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);}
+.editor-step-body{padding:0 14px 12px 14px;font-size:12px;color:var(--gray2);line-height:1.6;border-top:0.5px solid var(--border2);}
+.editor-step-acts{display:flex;gap:6px;margin-top:8px;}
+.drag-handle{color:var(--gray2);cursor:grab;font-size:18px;line-height:1;}
+.editor-card-list{display:flex;flex-direction:column;gap:6px;padding:8px 14px 12px 14px;border-top:0.5px solid var(--border2);}
+.editor-card-item{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r-md);cursor:grab;}
+.editor-card-item.dragging{opacity:.4;}
+.editor-card-item.drag-over{border-color:var(--brand);border-style:dashed;}
+.editor-sug-card{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:12px;margin-bottom:8px;}
 </style>
 </head>
 <body>
@@ -415,6 +430,113 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
   </div>
 </div>
 
+<!-- TELA EDITOR DO FLUXO (coordenador) -->
+<div id="screen-editor" class="screen">
+  <div class="header">
+    <button class="btn-icon" id="back-editor">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l14 0"/><path d="M5 12l6 6"/><path d="M5 12l6 -6"/></svg>
+      Voltar
+    </button>
+    <div>
+      <div class="header-title" id="editor-title">Editor do fluxo</div>
+      <div class="header-sub" id="editor-sub">Gerencie os passos e cards da etapa</div>
+    </div>
+    <div class="header-right">
+      <button class="btn-icon" id="btn-discard-editor" style="color:var(--danger-text);border-color:var(--danger-border)">Descartar</button>
+      <button class="btn-primary" id="btn-save-editor" style="margin-left:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><path d="M5 12l5 5l10-10"/></svg>
+        Salvar e publicar
+      </button>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;overflow:hidden;min-height:0;">
+    <!-- Painel esquerdo: sugestões pendentes -->
+    <div id="editor-suggestions" style="width:280px;flex-shrink:0;border-right:1px solid var(--border2);overflow-y:auto;padding:16px;background:var(--bg2);">
+      <div style="font-size:11px;font-weight:600;color:var(--gray2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;">Sugestões pendentes</div>
+      <div id="editor-pending-list"></div>
+    </div>
+    <!-- Painel direito: editor -->
+    <div style="flex:1;overflow-y:auto;padding:20px;min-height:0;">
+      <div style="max-width:700px;">
+        <!-- Ações de adição -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+          <button class="editor-action-btn" id="btn-editor-add-step">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+            Novo passo
+          </button>
+          <button class="editor-action-btn" id="btn-editor-add-msg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-5l-5 3v-3h-2a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3h12z"/></svg>
+            Alterar mensagem rápida
+          </button>
+        </div>
+        <!-- Lista de passos (drag and drop) -->
+        <div id="editor-step-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITOR: Novo/editar passo -->
+<div class="modal-bg" id="modal-editor-step">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title" id="modal-editor-step-title">Novo passo</div>
+    <input type="hidden" id="editor-step-index">
+    <div class="field"><label>Tipo do passo</label>
+      <select id="editor-step-tipo">
+        <option value="Gatilho">Gatilho</option>
+        <option value="Ação">Ação</option>
+        <option value="Aguardar">Aguardar</option>
+        <option value="Mensagem">Mensagem</option>
+        <option value="Decisão">Decisão (múltiplos cards)</option>
+        <option value="Avançar">Avançar</option>
+      </select>
+    </div>
+    <div class="field"><label>Título do passo</label><input type="text" id="editor-step-titulo" placeholder="Ex: Verificar no sistema"></div>
+    <div class="field"><label>Descrição</label><textarea id="editor-step-desc" style="min-height:80px" placeholder="Orientações do passo..."></textarea></div>
+    <div class="modal-acts">
+      <button class="btn-cancel" id="btn-cancel-editor-step">Cancelar</button>
+      <button class="btn-primary" id="btn-save-editor-step">Salvar passo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITOR: Novo/editar card dentro de passo -->
+<div class="modal-bg" id="modal-editor-card">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title" id="modal-editor-card-title">Novo card</div>
+    <input type="hidden" id="editor-card-step-index">
+    <input type="hidden" id="editor-card-index">
+    <div class="field"><label>Tipo do card</label>
+      <select id="editor-card-tipo">
+        <option value="ic-green">✓ Aprovado / Sim</option>
+        <option value="ic-red">✕ Negado / Não</option>
+        <option value="ic-amber">◷ Em andamento</option>
+        <option value="ic-blue">▶ Ação / Outros</option>
+      </select>
+    </div>
+    <div class="field"><label>Título do card</label><input type="text" id="editor-card-titulo" placeholder="Ex: Análise aprovada"></div>
+    <div class="field"><label>Descrição</label><textarea id="editor-card-desc" style="min-height:80px" placeholder="Orientações do card..."></textarea></div>
+    <div class="field"><label>Prazo (opcional)</label><input type="text" id="editor-card-prazo" placeholder="Ex: Prazo: 3 dias úteis"></div>
+    <div class="modal-acts">
+      <button class="btn-cancel" id="btn-cancel-editor-card">Cancelar</button>
+      <button class="btn-primary" id="btn-save-editor-card">Salvar card</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITOR: Alterar mensagem rápida -->
+<div class="modal-bg" id="modal-editor-msg">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title">Alterar mensagem rápida</div>
+    <div class="modal-sub">Esta mensagem é copiada pelo atendente durante o atendimento.</div>
+    <div class="field"><label>Texto da mensagem</label><textarea id="editor-msg-text" style="min-height:120px" placeholder="Digite o novo texto da mensagem rápida..."></textarea></div>
+    <div class="modal-acts">
+      <button class="btn-cancel" id="btn-cancel-editor-msg">Cancelar</button>
+      <button class="btn-primary" id="btn-save-editor-msg">Salvar mensagem</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- .app -->
 <script>
 (function() {
@@ -565,11 +687,17 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
         h+='<div class="fstep-empty">Nenhum passo cadastrado ainda.</div>';
       }
     }
-    h+='<button class="suggest-btn" id="btn-suggest-etapa"><span class="icon">'+IC.edit+'</span>Sugerir atualização</button>';
+    h+='<div style="display:flex;gap:8px;margin-top:4px">';h+='<button id="btn-edit-etapa" class="btn-secondary" style="flex:1;display:none;align-items:center;justify-content:center;gap:6px;font-size:12px;">&#9998; Editar fluxo</button>';h+='<button class="suggest-btn" style="flex:1" id="btn-suggest-etapa"><span class="icon">'+IC.edit+'</span>Sugerir atualização</button>';h+='</div>';
     var detail=document.getElementById(bem+'-detail');
     detail.innerHTML=h;
     var btn=document.getElementById('btn-suggest-etapa');
     if(btn){var el=e.label,bu=bem.toUpperCase();btn.addEventListener('click',function(){openSuggest(el,bu);});}
+    var btnEdit=document.getElementById('btn-edit-etapa');
+    if(btnEdit){
+      if(perfilAtivo&&perfilAtivo.perfil==='coordenador'){btnEdit.style.display='flex';}
+      else{btnEdit.style.display='none';}
+      (function(b,i){btnEdit.addEventListener('click',function(){openEditor(b,i);});})(bem,idx);
+    }
     var btnTree=document.getElementById('btn-open-tree');
     if(btnTree){(function(b,i){btnTree.addEventListener('click',function(){showTree(b,i);});})(bem,idx);}
     if(e.mensagemRapida){
@@ -898,6 +1026,430 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
   }
   function renderHistory(){var list=document.getElementById('history-list');if(!hist.length){list.innerHTML='<div class="empty">Nenhuma mudan\u00e7a registrada ainda.</div>';return;}list.innerHTML='';var tm={'adicionar':'Novo passo','adicionar_card':'Novo card em passo','alterar_passo':'Alterar passo','alterar_mensagem':'Alterar mensagem r\u00e1pida'};hist.forEach(function(s){var div=document.createElement('div');div.className='pcard';var canUndo=s.tipo==='adicionar'||s.tipo==='adicionar_card';div.innerHTML='<div class="pcard-hdr"><div class="pcard-meta">'+s.bem+' \u00b7 '+s.etapa+' \u00b7 por '+s.atendente+' \u00b7 aprovado em '+s.approvedAt+'</div><span class="ptag approved">Aprovado</span></div>'+'<span style="background:#f2f2f2;border:1px solid #ddd;border-radius:4px;padding:2px 8px;font-size:11px;margin-right:6px;">'+(tm[s.tipo]||s.tipo)+'</span>'+(s.tipoPasso?'<span style="background:#e6f6fd;border:1px solid #009BDB;border-radius:4px;padding:2px 8px;font-size:11px;color:#0079aa;">'+s.tipoPasso+'</span>':'')+'<div class="pcard-ch" style="margin-top:6px"><span class="icon">'+IC.sig+'</span>Canal: '+s.channel+'</div>'+'<div class="pcard-txt" style="margin-top:8px">'+s.texto+'</div>'+(canUndo?'<div class="pcard-acts"><button class="btn-no undo-btn" data-id="'+s.id+'">'+IC.x+' Desfazer</button></div>':'');list.appendChild(div);});list.querySelectorAll('.undo-btn').forEach(function(b){b.addEventListener('click',function(){undoSug(parseInt(b.dataset.id));});});}
     function fd(d){if(!d)return'-';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+
+  // ── EDITOR DO FLUXO ──
+  var _editorBem = '', _editorEtapa = '', _editorIdx = -1;
+  var _editorSteps = []; // cópia local dos passos durante edição
+
+  // Parsear arvore HTML em array de passos estruturados
+  function parseArvore(arvore) {
+    var steps = [];
+    var stepMarker = '<div class="vc-step">';
+    var pos = 0;
+    var stepCount = 0;
+    while (true) {
+      var i = arvore.indexOf(stepMarker, pos);
+      if (i === -1) break;
+      stepCount++;
+      var step = { type: 'step', raw: '', titulo: '', tipoPasso: '', desc: '', cards: [], hasCards: false };
+      // Encontrar título
+      var tm = 'vc-title">';
+      var ti = arvore.indexOf(tm, i);
+      if (ti !== -1) {
+        var ts = ti + tm.length, te = arvore.indexOf('</span>', ts);
+        step.titulo = arvore.slice(ts, te).trim();
+      }
+      // Encontrar badge tipo
+      var bm = 'vc-badge">';
+      var bi = arvore.lastIndexOf(bm, ti);
+      if (bi === -1) bi = arvore.indexOf(bm, i);
+      if (bi !== -1 && bi > i) {
+        var bs = bi + bm.length, be = arvore.indexOf('</span>', bs);
+        step.tipoPasso = arvore.slice(bs, be).trim();
+      }
+      // Encontrar desc no vc-body
+      var dm = 'vc-body">';
+      var di = arvore.indexOf(dm, i);
+      var nextStep = arvore.indexOf(stepMarker, i + 10);
+      var blockEnd = nextStep !== -1 ? nextStep : arvore.length;
+      if (di !== -1 && di < blockEnd) {
+        var dstart = di + dm.length;
+        var dend = arvore.indexOf('</div>', dstart);
+        step.desc = arvore.slice(dstart, dend).replace(/<[^>]+>/g, '').trim();
+      }
+      // Verificar se tem opcoes (cards)
+      var opcMarker = 'vc-opcao-label">';
+      step.hasCards = arvore.indexOf(opcMarker, i) !== -1 && (nextStep === -1 || arvore.indexOf(opcMarker, i) < nextStep);
+      if (step.hasCards) {
+        var lp = i;
+        while (true) {
+          var li = arvore.indexOf(opcMarker, lp);
+          if (li === -1 || (nextStep !== -1 && li >= nextStep)) break;
+          var ls = li + opcMarker.length, le = arvore.indexOf('<', ls);
+          var cardLabel = arvore.slice(ls, le).trim();
+          // Encontrar desc do card
+          var cdm = 'vc-opcao-desc">';
+          var cdi = arvore.indexOf(cdm, li);
+          var cardDesc = '';
+          if (cdi !== -1 && (nextStep === -1 || cdi < nextStep)) {
+            var cds = cdi + cdm.length, cde = arvore.indexOf('</div>', cds);
+            cardDesc = arvore.slice(cds, cde).replace(/<[^>]+>/g, '').trim();
+          }
+          // Encontrar prazo
+          var pm = 'vc-prazo">';
+          var pi2 = arvore.indexOf(pm, li);
+          var prazo = '';
+          if (pi2 !== -1 && (nextStep === -1 || pi2 < nextStep)) {
+            var ps = pi2 + pm.length, pe = arvore.indexOf('</div>', ps);
+            prazo = arvore.slice(ps, pe).replace(/<[^>]+>/g, '').trim();
+          }
+          // Encontrar tipo do card (icone)
+          var icMap = { 'ic-green': '✓ Aprovado / Sim', 'ic-red': '✕ Negado / Não', 'ic-amber': '◷ Em andamento', 'ic-blue': '▶ Ação / Outros' };
+          var cardTipo = 'ic-blue';
+          for (var ic in icMap) {
+            if (arvore.indexOf(ic, lp) !== -1 && arvore.indexOf(ic, lp) < li + 100) { cardTipo = ic; break; }
+          }
+          step.cards.push({ titulo: cardLabel, desc: cardDesc, prazo: prazo, tipo: cardTipo });
+          lp = le;
+        }
+      }
+      steps.push(step);
+      pos = nextStep !== -1 ? nextStep : arvore.length;
+    }
+    return steps;
+  }
+
+  // Reconstruir arvore HTML a partir do array de passos
+  function buildArvore(steps, mensagemRapida) {
+    var badgeStyle = {
+      'Gatilho': 'background:#fff8ee;color:#7a4500;border:1px solid #e8a020',
+      'Ação':    'background:#e6f6fd;color:#0079aa;border:1px solid #009BDB',
+      'Aguardar':'background:#eaf3de;color:#2e5a0e;border:1px solid #3b8d5a',
+      'Mensagem':'background:#f5f0ff;color:#6a3cb5;border:1px solid #b39ddb',
+      'Decisão': 'background:#f2f2f2;color:#555;border:1px solid #ccc',
+      'Avançar': 'background:#eaf3de;color:#2e5a0e;border:1px solid #3b8d5a'
+    };
+    var iconMap = { 'ic-green': '✓', 'ic-red': '✕', 'ic-amber': '◷', 'ic-blue': '▶' };
+    var cssMap  = { 'ic-green': 'ic-green', 'ic-red': 'ic-red', 'ic-amber': 'ic-amber', 'ic-blue': 'ic-blue' };
+
+    var html2 = '<style>\n.vc-flow{font-family:Inter,sans-serif;padding:20px;max-width:860px;margin:0 auto;}\n.vc-step{border:1px solid #e0e0e0;border-radius:10px;padding:16px 20px;margin-bottom:8px;background:#fff;}\n.vc-step-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}\n.vc-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;text-transform:uppercase;letter-spacing:.06em;}\n.vc-title{font-size:14px;font-weight:500;color:#111;}\n.vc-body{font-size:13px;color:#555;line-height:1.6;}\n.vc-connector{text-align:center;color:#bbb;font-size:20px;line-height:1;margin:4px 0;}\n.vc-opcoes{display:flex;flex-direction:column;gap:8px;margin-top:8px;}\n.vc-opcao{border:1px solid #e0e0e0;border-radius:8px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px;background:#fafafa;}\n.vc-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;margin-top:1px;}\n.ic-red{background:#fff0f0;color:#a32d2d;}\n.ic-green{background:#eaf3de;color:#2e5a0e;}\n.ic-amber{background:#fff8ee;color:#7a4500;}\n.ic-blue{background:#e6f6fd;color:#0079aa;}\n.vc-opcao-label{font-size:13px;font-weight:500;color:#111;margin-bottom:4px;}\n.vc-opcao-desc{font-size:12px;color:#555;line-height:1.5;}\n.vc-prazo{font-size:11px;color:#888;margin-top:5px;font-style:italic;}\n.vc-copy-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:4px 10px;border:1px solid #009BDB;border-radius:12px;background:#e6f6fd;color:#0079aa;font-size:11px;font-weight:500;cursor:pointer;font-family:Inter,sans-serif;}\n</style>\n<div class="vc-flow">\n';
+
+    steps.forEach(function(step, si) {
+      if (si > 0) html2 += '  <div class="vc-connector">\u2193</div>\n\n';
+      var bStyle = badgeStyle[step.tipoPasso] || badgeStyle['Ação'];
+      html2 += '  <div class="vc-step">\n';
+      html2 += '    <div class="vc-step-header">\n';
+      html2 += '      <span class="vc-badge" style="' + bStyle + '">' + step.tipoPasso + '</span>\n';
+      html2 += '      <span class="vc-title">Passo ' + (si+1) + ' \u2014 ' + step.titulo + '</span>\n';
+      html2 += '    </div>\n';
+      if (step.desc) {
+        html2 += '    <div class="vc-body">' + step.desc + '</div>\n';
+      }
+      if (step.hasCards && step.cards.length > 0) {
+        html2 += '    <div class="vc-opcoes">\n';
+        step.cards.forEach(function(card) {
+          html2 += '      <div class="vc-opcao">\n';
+          html2 += '        <div class="vc-icon ' + card.tipo + '">' + (iconMap[card.tipo]||'\u25b6') + '</div>\n';
+          html2 += '        <div>\n';
+          html2 += '          <div class="vc-opcao-label">' + card.titulo + '</div>\n';
+          html2 += '          <div class="vc-opcao-desc">' + card.desc + '</div>\n';
+          if (card.prazo) html2 += '          <div class="vc-prazo">' + card.prazo + '</div>\n';
+          html2 += '        </div>\n';
+          html2 += '      </div>\n';
+        });
+        html2 += '    </div>\n';
+      }
+      // Botão avançar para último passo
+      if (si === steps.length - 1 && step.tipoPasso === 'Avançar') {
+        html2 += '    <button id="btn-next-etapa" style="margin-top:12px;width:100%;padding:11px;background:#009BDB;color:#fff;border:none;border-radius:8px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">\u2192 ' + step.titulo + '</button>\n';
+      }
+      // Botão copiar mensagem rápida
+      if (step.tipoPasso === 'Mensagem' || step.tipoPasso === 'Ação') {
+        if (si === 0 && mensagemRapida) {
+          html2 += '    <button class="vc-copy-btn" id="copy-icon">\u29c9 Copiar mensagem</button>\n';
+        }
+      }
+      html2 += '  </div>\n\n';
+    });
+    html2 += '</div>';
+    return html2;
+  }
+
+  // Abrir editor
+  function openEditor(bem, etapaIdx) {
+    _editorBem = bem;
+    _editorIdx = etapaIdx;
+    var key = bem.toLowerCase();
+    var etapa = DATA[key][etapaIdx];
+    _editorEtapa = etapa.label;
+    document.getElementById('editor-title').textContent = 'Editor · ' + bem.toUpperCase() + ' · ' + etapa.label;
+    document.getElementById('editor-sub').textContent = 'Arraste os passos para reordenar';
+    // Parsear passos
+    _editorSteps = etapa.arvore ? parseArvore(etapa.arvore) : [];
+    renderEditorSteps();
+    renderEditorPending();
+    go('editor');
+  }
+
+  // Renderizar lista de passos no editor com drag and drop
+  function renderEditorSteps() {
+    var list = document.getElementById('editor-step-list');
+    list.innerHTML = '';
+    var badgeStyle = {
+      'Gatilho': 'background:#fff8ee;color:#7a4500;border:0.5px solid #e8a020',
+      'Ação':    'background:#e6f6fd;color:#0079aa;border:0.5px solid #009BDB',
+      'Aguardar':'background:#eaf3de;color:#2e5a0e;border:0.5px solid #3b8d5a',
+      'Mensagem':'background:#f5f0ff;color:#6a3cb5;border:0.5px solid #b39ddb',
+      'Decisão': 'background:#f2f2f2;color:#555;border:0.5px solid #ccc',
+      'Avançar': 'background:#eaf3de;color:#2e5a0e;border:0.5px solid #3b8d5a'
+    };
+
+    _editorSteps.forEach(function(step, si) {
+      var card = document.createElement('div');
+      card.className = 'editor-step-card';
+      card.draggable = true;
+      card.dataset.idx = si;
+
+      var bStyle = badgeStyle[step.tipoPasso] || badgeStyle['Ação'];
+      var cardsHTML = '';
+      if (step.hasCards && step.cards.length > 0) {
+        cardsHTML = '<div class="editor-card-list" id="card-list-' + si + '">';
+        step.cards.forEach(function(card2, ci) {
+          var icStyle = { 'ic-green':'background:#eaf3de;color:#2e5a0e', 'ic-red':'background:#fff0f0;color:#a32d2d', 'ic-amber':'background:#fff8ee;color:#7a4500', 'ic-blue':'background:#e6f6fd;color:#0079aa' }[card2.tipo] || 'background:#e6f6fd;color:#0079aa';
+          cardsHTML += '<div class="editor-card-item" draggable="true" data-step="' + si + '" data-card="' + ci + '">';
+          cardsHTML += '<span style="font-size:16px;color:var(--gray2);cursor:grab;">\u2807</span>';
+          cardsHTML += '<span style="width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;' + icStyle + '">' + (card2.tipo==='ic-green'?'✓':card2.tipo==='ic-red'?'✕':card2.tipo==='ic-amber'?'◷':'▶') + '</span>';
+          cardsHTML += '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;color:var(--black)">' + card2.titulo + '</div><div style="font-size:11px;color:var(--gray2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (card2.desc||'') + '</div></div>';
+          cardsHTML += '<div style="display:flex;gap:4px;flex-shrink:0">';
+          cardsHTML += '<button onclick="editCard(' + si + ',' + ci + ')" style="width:24px;height:24px;border:0.5px solid var(--border2);border-radius:5px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray2);font-size:12px;">✎</button>';
+          cardsHTML += '<button onclick="deleteCard(' + si + ',' + ci + ')" style="width:24px;height:24px;border:0.5px solid var(--danger-border);border-radius:5px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--danger-text);font-size:12px;">✕</button>';
+          cardsHTML += '</div></div>';
+        });
+        cardsHTML += '<button onclick="addCard(' + si + ')" style="margin-top:4px;font-size:11px;color:var(--brand);background:transparent;border:0.5px dashed var(--brand);border-radius:5px;padding:5px 10px;cursor:pointer;width:100%;">+ Adicionar card</button>';
+        cardsHTML += '</div>';
+      }
+
+      card.innerHTML = (
+        '<div class="editor-step-header">' +
+          '<span style="font-size:18px;color:var(--gray2);cursor:grab;line-height:1;">\u2807</span>' +
+          '<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;' + bStyle + '">' + step.tipoPasso + '</span>' +
+          '<span style="font-size:13px;font-weight:500;color:var(--black);flex:1;">Passo ' + (si+1) + ' \u2014 ' + step.titulo + '</span>' +
+          '<div style="display:flex;gap:4px;">' +
+            (step.hasCards ? '<button onclick="addCard(' + si + ')" style="font-size:11px;padding:3px 8px;border:0.5px solid var(--border2);border-radius:5px;background:transparent;cursor:pointer;color:var(--gray2);">+ Card</button>' : '') +
+            '<button onclick="editStep(' + si + ')" style="width:26px;height:26px;border:0.5px solid var(--border2);border-radius:5px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray2);font-size:13px;">✎</button>' +
+            '<button onclick="deleteStep(' + si + ')" style="width:26px;height:26px;border:0.5px solid var(--danger-border);border-radius:5px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--danger-text);font-size:13px;">✕</button>' +
+          '</div>' +
+        '</div>' +
+        (step.desc ? '<div class="editor-step-body">' + step.desc + '</div>' : '') +
+        cardsHTML
+      );
+
+      // Drag events para passos
+      card.addEventListener('dragstart', function(e) {
+        e.dataTransfer.setData('step-idx', si);
+        setTimeout(function() { card.classList.add('dragging'); }, 0);
+      });
+      card.addEventListener('dragend', function() { card.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(function(el){ el.classList.remove('drag-over'); }); });
+      card.addEventListener('dragover', function(e) { e.preventDefault(); card.classList.add('drag-over'); });
+      card.addEventListener('dragleave', function() { card.classList.remove('drag-over'); });
+      card.addEventListener('drop', function(e) {
+        e.preventDefault();
+        card.classList.remove('drag-over');
+        var fromIdx = parseInt(e.dataTransfer.getData('step-idx'));
+        var toIdx = si;
+        if (fromIdx === toIdx || isNaN(fromIdx)) return;
+        var moved = _editorSteps.splice(fromIdx, 1)[0];
+        _editorSteps.splice(toIdx, 0, moved);
+        renderEditorSteps();
+      });
+
+      list.appendChild(card);
+    });
+
+    // Drag and drop para cards
+    document.querySelectorAll('.editor-card-item').forEach(function(item) {
+      item.addEventListener('dragstart', function(e) {
+        e.stopPropagation();
+        e.dataTransfer.setData('card-step', item.dataset.step);
+        e.dataTransfer.setData('card-idx', item.dataset.card);
+        setTimeout(function() { item.classList.add('dragging'); }, 0);
+      });
+      item.addEventListener('dragend', function() { item.classList.remove('dragging'); });
+      item.addEventListener('dragover', function(e) { e.preventDefault(); e.stopPropagation(); item.classList.add('drag-over'); });
+      item.addEventListener('dragleave', function() { item.classList.remove('drag-over'); });
+      item.addEventListener('drop', function(e) {
+        e.preventDefault(); e.stopPropagation();
+        item.classList.remove('drag-over');
+        var fromStep = parseInt(e.dataTransfer.getData('card-step'));
+        var fromCard = parseInt(e.dataTransfer.getData('card-idx'));
+        var toStep = parseInt(item.dataset.step);
+        var toCard = parseInt(item.dataset.card);
+        if (fromStep !== toStep || fromCard === toCard) return;
+        var moved = _editorSteps[fromStep].cards.splice(fromCard, 1)[0];
+        _editorSteps[toStep].cards.splice(toCard, 0, moved);
+        renderEditorSteps();
+      });
+    });
+  }
+
+  // Renderizar sugestões pendentes no painel do editor
+  function renderEditorPending() {
+    var list = document.getElementById('editor-pending-list');
+    var relevant = pending.filter(function(s) { return s.etapa === _editorEtapa && s.bem.toLowerCase() === _editorBem.toLowerCase(); });
+    if (!relevant.length) {
+      list.innerHTML = '<div style="font-size:12px;color:var(--gray2);font-style:italic;">Nenhuma sugestão pendente para esta etapa.</div>';
+      return;
+    }
+    list.innerHTML = '';
+    var tm = { 'adicionar': 'Adicionar', 'alterar': 'Alterar', 'alterar_mensagem': 'Mensagem rápida' };
+    relevant.forEach(function(s) {
+      var div = document.createElement('div');
+      div.className = 'editor-sug-card';
+      div.innerHTML =
+        '<div style="font-size:10px;color:var(--gray2);margin-bottom:4px;">por ' + s.atendente + ' · ' + s.submittedAt + '</div>' +
+        '<div style="font-size:11px;margin-bottom:6px;"><span style="background:#f2f2f2;border:0.5px solid #ccc;border-radius:4px;padding:1px 7px;font-size:10px;">' + (tm[s.tipo]||s.tipo) + '</span> <span style="background:#e6f6fd;border:0.5px solid #009BDB;border-radius:4px;padding:1px 7px;font-size:10px;color:#0079aa;">' + s.channel + '</span></div>' +
+        '<div style="font-size:12px;color:var(--black);line-height:1.5;margin-bottom:6px;">' + s.texto + '</div>' +
+        (s.justificativa ? '<div style="font-size:11px;color:#633806;background:#FAEEDA;border:0.5px solid #EF9F27;border-radius:4px;padding:5px 8px;margin-bottom:6px;">' + s.justificativa + '</div>' : '') +
+        '<div style="display:flex;gap:5px;">' +
+          '<button onclick="useSuggestion(' + s.id + ')" style="flex:1;font-size:11px;padding:4px 8px;border:0.5px solid var(--brand);border-radius:5px;background:var(--bg2);color:var(--brand);cursor:pointer;font-family:var(--fd);">Usar como base</button>' +
+          '<button onclick="rejectSug(' + s.id + ');renderEditorPending();" style="font-size:11px;padding:4px 8px;border:0.5px solid var(--danger-border);border-radius:5px;background:transparent;color:var(--danger-text);cursor:pointer;font-family:var(--fd);">Rejeitar</button>' +
+        '</div>';
+      list.appendChild(div);
+    });
+  }
+
+  function useSuggestion(id) {
+    var s = pending.find(function(x) { return x.id === id; });
+    if (!s) return;
+    // Preencher o modal de novo passo com a descrição como base
+    document.getElementById('editor-step-index').value = '-1';
+    document.getElementById('modal-editor-step-title').textContent = 'Novo passo (baseado na sugestão)';
+    document.getElementById('editor-step-tipo').value = 'Ação';
+    document.getElementById('editor-step-titulo').value = '';
+    document.getElementById('editor-step-desc').value = s.texto;
+    document.getElementById('modal-editor-step').classList.add('open');
+  }
+
+  // CRUD de passos
+  function addStep() {
+    document.getElementById('editor-step-index').value = '-1';
+    document.getElementById('modal-editor-step-title').textContent = 'Novo passo';
+    document.getElementById('editor-step-tipo').value = 'Ação';
+    document.getElementById('editor-step-titulo').value = '';
+    document.getElementById('editor-step-desc').value = '';
+    document.getElementById('modal-editor-step').classList.add('open');
+  }
+
+  function editStep(si) {
+    var step = _editorSteps[si];
+    document.getElementById('editor-step-index').value = si;
+    document.getElementById('modal-editor-step-title').textContent = 'Editar passo';
+    document.getElementById('editor-step-tipo').value = step.tipoPasso || 'Ação';
+    document.getElementById('editor-step-titulo').value = step.titulo.replace(/^Passo \d+ \u2014 /, '');
+    document.getElementById('editor-step-desc').value = step.desc;
+    document.getElementById('modal-editor-step').classList.add('open');
+  }
+
+  function saveEditorStep() {
+    var si = parseInt(document.getElementById('editor-step-index').value);
+    var tipo = document.getElementById('editor-step-tipo').value;
+    var titulo = document.getElementById('editor-step-titulo').value.trim();
+    var desc = document.getElementById('editor-step-desc').value.trim();
+    if (!titulo) return;
+    var step = { tipoPasso: tipo, titulo: titulo, desc: desc, hasCards: tipo === 'Decisão', cards: [] };
+    if (si === -1) {
+      _editorSteps.push(step);
+    } else {
+      step.hasCards = _editorSteps[si].hasCards || tipo === 'Decisão';
+      step.cards = _editorSteps[si].cards || [];
+      _editorSteps[si] = step;
+    }
+    document.getElementById('modal-editor-step').classList.remove('open');
+    renderEditorSteps();
+  }
+
+  function deleteStep(si) {
+    if (!confirm('Excluir este passo?')) return;
+    _editorSteps.splice(si, 1);
+    renderEditorSteps();
+  }
+
+  // CRUD de cards
+  function addCard(si) {
+    _editorSteps[si].hasCards = true;
+    document.getElementById('editor-card-step-index').value = si;
+    document.getElementById('editor-card-index').value = '-1';
+    document.getElementById('modal-editor-card-title').textContent = 'Novo card';
+    document.getElementById('editor-card-tipo').value = 'ic-blue';
+    document.getElementById('editor-card-titulo').value = '';
+    document.getElementById('editor-card-desc').value = '';
+    document.getElementById('editor-card-prazo').value = '';
+    document.getElementById('modal-editor-card').classList.add('open');
+  }
+
+  function editCard(si, ci) {
+    var card = _editorSteps[si].cards[ci];
+    document.getElementById('editor-card-step-index').value = si;
+    document.getElementById('editor-card-index').value = ci;
+    document.getElementById('modal-editor-card-title').textContent = 'Editar card';
+    document.getElementById('editor-card-tipo').value = card.tipo || 'ic-blue';
+    document.getElementById('editor-card-titulo').value = card.titulo;
+    document.getElementById('editor-card-desc').value = card.desc;
+    document.getElementById('editor-card-prazo').value = card.prazo || '';
+    document.getElementById('modal-editor-card').classList.add('open');
+  }
+
+  function saveEditorCard() {
+    var si = parseInt(document.getElementById('editor-card-step-index').value);
+    var ci = parseInt(document.getElementById('editor-card-index').value);
+    var card = {
+      tipo: document.getElementById('editor-card-tipo').value,
+      titulo: document.getElementById('editor-card-titulo').value.trim(),
+      desc: document.getElementById('editor-card-desc').value.trim(),
+      prazo: document.getElementById('editor-card-prazo').value.trim()
+    };
+    if (!card.titulo) return;
+    if (ci === -1) {
+      _editorSteps[si].cards.push(card);
+    } else {
+      _editorSteps[si].cards[ci] = card;
+    }
+    document.getElementById('modal-editor-card').classList.remove('open');
+    renderEditorSteps();
+  }
+
+  function deleteCard(si, ci) {
+    _editorSteps[si].cards.splice(ci, 1);
+    if (_editorSteps[si].cards.length === 0) _editorSteps[si].hasCards = false;
+    renderEditorSteps();
+  }
+
+  function openEditorMsg() {
+    var key = _editorBem.toLowerCase();
+    var etapa = DATA[key].find(function(e) { return e.label === _editorEtapa; });
+    document.getElementById('editor-msg-text').value = etapa ? (etapa.mensagemRapida || '') : '';
+    document.getElementById('modal-editor-msg').classList.add('open');
+  }
+
+  function saveEditorMsg() {
+    var text = document.getElementById('editor-msg-text').value.trim();
+    var key = _editorBem.toLowerCase();
+    var etapa = DATA[key].find(function(e) { return e.label === _editorEtapa; });
+    if (etapa) etapa.mensagemRapida = text;
+    document.getElementById('modal-editor-msg').classList.remove('open');
+  }
+
+  function saveEditor() {
+    var key = _editorBem.toLowerCase();
+    var etapa = DATA[key].find(function(e) { return e.label === _editorEtapa; });
+    if (!etapa) return;
+    etapa.arvore = buildArvore(_editorSteps, etapa.mensagemRapida);
+    var cd = {};
+    Object.keys(DATA).forEach(function(bem) {
+      cd[bem] = DATA[bem].map(function(e) {
+        return { label: e.label, arvore: e.arvore||null, mensagemRapida: e.mensagemRapida||null, passos: e.passos||[] };
+      });
+    });
+    storageSet('pv_data', JSON.stringify(cd));
+    var fb = document.createElement('div');
+    fb.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#2e5a0e;color:#fff;padding:12px 20px;border-radius:8px;font-family:Inter,sans-serif;font-size:13px;font-weight:500;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.2)';
+    fb.textContent = '\u2713 Fluxo salvo e publicado!';
+    document.body.appendChild(fb);
+    setTimeout(function() { document.body.removeChild(fb); }, 3000);
+    go(_editorBem.toLowerCase());
+  }
+
+
   document.addEventListener('DOMContentLoaded',function(){
     loadFromStorage();
     document.getElementById('btn-login').addEventListener('click',doLogin);
@@ -921,6 +1473,17 @@ body{font-family:var(--fb);background:var(--bg3);color:var(--black);min-height:1
     document.getElementById('btn-approve-edit').addEventListener('click',approveSug);
     var btnClear=document.getElementById('btn-clear-history');
     if(btnClear)btnClear.addEventListener('click',clearAllData);
+    document.getElementById('back-editor').addEventListener('click',function(){go(_editorBem.toLowerCase()||'inicial');});
+    document.getElementById('btn-save-editor').addEventListener('click',saveEditor);
+    document.getElementById('btn-discard-editor').addEventListener('click',function(){if(confirm('Descartar todas as alterações?'))go(_editorBem.toLowerCase()||'inicial');});
+    document.getElementById('btn-editor-add-step').addEventListener('click',addStep);
+    document.getElementById('btn-editor-add-msg').addEventListener('click',openEditorMsg);
+    document.getElementById('btn-cancel-editor-step').addEventListener('click',function(){document.getElementById('modal-editor-step').classList.remove('open');});
+    document.getElementById('btn-save-editor-step').addEventListener('click',saveEditorStep);
+    document.getElementById('btn-cancel-editor-card').addEventListener('click',function(){document.getElementById('modal-editor-card').classList.remove('open');});
+    document.getElementById('btn-save-editor-card').addEventListener('click',saveEditorCard);
+    document.getElementById('btn-cancel-editor-msg').addEventListener('click',function(){document.getElementById('modal-editor-msg').classList.remove('open');});
+    document.getElementById('btn-save-editor-msg').addEventListener('click',saveEditorMsg);
   });
     var DATA = {
     inicial: [

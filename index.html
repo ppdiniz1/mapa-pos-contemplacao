@@ -118,6 +118,8 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
 .fmt-btn:hover{border-color:var(--brand);color:var(--brand);}
 
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <div class="app">
@@ -285,14 +287,31 @@ var passoIdx    = -1;
 var opcoesTemp  = [];
 var flowKey     = '';
 /* ═════════════════════════════════════════════ STORAGE ══ */
-function sGet(k)   { return window.storage ? window.storage.get(k,true)   : Promise.resolve(null); }
-function sSet(k,v) { return window.storage ? window.storage.set(k,v,true) : Promise.resolve(null); }
-function salvarData()  { sSet('mpv_data', JSON.stringify(DATA)); }
+var firebaseConfig = {
+  apiKey:            "AIzaSyBMf9dgfNCFcIVx7Fx7vJ5m3jgsRm02BV8",
+  authDomain:        "porto-vale-mapa.firebaseapp.com",
+  projectId:         "porto-vale-mapa",
+  storageBucket:     "porto-vale-mapa.firebasestorage.app",
+  messagingSenderId: "624584558842",
+  appId:             "1:624584558842:web:6e526a3fe758a321236143"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
+
+function salvarData() {
+  db.collection('porto-vale').doc('data').set({ payload: JSON.stringify(DATA) })
+    .catch(function(e){ console.error('Erro ao salvar:', e); });
+}
 function carregarData(cb) {
-  sGet('mpv_data').then(function(r){
-    if (r && r.value) { try { DATA = JSON.parse(r.value); } catch(e){} }
+  db.collection('porto-vale').doc('data').get().then(function(doc) {
+    if (doc.exists && doc.data().payload) {
+      try { DATA = JSON.parse(doc.data().payload); } catch(e) {}
+    }
     if (cb) cb();
-  }).catch(function(){ if (cb) cb(); });
+  }).catch(function(e) {
+    console.error('Erro ao carregar:', e);
+    if (cb) cb();
+  });
 }
 /* ══════════════════════════════════════════ NAVEGACAO ══ */
 function go(id) {
@@ -386,29 +405,26 @@ function selecionarEtapaFluxo(idx) {
   } else {
     h += '<div class="fstep-empty">Nenhuma orientacao cadastrada ainda.</div>';
   }
-  if (etapa.mensagemRapida) {
-    h += '<button class="copy-msg-btn" id="btn-copiar-msg">Copiar mensagem</button>';
-  }
   detail.innerHTML = h;
-  var btnCopiar = document.getElementById('btn-copiar-msg');
-  if (btnCopiar) {
-    var msgCopy = etapa.mensagemRapida;
-    btnCopiar.onclick = function(){ copiarMsg(this, msgCopy); };
-  }
-  // Botões copiar dos passos
   detail.querySelectorAll('.vc-copy-btn').forEach(function(btn) {
-    var msg = btn.dataset.msg;
-    btn.addEventListener('click', function(){ copiarMsg(btn, msg); });
+    var pi  = parseInt(btn.dataset.pi);
+    var msg = etapa.passos[pi] ? etapa.passos[pi].msg : '';
+    if (msg) btn.addEventListener('click', function(){ copiarMsg(btn, msg); });
   });
 }
 function copiarMsg(btn, msg) {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(msg).then(function(){ flashCopy(btn); });
-  } else {
-    var t = document.createElement('textarea');
-    t.value = msg; document.body.appendChild(t); t.select();
-    document.execCommand('copy'); document.body.removeChild(t); flashCopy(btn);
-  }
+  var t = document.createElement('textarea');
+  t.value = msg;
+  t.style.position = 'fixed';
+  t.style.opacity  = '0';
+  document.body.appendChild(t);
+  t.focus();
+  t.select();
+  try {
+    document.execCommand('copy');
+    flashCopy(btn);
+  } catch(e) {}
+  document.body.removeChild(t);
 }
 function flashCopy(btn) {
   var orig = btn.textContent; btn.textContent = 'Copiado!';
@@ -757,7 +773,7 @@ function sincronizarArvore() {
       });
       h += '</div>';
     }
-    if (p.msg) h += '<button class="vc-copy-btn" data-msg="'+p.msg.replace(/"/g,"&quot;")+'">&#10697; Copiar mensagem</button>';
+    if (p.msg) h += '<button class="vc-copy-btn" data-pi="'+pi+'">Copiar mensagem</button>';
     h += '</div>';
   });
   h += '</div>';

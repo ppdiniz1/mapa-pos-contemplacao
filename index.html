@@ -128,6 +128,9 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
 .icon-pick{display:flex;align-items:center;justify-content:center;height:36px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--gray1);cursor:pointer;}
 .icon-pick:hover{border-color:var(--brand);color:var(--brand);}
 .icon-pick.selected{background:#e6f6fd;border-color:var(--brand);color:var(--brand);}
+.cat-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;border:2px solid transparent;border-radius:var(--r-md);padding:2px;}
+.cat-drag-handle{color:var(--gray3);cursor:grab;font-size:16px;flex-shrink:0;}
+.cat-row input{flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-md);font-size:13px;font-family:inherit;}
 
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -164,6 +167,7 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
       <div class="header-right">
         <span class="perfil-badge" id="perfil-badge"></span>
         <button class="btn-icon" id="btn-painel" style="display:none;" onclick="showPainel()">&#9881; Painel</button>
+        <button class="btn-icon" id="btn-categorias" style="display:none;" onclick="abrirModalCategorias()">&#128193; Categorias</button>
         <button class="btn-icon" onclick="doLogout()">Sair</button>
       </div>
     </div>
@@ -174,30 +178,7 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
         <div style="font-size:14px;font-weight:500;margin-bottom:4px;">Nenhum fluxo disponivel</div>
         <div style="font-size:12px;">O coordenador ainda nao criou nenhum fluxo.</div>
       </div>
-      <div class="cat-section">
-        <div class="cat-header">
-          <span class="cat-header-title">Atendimentos basicos</span>
-          <div class="cat-header-line"></div>
-          <span class="cat-header-count" id="count-basicos">0</span>
-        </div>
-        <div class="cat-grid" id="cat-basicos"></div>
-      </div>
-      <div class="cat-section">
-        <div class="cat-header">
-          <span class="cat-header-title">Atendimentos por tipo de bem</span>
-          <div class="cat-header-line"></div>
-          <span class="cat-header-count" id="count-bem">0</span>
-        </div>
-        <div class="cat-grid" id="cat-bem"></div>
-      </div>
-      <div class="cat-section">
-        <div class="cat-header">
-          <span class="cat-header-title">Atendimentos especificos</span>
-          <div class="cat-header-line"></div>
-          <span class="cat-header-count" id="count-especificos">0</span>
-        </div>
-        <div class="cat-grid" id="cat-especificos"></div>
-      </div>
+      <div id="home-categorias"></div>
     </div>
   </div>
   <!-- ══════════════════════════════════════════ FIM HOME ══ -->
@@ -257,6 +238,19 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
       <div class="modal-acts">
         <button class="btn-cancel" onclick="fecharModal('modal-fluxo')">Cancelar</button>
         <button class="btn-primary" onclick="salvarFluxo()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Categorias -->
+  <div class="modal-bg" id="modal-categorias">
+    <div class="modal modal-wide">
+      <div class="modal-title">Gerenciar categorias</div>
+      <div id="lista-categorias"></div>
+      <button class="btn-add" onclick="adicionarCategoria()" style="margin-top:8px;">+ Nova categoria</button>
+      <div class="modal-acts">
+        <button class="btn-cancel" onclick="fecharModal('modal-categorias')">Cancelar</button>
+        <button class="btn-primary" onclick="salvarCategoriasModal()">Salvar</button>
       </div>
     </div>
   </div>
@@ -326,6 +320,12 @@ var passoIdx    = -1;
 var opcoesTemp  = [];
 var flowKey     = '';
 var iconeSelecionado = 'folder';
+var CATEGORIAS = [
+  { id:'basicos',     nome:'Atendimentos basicos' },
+  { id:'bem',         nome:'Atendimentos por tipo de bem' },
+  { id:'especificos', nome:'Atendimentos especificos' }
+];
+var draggedCatRow = null;
 /* ═════════════════════════════════════════════ STORAGE ══ */
 var firebaseConfig = {
   apiKey:            "AIzaSyBMf9dgfNCFcIVx7Fx7vJ5m3jgsRm02BV8",
@@ -343,8 +343,14 @@ try {
 
 function salvarData() {
   if (db) {
-    db.collection('porto-vale').doc('data').set({ payload: JSON.stringify(DATA) })
+    db.collection('porto-vale').doc('data').set({ payload: JSON.stringify(DATA) }, { merge: true })
       .catch(function(e){ console.error('Erro ao salvar:', e); });
+  }
+}
+function salvarCategorias() {
+  if (db) {
+    db.collection('porto-vale').doc('data').set({ categoriasPayload: JSON.stringify(CATEGORIAS) }, { merge: true })
+      .catch(function(e){ console.error('Erro ao salvar categorias:', e); });
   }
 }
 function carregarData(cb) {
@@ -352,6 +358,9 @@ function carregarData(cb) {
     db.collection('porto-vale').doc('data').get().then(function(doc) {
       if (doc.exists && doc.data().payload) {
         try { DATA = JSON.parse(doc.data().payload); } catch(e) {}
+      }
+      if (doc.exists && doc.data().categoriasPayload) {
+        try { CATEGORIAS = JSON.parse(doc.data().categoriasPayload); } catch(e) {}
       }
       if (cb) cb();
     }).catch(function(e) {
@@ -385,6 +394,7 @@ function doLogin() {
   document.getElementById('home-greeting').textContent = 'Ola, ' + found.nome + '!';
   document.getElementById('perfil-badge').textContent  = found.perfil === 'coordenador' ? 'Coordenador' : 'Atendente';
   document.getElementById('btn-painel').style.display  = found.perfil === 'coordenador' ? 'flex' : 'none';
+  document.getElementById('btn-categorias').style.display = found.perfil === 'coordenador' ? 'flex' : 'none';
   carregarData(function(){ renderHome(); go('home'); });
 }
 function doLogout() {
@@ -410,16 +420,37 @@ var ICON_SET = {
 var ICON_KEYS = ['car','building','clipboard','message','folder','home','users','star','wallet','shield','calendar'];
 function renderHome() {
   var empty = document.getElementById('home-empty');
-  var cats  = { basicos: document.getElementById('cat-basicos'), bem: document.getElementById('cat-bem'), especificos: document.getElementById('cat-especificos') };
-  Object.keys(cats).forEach(function(c){ cats[c].innerHTML = ''; });
-  var keys = Object.keys(DATA);
-  if (!keys.length) { empty.style.display='block'; return; }
-  empty.style.display = 'none';
+  var container = document.getElementById('home-categorias');
+  container.innerHTML = '';
   var isCoordenador = perfilAtivo && perfilAtivo.perfil === 'coordenador';
+
+  // Garante que exista pelo menos uma categoria valida
+  if (!CATEGORIAS.length) CATEGORIAS = [{ id:'basicos', nome:'Atendimentos basicos' }];
+
+  var grids = {};
+  CATEGORIAS.forEach(function(cat) {
+    var section = document.createElement('div');
+    section.className = 'cat-section';
+    section.innerHTML =
+      '<div class="cat-header">' +
+        '<span class="cat-header-title">' + cat.nome + '</span>' +
+        '<div class="cat-header-line"></div>' +
+        '<span class="cat-header-count" id="count-' + cat.id + '">0</span>' +
+      '</div>' +
+      '<div class="cat-grid" id="cat-' + cat.id + '"></div>';
+    container.appendChild(section);
+    grids[cat.id] = section.querySelector('.cat-grid');
+  });
+
+  var keys = Object.keys(DATA);
+  if (!keys.length) { empty.style.display = 'block'; }
+  else { empty.style.display = 'none'; }
+
+  var primeiraCat = CATEGORIAS[0].id;
   keys.forEach(function(key, ki) {
     var f   = DATA[key];
     var n   = f.etapas ? f.etapas.length : 0;
-    var cat = f.categoria || 'basicos';
+    var cat = (f.categoria && grids[f.categoria]) ? f.categoria : primeiraCat;
     var c   = document.createElement('div');
     c.className   = 'card';
     c.draggable   = isCoordenador;
@@ -436,13 +467,13 @@ function renderHome() {
       });
       c.addEventListener('dragend', function() { c.style.opacity = '1'; });
     }
-    var grid = cats[cat] || cats['basicos'];
-    grid.appendChild(c);
+    grids[cat].appendChild(c);
   });
-  // Drop zones (só coordenador)
+
+  // Drop zones (so coordenador)
   if (isCoordenador) {
-    Object.keys(cats).forEach(function(catId) {
-      var grid = cats[catId];
+    Object.keys(grids).forEach(function(catId) {
+      var grid = grids[catId];
       grid.addEventListener('dragover',  function(e){ e.preventDefault(); grid.classList.add('drag-over'); });
       grid.addEventListener('dragleave', function(){ grid.classList.remove('drag-over'); });
       grid.addEventListener('drop', function(e){
@@ -454,12 +485,13 @@ function renderHome() {
       });
     });
   }
+
   // Contadores e mensagem de vazio por categoria
-  Object.keys(cats).forEach(function(catId) {
-    var count = cats[catId].children.length;
+  Object.keys(grids).forEach(function(catId) {
+    var count = grids[catId].children.length;
     var countEl = document.getElementById('count-' + catId);
     if (countEl) countEl.textContent = count;
-    if (!count) cats[catId].innerHTML = '<div class="cat-empty">Nenhum fluxo nesta categoria.</div>';
+    if (!count) grids[catId].innerHTML = '<div class="cat-empty">Nenhum fluxo nesta categoria.</div>';
   });
 }
 /* ════════════════════════════════════════ TELA DE FLUXO ══ */
@@ -594,7 +626,7 @@ function salvarFluxo() {
     fecharModal('modal-fluxo');
   } else {
     var key = 'f'+Date.now();
-    DATA[key] = { nome:nome, etapas:[], categoria:'basicos', icone:iconeSelecionado };
+    DATA[key] = { nome:nome, etapas:[], categoria:(CATEGORIAS[0] ? CATEGORIAS[0].id : 'basicos'), icone:iconeSelecionado };
     salvarData(); renderListaFluxos(); renderHome();
     fecharModal('modal-fluxo'); selecionarFluxo(key);
   }
@@ -942,6 +974,100 @@ function fmtOpcaoTopico(idx) {
 /* ══════════════════════════ FIM FORMATACAO DAS OPCOES ══ */
 
 /* ══════════════════════════════════════════════ MODAIS ══ */
+/* ══════════════════════════════════ GERENCIAR CATEGORIAS ══ */
+function abrirModalCategorias() {
+  renderListaCategoriasModal();
+  abrirModal('modal-categorias');
+}
+function renderListaCategoriasModal() {
+  var list = document.getElementById('lista-categorias');
+  list.innerHTML = '';
+  CATEGORIAS.forEach(function(cat) {
+    var row = document.createElement('div');
+    row.className = 'cat-row';
+    row.draggable = true;
+    row.dataset.id = cat.id;
+    row.innerHTML =
+      '<span class="cat-drag-handle">&#8942;&#8942;</span>' +
+      '<input type="text" class="cat-nome-input" value="' + cat.nome + '" placeholder="Nome da categoria">' +
+      '<button class="btn-del" type="button">x</button>';
+    row.querySelector('.btn-del').addEventListener('click', function() { row.remove(); });
+    ativarDragCategoria(row, list);
+    list.appendChild(row);
+  });
+}
+function ativarDragCategoria(row, list) {
+  row.addEventListener('dragstart', function() {
+    draggedCatRow = row;
+    setTimeout(function(){ row.style.opacity = '0.4'; }, 0);
+  });
+  row.addEventListener('dragend', function() {
+    row.style.opacity = '1';
+    draggedCatRow = null;
+    list.querySelectorAll('.cat-row').forEach(function(r){ r.style.borderColor = 'transparent'; });
+  });
+  row.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    if (!draggedCatRow || draggedCatRow === row) return;
+    row.style.borderColor = 'var(--brand)';
+  });
+  row.addEventListener('dragleave', function() {
+    row.style.borderColor = 'transparent';
+  });
+  row.addEventListener('drop', function(e) {
+    e.preventDefault();
+    row.style.borderColor = 'transparent';
+    if (!draggedCatRow || draggedCatRow === row) return;
+    var rows    = Array.prototype.slice.call(list.children);
+    var fromIdx = rows.indexOf(draggedCatRow);
+    var toIdx   = rows.indexOf(row);
+    if (fromIdx < toIdx) list.insertBefore(draggedCatRow, row.nextSibling);
+    else list.insertBefore(draggedCatRow, row);
+  });
+}
+function adicionarCategoria() {
+  var list = document.getElementById('lista-categorias');
+  var row = document.createElement('div');
+  row.className = 'cat-row';
+  row.draggable = true;
+  row.dataset.id = 'c' + Date.now() + Math.floor(Math.random()*1000);
+  row.innerHTML =
+    '<span class="cat-drag-handle">&#8942;&#8942;</span>' +
+    '<input type="text" class="cat-nome-input" value="" placeholder="Nome da categoria">' +
+    '<button class="btn-del" type="button">x</button>';
+  row.querySelector('.btn-del').addEventListener('click', function() { row.remove(); });
+  ativarDragCategoria(row, list);
+  list.appendChild(row);
+  row.querySelector('input').focus();
+}
+function salvarCategoriasModal() {
+  var rows = document.querySelectorAll('#lista-categorias .cat-row');
+  var novasCategorias = [];
+  rows.forEach(function(row) {
+    var nome = row.querySelector('.cat-nome-input').value.trim();
+    if (!nome) return;
+    novasCategorias.push({ id: row.dataset.id, nome: nome });
+  });
+  if (!novasCategorias.length) { alert('E preciso manter ao menos uma categoria.'); return; }
+
+  // Identifica categorias removidas e realoca os fluxos que pertenciam a elas
+  var idsNovos = novasCategorias.map(function(c){ return c.id; });
+  var idsRemovidos = CATEGORIAS.filter(function(c){ return idsNovos.indexOf(c.id) === -1; }).map(function(c){ return c.id; });
+  if (idsRemovidos.length) {
+    var fallbackId = novasCategorias[0].id;
+    Object.keys(DATA).forEach(function(key) {
+      if (idsRemovidos.indexOf(DATA[key].categoria) !== -1) DATA[key].categoria = fallbackId;
+    });
+    salvarData();
+  }
+
+  CATEGORIAS = novasCategorias;
+  salvarCategorias();
+  fecharModal('modal-categorias');
+  renderHome();
+}
+/* ══════════════════════════════ FIM GERENCIAR CATEGORIAS ══ */
+
 function abrirModal(id)  { document.getElementById(id).classList.add('open');    }
 function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
 /* ══════════════════════════════════════ ENTER NO LOGIN ══ */

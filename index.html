@@ -156,6 +156,21 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
   </div>
   <!-- ════════════════════════════════════════ FIM LOGIN ══ -->
 
+  <!-- ══════════════════════════════════ DEFINIR NOVA SENHA ══ -->
+  <div id="screen-set-password" class="screen">
+    <div class="login-wrap">
+      <div class="login-title">Defina uma nova senha</div>
+      <div class="login-sub">Sua senha foi redefinida pelo coordenador. Escolha uma nova senha para continuar.</div>
+      <div class="login-card">
+        <div class="field"><label>Nova senha</label><input type="password" id="inp-nova-senha" placeholder="Digite a nova senha"></div>
+        <div class="field"><label>Confirmar nova senha</label><input type="password" id="inp-nova-senha-confirma" placeholder="Repita a nova senha"></div>
+        <div class="login-error" id="set-password-error">As senhas nao coincidem ou sao muito curtas (minimo 4 caracteres).</div>
+        <button class="btn-login" onclick="definirNovaSenha()">Salvar e entrar</button>
+      </div>
+    </div>
+  </div>
+  <!-- ══════════════════════════════ FIM DEFINIR NOVA SENHA ══ -->
+
   <!-- ════════════════════════════════════════════ HOME ══ -->
   <div id="screen-home" class="screen">
     <div class="header">
@@ -168,11 +183,12 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
         <span class="perfil-badge" id="perfil-badge"></span>
         <button class="btn-icon" id="btn-painel" style="display:none;" onclick="showPainel()">&#9881; Painel</button>
         <button class="btn-icon" id="btn-categorias" style="display:none;" onclick="abrirModalCategorias()">&#128193; Categorias</button>
+        <button class="btn-icon" id="btn-usuarios" style="display:none;" onclick="abrirModalUsuarios()">&#128100; Usuarios</button>
         <button class="btn-icon" onclick="doLogout()">Sair</button>
       </div>
     </div>
     <div class="home-body">
-      <div class="home-greeting" id="home-greeting">Olá</div>
+      <div class="home-greeting" id="home-greeting">Ola</div>
       <div class="home-desc">Selecione um fluxo para consultar as etapas e orientacoes.</div>
       <div id="home-empty" style="display:none;text-align:center;padding:48px 20px;color:var(--gray2);">
         <div style="font-size:14px;font-weight:500;margin-bottom:4px;">Nenhum fluxo disponivel</div>
@@ -255,6 +271,40 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
     </div>
   </div>
 
+  <!-- MODAL: Usuarios (lista) -->
+  <div class="modal-bg" id="modal-usuarios">
+    <div class="modal modal-wide">
+      <div class="modal-title">Gerenciar usuarios</div>
+      <div id="lista-usuarios"></div>
+      <button class="btn-add" onclick="abrirFormNovoUsuario()" style="margin-top:8px;">+ Novo usuario</button>
+      <div class="modal-acts">
+        <button class="btn-cancel" onclick="fecharModal('modal-usuarios')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Usuario (form criar/editar) -->
+  <div class="modal-bg" id="modal-usuario-form">
+    <div class="modal">
+      <div class="modal-title" id="modal-usuario-form-titulo">Novo usuario</div>
+      <div class="field"><label>Nome</label><input type="text" id="inp-usuario-nome" placeholder="Ex: Maria Silva"></div>
+      <div class="field"><label>Login</label><input type="text" id="inp-usuario-login" placeholder="Ex: maria.silva"></div>
+      <div class="field"><label id="label-usuario-senha">Senha</label><input type="password" id="inp-usuario-senha" placeholder="Digite a senha"></div>
+      <div class="field"><label>Nivel de acesso</label>
+        <select id="inp-usuario-perfil">
+          <option value="atendente">Atendente</option>
+          <option value="editor">Editor de Fluxos</option>
+          <option value="coordenador">Coordenador</option>
+        </select>
+      </div>
+      <div class="login-error" id="usuario-form-error">Preencha nome, login e senha corretamente.</div>
+      <div class="modal-acts">
+        <button class="btn-cancel" onclick="fecharModal('modal-usuario-form')">Cancelar</button>
+        <button class="btn-primary" onclick="salvarUsuarioForm()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: Etapa -->
   <div class="modal-bg" id="modal-etapa">
     <div class="modal">
@@ -326,6 +376,9 @@ var CATEGORIAS = [
   { id:'especificos', nome:'Atendimentos especificos' }
 ];
 var draggedCatRow = null;
+var usuariosProntos = false;
+var usuarioEmRecuperacao = null;
+var PERFIL_LABEL = { atendente:'Atendente', editor:'Editor de Fluxos', coordenador:'Coordenador' };
 /* ═════════════════════════════════════════════ STORAGE ══ */
 var firebaseConfig = {
   apiKey:            "AIzaSyBMf9dgfNCFcIVx7Fx7vJ5m3jgsRm02BV8",
@@ -340,6 +393,7 @@ try {
   firebase.initializeApp(firebaseConfig);
   db = firebase.firestore();
 } catch(e) { console.error('Firebase init erro:', e); }
+carregarUsuarios();
 
 function salvarData() {
   if (db) {
@@ -371,36 +425,108 @@ function carregarData(cb) {
     if (cb) cb();
   }
 }
+function sha256Hex(str) {
+  var enc = new TextEncoder().encode(str);
+  return crypto.subtle.digest('SHA-256', enc).then(function(buf) {
+    var bytes = new Uint8Array(buf);
+    var hex = '';
+    for (var i = 0; i < bytes.length; i++) { hex += bytes[i].toString(16).padStart(2, '0'); }
+    return hex;
+  });
+}
+function salvarUsuarios() {
+  if (db) {
+    db.collection('porto-vale').doc('usuarios').set({ payload: JSON.stringify(USUARIOS) })
+      .catch(function(e){ console.error('Erro ao salvar usuarios:', e); });
+  }
+}
+function carregarUsuarios(cb) {
+  if (!db) { usuariosProntos = true; if (cb) cb(); return; }
+  db.collection('porto-vale').doc('usuarios').get().then(function(doc) {
+    if (doc.exists && doc.data().payload) {
+      try { USUARIOS = JSON.parse(doc.data().payload); } catch(e) { USUARIOS = []; }
+    } else {
+      USUARIOS = [];
+    }
+    if (!USUARIOS.length) {
+      sha256Hex('trocar123').then(function(hash) {
+        USUARIOS = [{ id:'u'+Date.now(), nome:'Coordenador', usuario:'coordenador', senhaHash:hash, perfil:'coordenador' }];
+        salvarUsuarios();
+        usuariosProntos = true;
+        if (cb) cb();
+      });
+    } else {
+      usuariosProntos = true;
+      if (cb) cb();
+    }
+  }).catch(function(e) {
+    console.error('Erro ao carregar usuarios:', e);
+    usuariosProntos = true;
+    if (cb) cb();
+  });
+}
 /* ══════════════════════════════════════════ NAVEGACAO ══ */
 function go(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById('screen-'+id).classList.add('active');
 }
 /* ══════════════════════════════════════════════ LOGIN ══ */
-var USUARIOS = [
-  { nome:'Coordenador', usuario:'Coordenador',    senha:'1234', perfil:'coordenador' },
-  { nome:'Atendente',   usuario:'PortoVale@2026', senha:'1234', perfil:'atendente'   }
-];
+var USUARIOS = [];
 function doLogin() {
+  if (!usuariosProntos) { carregarUsuarios(doLogin); return; }
   var user = document.getElementById('inp-user').value.trim();
   var pass = document.getElementById('inp-pass').value;
   var found = null;
   for (var i = 0; i < USUARIOS.length; i++) {
-    if (USUARIOS[i].usuario === user && USUARIOS[i].senha === pass) { found = USUARIOS[i]; break; }
+    if (USUARIOS[i].usuario === user) { found = USUARIOS[i]; break; }
   }
   if (!found) { document.getElementById('login-error').style.display = 'flex'; return; }
   document.getElementById('login-error').style.display = 'none';
-  perfilAtivo = found;
-  document.getElementById('home-greeting').textContent = 'Ola, ' + found.nome + '!';
-  document.getElementById('perfil-badge').textContent  = found.perfil === 'coordenador' ? 'Coordenador' : 'Atendente';
-  document.getElementById('btn-painel').style.display  = found.perfil === 'coordenador' ? 'flex' : 'none';
-  document.getElementById('btn-categorias').style.display = found.perfil === 'coordenador' ? 'flex' : 'none';
+  if (found.senhaHash === '') {
+    usuarioEmRecuperacao = found;
+    document.getElementById('inp-nova-senha').value = '';
+    document.getElementById('inp-nova-senha-confirma').value = '';
+    document.getElementById('set-password-error').style.display = 'none';
+    go('set-password');
+    return;
+  }
+  sha256Hex(pass).then(function(hash) {
+    if (found.senhaHash !== hash) { document.getElementById('login-error').style.display = 'flex'; return; }
+    finalizarLogin(found);
+  });
+}
+function finalizarLogin(usuario) {
+  perfilAtivo = usuario;
+  document.getElementById('home-greeting').textContent = 'Ola, ' + usuario.nome + '!';
+  document.getElementById('perfil-badge').textContent  = PERFIL_LABEL[usuario.perfil] || usuario.perfil;
+  var podeEditar = usuario.perfil === 'editor' || usuario.perfil === 'coordenador';
+  document.getElementById('btn-painel').style.display     = podeEditar ? 'flex' : 'none';
+  document.getElementById('btn-categorias').style.display = podeEditar ? 'flex' : 'none';
+  document.getElementById('btn-usuarios').style.display    = usuario.perfil === 'coordenador' ? 'flex' : 'none';
   carregarData(function(){ renderHome(); go('home'); });
+}
+function definirNovaSenha() {
+  var novaSenha = document.getElementById('inp-nova-senha').value;
+  var confirma  = document.getElementById('inp-nova-senha-confirma').value;
+  if (!usuarioEmRecuperacao || novaSenha.length < 4 || novaSenha !== confirma) {
+    document.getElementById('set-password-error').style.display = 'flex';
+    return;
+  }
+  sha256Hex(novaSenha).then(function(hash) {
+    usuarioEmRecuperacao.senhaHash = hash;
+    salvarUsuarios();
+    var usuario = usuarioEmRecuperacao;
+    usuarioEmRecuperacao = null;
+    finalizarLogin(usuario);
+  });
 }
 function doLogout() {
   perfilAtivo = null; DATA = {}; flowKey = ''; fluxoKey = ''; etapaIdx = -1;
   document.getElementById('inp-user').value = '';
   document.getElementById('inp-pass').value = '';
+  document.getElementById('btn-painel').style.display = 'none';
+  document.getElementById('btn-categorias').style.display = 'none';
+  document.getElementById('btn-usuarios').style.display = 'none';
   go('login');
 }
 /* ════════════════════════════════════════════════ HOME ══ */
@@ -422,7 +548,7 @@ function renderHome() {
   var empty = document.getElementById('home-empty');
   var container = document.getElementById('home-categorias');
   container.innerHTML = '';
-  var isCoordenador = perfilAtivo && perfilAtivo.perfil === 'coordenador';
+  var isCoordenador = perfilAtivo && (perfilAtivo.perfil === 'coordenador' || perfilAtivo.perfil === 'editor');
 
   // Garante que exista pelo menos uma categoria valida
   if (!CATEGORIAS.length) CATEGORIAS = [{ id:'basicos', nome:'Atendimentos basicos' }];
@@ -558,7 +684,10 @@ function flashCopy(btn) {
   setTimeout(function(){ btn.textContent = orig; btn.style.background = btn.style.borderColor = btn.style.color = ''; }, 2500);
 }
 /* ════════════════════════════════════ PAINEL COORDENADOR ══ */
-function showPainel() { renderListaFluxos(); go('painel'); }
+function showPainel() {
+  if (!perfilAtivo || (perfilAtivo.perfil !== 'editor' && perfilAtivo.perfil !== 'coordenador')) return;
+  renderListaFluxos(); go('painel');
+}
 function renderListaFluxos() {
   var list = document.getElementById('lista-fluxos');
   list.innerHTML = '';
@@ -976,6 +1105,7 @@ function fmtOpcaoTopico(idx) {
 /* ══════════════════════════════════════════════ MODAIS ══ */
 /* ══════════════════════════════════ GERENCIAR CATEGORIAS ══ */
 function abrirModalCategorias() {
+  if (!perfilAtivo || (perfilAtivo.perfil !== 'editor' && perfilAtivo.perfil !== 'coordenador')) return;
   renderListaCategoriasModal();
   abrirModal('modal-categorias');
 }
@@ -1068,11 +1198,112 @@ function salvarCategoriasModal() {
 }
 /* ══════════════════════════════ FIM GERENCIAR CATEGORIAS ══ */
 
+/* ═══════════════════════════════════ GERENCIAR USUARIOS ══ */
+function abrirModalUsuarios() {
+  if (!perfilAtivo || perfilAtivo.perfil !== 'coordenador') return;
+  renderListaUsuariosModal();
+  abrirModal('modal-usuarios');
+}
+function renderListaUsuariosModal() {
+  var list = document.getElementById('lista-usuarios');
+  list.innerHTML = '';
+  USUARIOS.forEach(function(u) {
+    var row = document.createElement('div');
+    row.className = 'prow';
+    row.innerHTML =
+      '<div style="flex:1;"><div class="prow-label">' + u.nome + '</div><div class="prow-sub">' + u.usuario + '</div></div>' +
+      '<span class="perfil-badge" style="margin-right:6px;">' + (PERFIL_LABEL[u.perfil] || u.perfil) + '</span>' +
+      '<button class="btn-edit-fluxo" style="width:22px;height:22px;border:none;background:none;color:var(--gray3);cursor:pointer;font-size:14px;border-radius:4px;">&#9998;</button>' +
+      '<button class="btn-del">x</button>';
+    row.querySelector('.btn-edit-fluxo').addEventListener('click', function(){ editarUsuario(u.id); });
+    row.querySelector('.btn-del').addEventListener('click', function(){ excluirUsuario(u.id); });
+    list.appendChild(row);
+  });
+}
+function abrirFormNovoUsuario() {
+  document.getElementById('modal-usuario-form-titulo').textContent = 'Novo usuario';
+  document.getElementById('modal-usuario-form').dataset.editId = '';
+  document.getElementById('inp-usuario-nome').value  = '';
+  document.getElementById('inp-usuario-login').value = '';
+  document.getElementById('inp-usuario-senha').value = '';
+  document.getElementById('inp-usuario-perfil').value = 'atendente';
+  document.getElementById('label-usuario-senha').textContent = 'Senha';
+  document.getElementById('usuario-form-error').style.display = 'none';
+  abrirModal('modal-usuario-form');
+}
+function editarUsuario(id) {
+  var u = USUARIOS.find(function(x){ return x.id === id; });
+  if (!u) return;
+  document.getElementById('modal-usuario-form-titulo').textContent = 'Editar usuario';
+  document.getElementById('modal-usuario-form').dataset.editId = id;
+  document.getElementById('inp-usuario-nome').value  = u.nome;
+  document.getElementById('inp-usuario-login').value = u.usuario;
+  document.getElementById('inp-usuario-senha').value = '';
+  document.getElementById('inp-usuario-perfil').value = u.perfil;
+  document.getElementById('label-usuario-senha').textContent = 'Senha (deixe em branco para nao alterar)';
+  document.getElementById('usuario-form-error').style.display = 'none';
+  abrirModal('modal-usuario-form');
+}
+function contarCoordenadores() {
+  return USUARIOS.filter(function(u){ return u.perfil === 'coordenador'; }).length;
+}
+function salvarUsuarioForm() {
+  var nome  = document.getElementById('inp-usuario-nome').value.trim();
+  var login = document.getElementById('inp-usuario-login').value.trim();
+  var senha = document.getElementById('inp-usuario-senha').value;
+  var perfil = document.getElementById('inp-usuario-perfil').value;
+  var editId = document.getElementById('modal-usuario-form').dataset.editId;
+  var errEl = document.getElementById('usuario-form-error');
+
+  if (!nome || !login || (!editId && !senha)) { errEl.style.display = 'flex'; return; }
+  var loginDuplicado = USUARIOS.some(function(u){ return u.usuario === login && u.id !== editId; });
+  if (loginDuplicado) { errEl.textContent = 'Ja existe um usuario com esse login.'; errEl.style.display = 'flex'; return; }
+  errEl.style.display = 'none';
+
+  if (editId) {
+    var u = USUARIOS.find(function(x){ return x.id === editId; });
+    if (!u) return;
+    if (u.perfil === 'coordenador' && perfil !== 'coordenador' && contarCoordenadores() <= 1) {
+      errEl.textContent = 'Nao e possivel rebaixar o unico coordenador restante.';
+      errEl.style.display = 'flex';
+      return;
+    }
+    u.nome = nome; u.usuario = login; u.perfil = perfil;
+    if (senha) {
+      sha256Hex(senha).then(function(hash) {
+        u.senhaHash = hash;
+        salvarUsuarios(); renderListaUsuariosModal(); fecharModal('modal-usuario-form');
+      });
+    } else {
+      salvarUsuarios(); renderListaUsuariosModal(); fecharModal('modal-usuario-form');
+    }
+  } else {
+    sha256Hex(senha).then(function(hash) {
+      USUARIOS.push({ id:'u'+Date.now(), nome:nome, usuario:login, senhaHash:hash, perfil:perfil });
+      salvarUsuarios(); renderListaUsuariosModal(); fecharModal('modal-usuario-form');
+    });
+  }
+}
+function excluirUsuario(id) {
+  var u = USUARIOS.find(function(x){ return x.id === id; });
+  if (!u) return;
+  if (u.perfil === 'coordenador' && contarCoordenadores() <= 1) {
+    alert('Nao e possivel excluir o unico coordenador restante.');
+    return;
+  }
+  USUARIOS = USUARIOS.filter(function(x){ return x.id !== id; });
+  salvarUsuarios();
+  renderListaUsuariosModal();
+}
+/* ═══════════════════════════════ FIM GERENCIAR USUARIOS ══ */
+
 function abrirModal(id)  { document.getElementById(id).classList.add('open');    }
 function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
 /* ══════════════════════════════════════ ENTER NO LOGIN ══ */
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter' && document.getElementById('screen-login').classList.contains('active')) doLogin();
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('screen-login').classList.contains('active')) doLogin();
+  if (document.getElementById('screen-set-password').classList.contains('active')) definirNovaSenha();
 });
 
 </script>

@@ -203,6 +203,8 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
         <button class="btn-icon" id="btn-painel" style="display:none;" onclick="showPainel()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="18" r="2"/></svg> Painel</button>
         <button class="btn-icon" id="btn-categorias" style="display:none;" onclick="abrirModalCategorias()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><path d="M5 4h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2"/></svg> Categorias</button>
         <button class="btn-icon" id="btn-usuarios" style="display:none;" onclick="abrirModalUsuarios()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/></svg> Usuários</button>
+        <button class="btn-icon" id="btn-minha-senha" style="display:none;" onclick="abrirModalMinhaSenha()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0z"/></svg> Minha senha</button>
+        <button class="btn-icon" id="btn-sugestoes" style="display:none;" onclick="abrirModalSugestoes()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12l.01 0"/><path d="M13 12l2 0"/><path d="M9 16l.01 0"/><path d="M13 16l2 0"/></svg> Sugestões<span id="badge-sugestoes-pendentes" style="display:none;background:var(--danger-text);color:#fff;border-radius:20px;font-size:10px;padding:1px 6px;margin-left:4px;"></span></button>
         <button class="btn-icon" onclick="doLogout()">Sair</button>
       </div>
     </div>
@@ -223,6 +225,9 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
     <div class="header">
       <button class="btn-icon" onclick="go('home')">&#8592; Voltar</button>
       <div><div class="header-title" id="flow-title"></div><div class="header-sub" id="flow-sub"></div></div>
+      <div class="header-right">
+        <button class="btn-icon" onclick="abrirModalSugestaoTipo()">+ Sugerir mudança</button>
+      </div>
     </div>
     <div class="flow-progress-wrap">
       <div class="flow-progress-label" id="flow-progress-label">Selecione uma etapa</div>
@@ -254,7 +259,7 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
         <div id="sec-etapas" style="display:none;">
           <div class="painel-sec-header">
             <span class="painel-sec-title">Etapas de <span id="label-fluxo-sel" style="color:var(--brand);text-transform:none;"></span></span>
-            <button class="btn-add" onclick="abrirModal('modal-etapa')">+ Nova etapa</button>
+            <button class="btn-add" onclick="abrirModalNovaEtapaPainel()">+ Nova etapa</button>
           </div>
           <input type="text" id="busca-etapas" placeholder="Buscar etapa..." oninput="filtroEtapas=this.value;renderListaEtapas();" style="width:100%;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-md);font-size:12px;font-family:inherit;margin-bottom:8px;">
           <div id="lista-etapas"></div>
@@ -290,6 +295,46 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
       <div id="preview-content" style="max-height:60vh;overflow-y:auto;"></div>
       <div class="modal-acts">
         <button class="btn-cancel" onclick="fecharModal('modal-preview')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Lista de sugestoes (so coordenador) -->
+  <div class="modal-bg" id="modal-sugestoes">
+    <div class="modal modal-wide">
+      <div class="modal-title">Sugestões de mudança</div>
+      <div class="painel-sec-header"><span class="painel-sec-title">Pendentes</span></div>
+      <div id="lista-sugestoes-pendentes"></div>
+      <div class="painel-sec-header" style="margin-top:16px;"><span class="painel-sec-title">Histórico</span></div>
+      <div id="lista-sugestoes-historico"></div>
+      <div class="modal-acts">
+        <button class="btn-cancel" onclick="fecharModal('modal-sugestoes')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Escolher tipo de sugestao -->
+  <div class="modal-bg" id="modal-sugestao-tipo">
+    <div class="modal">
+      <div class="modal-title">Sugerir mudança</div>
+      <div class="field"><label>Tipo de sugestão</label>
+        <select id="sug-tipo" onchange="atualizarCamposSugestao()">
+          <option value="nova_etapa">Nova etapa para este fluxo</option>
+          <option value="novo_passo">Novo passo em uma etapa existente</option>
+          <option value="edicao_passo">Editar um passo existente</option>
+          <option value="edicao_etapa">Editar o nome de uma etapa existente</option>
+        </select>
+      </div>
+      <div class="field" id="sug-campo-etapa" style="display:none;"><label>Etapa</label>
+        <select id="sug-etapa-select" onchange="atualizarPassosSugestao()"></select>
+      </div>
+      <div class="field" id="sug-campo-passo" style="display:none;"><label>Passo</label>
+        <select id="sug-passo-select"></select>
+      </div>
+      <div class="login-error" id="sug-tipo-error">Esta etapa ainda não tem passos cadastrados.</div>
+      <div class="modal-acts">
+        <button class="btn-cancel" onclick="fecharModal('modal-sugestao-tipo')">Cancelar</button>
+        <button class="btn-primary" onclick="continuarSugestao()">Continuar</button>
       </div>
     </div>
   </div>
@@ -341,13 +386,29 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
     </div>
   </div>
 
+  <!-- MODAL: Alterar minha senha (autoatendimento, qualquer perfil) -->
+  <div class="modal-bg" id="modal-minha-senha">
+    <div class="modal">
+      <div class="modal-title">Alterar minha senha</div>
+      <div class="field"><label>Senha atual</label><input type="password" id="inp-senha-atual" placeholder="Digite sua senha atual"></div>
+      <div class="field"><label>Nova senha</label><input type="password" id="inp-minha-nova-senha" placeholder="Digite a nova senha"></div>
+      <div class="field"><label>Confirmar nova senha</label><input type="password" id="inp-minha-nova-senha-confirma" placeholder="Repita a nova senha"></div>
+      <div class="login-error" id="minha-senha-error">Verifique os campos.</div>
+      <div class="modal-acts">
+        <button class="btn-cancel" onclick="fecharModal('modal-minha-senha')">Cancelar</button>
+        <button class="btn-primary" onclick="salvarMinhaSenha()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: Etapa -->
   <div class="modal-bg" id="modal-etapa">
     <div class="modal">
-      <div class="modal-title">Nova etapa</div>
+      <div class="modal-title" id="modal-etapa-titulo">Nova etapa</div>
       <div class="field"><label>Nome da etapa</label><input type="text" id="inp-etapa-nome" placeholder="Ex: Verificação do cliente"></div>
+      <div class="field" id="campo-comentario-etapa" style="display:none;"><label>Comentário (opcional)</label><textarea id="inp-comentario-sugestao-etapa" rows="3" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-md);font-size:13px;font-family:inherit;" placeholder="Explique o motivo da sugestão..."></textarea></div>
       <div class="modal-acts">
-        <button class="btn-cancel" onclick="fecharModal('modal-etapa')">Cancelar</button>
+        <button class="btn-cancel" onclick="cancelarModalEtapa()">Cancelar</button>
         <button class="btn-primary" onclick="salvarEtapa()">Salvar</button>
       </div>
     </div>
@@ -387,8 +448,9 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
         <label>Mensagem rapida (opcional)</label>
         <textarea id="inp-passo-msg" rows="4" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-md);font-size:13px;font-family:inherit;" placeholder="Texto que o atendente pode copiar com um clique..."></textarea>
       </div>
+      <div class="field" id="campo-comentario-passo" style="display:none;"><label>Comentário (opcional)</label><textarea id="inp-comentario-sugestao-passo" rows="3" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-md);font-size:13px;font-family:inherit;" placeholder="Explique o motivo da sugestão..."></textarea></div>
       <div class="modal-acts">
-        <button class="btn-cancel" onclick="fecharModal('modal-passo')">Cancelar</button>
+        <button class="btn-cancel" onclick="cancelarModalPasso()">Cancelar</button>
         <button class="btn-primary" onclick="salvarPasso()">Salvar passo</button>
       </div>
     </div>
@@ -417,6 +479,10 @@ var filtroFluxos = '';
 var filtroEtapas = '';
 var usuariosProntos = false;
 var usuarioEmRecuperacao = null;
+var SUGESTOES = [];
+var modoSugestao = false;
+var sugestaoInfo = null;
+var sugestaoRevisando = null;
 var PERFIL_LABEL = { atendente:'Atendente', editor:'Editor de Fluxos', coordenador:'Coordenador' };
 /* ═════════════════════════════════════════════ TOAST ══ */
 var toastTimer = null;
@@ -458,6 +524,13 @@ function salvarCategorias() {
       .catch(function(e){ console.error('Erro ao salvar categorias:', e); });
   }
 }
+function salvarSugestoes() {
+  mostrarToast('Salvo!');
+  if (db) {
+    db.collection('porto-vale').doc('data').set({ sugestoesPayload: JSON.stringify(SUGESTOES) }, { merge: true })
+      .catch(function(e){ console.error('Erro ao salvar sugestoes:', e); });
+  }
+}
 function carregarData(cb) {
   if (db) {
     db.collection('porto-vale').doc('data').get().then(function(doc) {
@@ -466,6 +539,9 @@ function carregarData(cb) {
       }
       if (doc.exists && doc.data().categoriasPayload) {
         try { CATEGORIAS = JSON.parse(doc.data().categoriasPayload); } catch(e) {}
+      }
+      if (doc.exists && doc.data().sugestoesPayload) {
+        try { SUGESTOES = JSON.parse(doc.data().sugestoesPayload); } catch(e) {}
       }
       if (cb) cb();
     }).catch(function(e) {
@@ -577,7 +653,9 @@ function finalizarLogin(usuario) {
   document.getElementById('btn-painel').style.display     = podeEditar ? 'flex' : 'none';
   document.getElementById('btn-categorias').style.display = podeEditar ? 'flex' : 'none';
   document.getElementById('btn-usuarios').style.display    = usuario.perfil === 'coordenador' ? 'flex' : 'none';
-  carregarData(function(){ renderHome(); go('home'); });
+  document.getElementById('btn-minha-senha').style.display  = 'flex';
+  document.getElementById('btn-sugestoes').style.display    = usuario.perfil === 'coordenador' ? 'flex' : 'none';
+  carregarData(function(){ renderHome(); atualizarBadgeSugestoes(); go('home'); });
 }
 function definirNovaSenha() {
   var novaSenha = document.getElementById('inp-nova-senha').value;
@@ -601,6 +679,8 @@ function doLogout() {
   document.getElementById('btn-painel').style.display = 'none';
   document.getElementById('btn-categorias').style.display = 'none';
   document.getElementById('btn-usuarios').style.display = 'none';
+  document.getElementById('btn-minha-senha').style.display = 'none';
+  document.getElementById('btn-sugestoes').style.display = 'none';
   go('login');
 }
 /* ════════════════════════════════════════════════ HOME ══ */
@@ -949,14 +1029,71 @@ function duplicarEtapa(idx) {
   DATA[fluxoKey].etapas.splice(idx + 1, 0, nova);
   salvarData(); renderListaEtapas(); renderHome();
 }
+function abrirModalNovaEtapaPainel() {
+  modoSugestao = false; sugestaoInfo = null; sugestaoRevisando = null;
+  document.getElementById('inp-etapa-nome').value = '';
+  document.getElementById('modal-etapa').dataset.editIdx = '';
+  document.getElementById('campo-comentario-etapa').style.display = 'none';
+  document.getElementById('modal-etapa-titulo').textContent = 'Nova etapa';
+  abrirModal('modal-etapa');
+}
 function editarEtapa(idx) {
+  modoSugestao = false; sugestaoInfo = null; sugestaoRevisando = null;
+  document.getElementById('campo-comentario-etapa').style.display = 'none';
+  document.getElementById('modal-etapa-titulo').textContent = 'Editar etapa';
   document.getElementById('inp-etapa-nome').value = DATA[fluxoKey].etapas[idx].label;
   document.getElementById('modal-etapa').dataset.editIdx = idx;
   abrirModal('modal-etapa');
 }
 function salvarEtapa() {
   var nome = document.getElementById('inp-etapa-nome').value.trim();
-  if (!nome || !fluxoKey) return;
+  if (!nome) return;
+
+  if (sugestaoRevisando) {
+    var alvo = DATA[sugestaoRevisando.fluxoKey];
+    if (sugestaoRevisando.tipo === 'edicao_etapa') {
+      alvo.etapas[sugestaoRevisando.etapaIdx].label = nome;
+    } else {
+      alvo.etapas.push({ label:nome, passos:[], arvore:'', mensagemRapida:'' });
+    }
+    salvarData();
+    marcarSugestaoDecidida(sugestaoRevisando, 'aprovada');
+    sugestaoRevisando = null;
+    document.getElementById('modal-etapa-titulo').textContent = 'Nova etapa';
+    fecharModal('modal-etapa');
+    renderListaSugestoes(); atualizarBadgeSugestoes();
+    if (fluxoKey) { renderListaEtapas(); renderHome(); }
+    return;
+  }
+
+  if (modoSugestao) {
+    var comentario = document.getElementById('inp-comentario-sugestao-etapa').value.trim();
+    var sug = {
+      id: 's' + Date.now(),
+      tipo: sugestaoInfo.tipo,
+      fluxoKey: sugestaoInfo.fluxoKey,
+      fluxoNome: sugestaoInfo.fluxoNome,
+      etapaIdx: sugestaoInfo.etapaIdx,
+      etapaLabel: sugestaoInfo.etapaIdx > -1 ? DATA[sugestaoInfo.fluxoKey].etapas[sugestaoInfo.etapaIdx].label : null,
+      passoIdx: -1,
+      conteudo: { label: nome },
+      comentarioAutor: comentario,
+      autorId: perfilAtivo.id,
+      autorNome: perfilAtivo.nome,
+      criadoEm: Date.now(),
+      status: 'pendente'
+    };
+    SUGESTOES.push(sug);
+    salvarSugestoes();
+    modoSugestao = false; sugestaoInfo = null;
+    document.getElementById('campo-comentario-etapa').style.display = 'none';
+    document.getElementById('modal-etapa-titulo').textContent = 'Nova etapa';
+    fecharModal('modal-etapa');
+    mostrarToast('Sugestão enviada!');
+    return;
+  }
+
+  if (!fluxoKey) return;
   var modal = document.getElementById('modal-etapa');
   var editIdx = modal.dataset.editIdx;
   if (editIdx !== undefined && editIdx !== '') {
@@ -995,10 +1132,18 @@ function renderEditorPassos() {
   }
   h += '</div>';
   right.innerHTML = h;
-  document.getElementById('btn-novo-passo').addEventListener('click', function(){ abrirModalPasso(-1); });
+  document.getElementById('btn-novo-passo').addEventListener('click', function(){
+    modoSugestao = false; sugestaoInfo = null; sugestaoRevisando = null;
+    document.getElementById('campo-comentario-passo').style.display = 'none';
+    abrirModalPasso(-1);
+  });
   document.getElementById('btn-preview-etapa').addEventListener('click', abrirPreviewEtapa);
   right.querySelectorAll('.btn-edit').forEach(function(btn){
-    btn.addEventListener('click', function(){ abrirModalPasso(parseInt(btn.dataset.idx)); });
+    btn.addEventListener('click', function(){
+      modoSugestao = false; sugestaoInfo = null; sugestaoRevisando = null;
+      document.getElementById('campo-comentario-passo').style.display = 'none';
+      abrirModalPasso(parseInt(btn.dataset.idx));
+    });
   });
   right.querySelectorAll('.btn-dup-p').forEach(function(btn){
     btn.addEventListener('click', function(){ duplicarPasso(parseInt(btn.dataset.idx)); });
@@ -1187,6 +1332,54 @@ function salvarPasso() {
   var msg = document.getElementById('inp-passo-msg').value.trim();
   var p = { tipo:tipo, titulo:titulo, desc:desc, msg:msg };
   if (tipo === 'Decisao') p.opcoes = opcoesTemp.filter(function(o){ return o.label; });
+
+  if (sugestaoRevisando) {
+    var passosAlvo = DATA[sugestaoRevisando.fluxoKey].etapas[sugestaoRevisando.etapaIdx].passos;
+    if (sugestaoRevisando.passoIdx === -1 || sugestaoRevisando.passoIdx === undefined) {
+      passosAlvo.push(p);
+    } else {
+      passosAlvo[sugestaoRevisando.passoIdx] = p;
+    }
+    var fkBak = fluxoKey, eiBak = etapaIdx;
+    fluxoKey = sugestaoRevisando.fluxoKey; etapaIdx = sugestaoRevisando.etapaIdx;
+    sincronizarArvore();
+    fluxoKey = fkBak; etapaIdx = eiBak;
+    salvarData();
+    marcarSugestaoDecidida(sugestaoRevisando, 'aprovada');
+    sugestaoRevisando = null;
+    document.getElementById('campo-comentario-passo').style.display = 'none';
+    fecharModal('modal-passo');
+    renderListaSugestoes(); atualizarBadgeSugestoes();
+    if (fluxoKey && etapaIdx > -1) renderEditorPassos();
+    return;
+  }
+
+  if (modoSugestao) {
+    var comentario = document.getElementById('inp-comentario-sugestao-passo').value.trim();
+    var sug = {
+      id: 's' + Date.now(),
+      tipo: sugestaoInfo.tipo,
+      fluxoKey: sugestaoInfo.fluxoKey,
+      fluxoNome: sugestaoInfo.fluxoNome,
+      etapaIdx: sugestaoInfo.etapaIdx,
+      etapaLabel: DATA[sugestaoInfo.fluxoKey].etapas[sugestaoInfo.etapaIdx].label,
+      passoIdx: sugestaoInfo.passoIdx,
+      conteudo: p,
+      comentarioAutor: comentario,
+      autorId: perfilAtivo.id,
+      autorNome: perfilAtivo.nome,
+      criadoEm: Date.now(),
+      status: 'pendente'
+    };
+    SUGESTOES.push(sug);
+    salvarSugestoes();
+    modoSugestao = false; sugestaoInfo = null;
+    document.getElementById('campo-comentario-passo').style.display = 'none';
+    fecharModal('modal-passo');
+    mostrarToast('Sugestão enviada!');
+    return;
+  }
+
   var passos = DATA[fluxoKey].etapas[etapaIdx].passos;
   if (passoIdx === -1) passos.push(p); else passos[passoIdx] = p;
   sincronizarArvore(); salvarData(); renderEditorPassos();
@@ -1464,6 +1657,262 @@ function excluirUsuario(id) {
   renderListaUsuariosModal();
 }
 /* ═══════════════════════════════ FIM GERENCIAR USUARIOS ══ */
+
+/* ═══════════════════════════════════ ALTERAR MINHA SENHA ══ */
+function abrirModalMinhaSenha() {
+  document.getElementById('inp-senha-atual').value = '';
+  document.getElementById('inp-minha-nova-senha').value = '';
+  document.getElementById('inp-minha-nova-senha-confirma').value = '';
+  document.getElementById('minha-senha-error').style.display = 'none';
+  abrirModal('modal-minha-senha');
+}
+function salvarMinhaSenha() {
+  var atual    = document.getElementById('inp-senha-atual').value;
+  var nova     = document.getElementById('inp-minha-nova-senha').value;
+  var confirma = document.getElementById('inp-minha-nova-senha-confirma').value;
+  var errEl    = document.getElementById('minha-senha-error');
+  if (nova.length < 4 || nova !== confirma) {
+    errEl.textContent = 'As novas senhas não coincidem ou são muito curtas (mínimo 4 caracteres).';
+    errEl.style.display = 'flex';
+    return;
+  }
+  sha256Hex(atual).then(function(hashAtual) {
+    if (hashAtual !== perfilAtivo.senhaHash) {
+      errEl.textContent = 'Senha atual incorreta.';
+      errEl.style.display = 'flex';
+      return;
+    }
+    sha256Hex(nova).then(function(hashNova) {
+      var u = USUARIOS.find(function(x){ return x.id === perfilAtivo.id; });
+      if (u) u.senhaHash = hashNova;
+      perfilAtivo.senhaHash = hashNova;
+      salvarUsuarios();
+      fecharModal('modal-minha-senha');
+    });
+  });
+}
+/* ═════════════════════════════════ FIM ALTERAR MINHA SENHA ══ */
+
+/* ══════════════════════════════════ SISTEMA DE SUGESTOES ══ */
+function abrirModalSugestaoTipo() {
+  document.getElementById('sug-tipo').value = 'nova_etapa';
+  document.getElementById('sug-tipo-error').style.display = 'none';
+  atualizarCamposSugestao();
+  abrirModal('modal-sugestao-tipo');
+}
+function atualizarCamposSugestao() {
+  var tipo = document.getElementById('sug-tipo').value;
+  document.getElementById('sug-campo-etapa').style.display = (tipo === 'nova_etapa') ? 'none' : 'block';
+  document.getElementById('sug-campo-passo').style.display = (tipo === 'edicao_passo') ? 'block' : 'none';
+  if (tipo !== 'nova_etapa') {
+    var sel = document.getElementById('sug-etapa-select');
+    sel.innerHTML = '';
+    (DATA[flowKey].etapas || []).forEach(function(et, i) {
+      var opt = document.createElement('option');
+      opt.value = i; opt.textContent = et.label;
+      sel.appendChild(opt);
+    });
+    atualizarPassosSugestao();
+  }
+}
+function atualizarPassosSugestao() {
+  var tipo = document.getElementById('sug-tipo').value;
+  if (tipo !== 'edicao_passo') return;
+  var etIdx = parseInt(document.getElementById('sug-etapa-select').value);
+  var sel = document.getElementById('sug-passo-select');
+  sel.innerHTML = '';
+  var passos = (DATA[flowKey].etapas[etIdx] && DATA[flowKey].etapas[etIdx].passos) || [];
+  passos.forEach(function(p, i) {
+    var opt = document.createElement('option');
+    opt.value = i; opt.textContent = 'Passo ' + (i + 1) + ' - ' + p.titulo;
+    sel.appendChild(opt);
+  });
+}
+function continuarSugestao() {
+  var tipo = document.getElementById('sug-tipo').value;
+  var errEl = document.getElementById('sug-tipo-error');
+  errEl.style.display = 'none';
+
+  if (tipo === 'nova_etapa') {
+    modoSugestao = true;
+    sugestaoInfo = { tipo:'nova_etapa', fluxoKey:flowKey, fluxoNome:DATA[flowKey].nome, etapaIdx:-1, passoIdx:-1 };
+    fluxoKey = flowKey;
+    document.getElementById('modal-etapa-titulo').textContent = 'Sugerir nova etapa';
+    document.getElementById('inp-etapa-nome').value = '';
+    document.getElementById('modal-etapa').dataset.editIdx = '';
+    document.getElementById('campo-comentario-etapa').style.display = 'block';
+    document.getElementById('inp-comentario-sugestao-etapa').value = '';
+    fecharModal('modal-sugestao-tipo');
+    abrirModal('modal-etapa');
+    return;
+  }
+
+  var etIdx = parseInt(document.getElementById('sug-etapa-select').value);
+  if (isNaN(etIdx)) { errEl.textContent = 'Este fluxo ainda não tem etapas cadastradas.'; errEl.style.display = 'flex'; return; }
+  var etapaAlvo = DATA[flowKey].etapas[etIdx];
+
+  if (tipo === 'edicao_etapa') {
+    modoSugestao = true;
+    sugestaoInfo = { tipo:'edicao_etapa', fluxoKey:flowKey, fluxoNome:DATA[flowKey].nome, etapaIdx:etIdx, passoIdx:-1 };
+    fluxoKey = flowKey;
+    document.getElementById('modal-etapa-titulo').textContent = 'Sugerir edição de etapa';
+    document.getElementById('inp-etapa-nome').value = etapaAlvo.label;
+    document.getElementById('modal-etapa').dataset.editIdx = '';
+    document.getElementById('campo-comentario-etapa').style.display = 'block';
+    document.getElementById('inp-comentario-sugestao-etapa').value = '';
+    fecharModal('modal-sugestao-tipo');
+    abrirModal('modal-etapa');
+    return;
+  }
+
+  if (tipo === 'novo_passo') {
+    modoSugestao = true;
+    sugestaoInfo = { tipo:'novo_passo', fluxoKey:flowKey, fluxoNome:DATA[flowKey].nome, etapaIdx:etIdx, passoIdx:-1 };
+    document.getElementById('modal-passo-titulo').textContent = 'Sugerir novo passo';
+    document.getElementById('inp-passo-tipo').value = 'Gatilho';
+    document.getElementById('inp-passo-titulo').value = '';
+    document.getElementById('inp-passo-desc').value = '';
+    document.getElementById('inp-passo-msg').value = '';
+    opcoesTemp = [];
+    toggleOpcoes(); renderOpcoes();
+    document.getElementById('campo-comentario-passo').style.display = 'block';
+    document.getElementById('inp-comentario-sugestao-passo').value = '';
+    fecharModal('modal-sugestao-tipo');
+    abrirModal('modal-passo');
+    return;
+  }
+
+  if (tipo === 'edicao_passo') {
+    var passos = etapaAlvo.passos || [];
+    if (!passos.length) { errEl.textContent = 'Esta etapa ainda não tem passos cadastrados.'; errEl.style.display = 'flex'; return; }
+    var pIdx = parseInt(document.getElementById('sug-passo-select').value);
+    var passoAlvo = passos[pIdx];
+    modoSugestao = true;
+    sugestaoInfo = { tipo:'edicao_passo', fluxoKey:flowKey, fluxoNome:DATA[flowKey].nome, etapaIdx:etIdx, passoIdx:pIdx };
+    document.getElementById('modal-passo-titulo').textContent = 'Sugerir edição de passo';
+    document.getElementById('inp-passo-tipo').value = passoAlvo.tipo;
+    document.getElementById('inp-passo-titulo').value = passoAlvo.titulo;
+    document.getElementById('inp-passo-desc').value = passoAlvo.desc || '';
+    document.getElementById('inp-passo-msg').value = passoAlvo.msg || '';
+    opcoesTemp = passoAlvo.opcoes ? JSON.parse(JSON.stringify(passoAlvo.opcoes)) : [];
+    toggleOpcoes(); renderOpcoes();
+    document.getElementById('campo-comentario-passo').style.display = 'block';
+    document.getElementById('inp-comentario-sugestao-passo').value = '';
+    fecharModal('modal-sugestao-tipo');
+    abrirModal('modal-passo');
+    return;
+  }
+}
+function cancelarModalEtapa() {
+  modoSugestao = false; sugestaoInfo = null; sugestaoRevisando = null;
+  document.getElementById('campo-comentario-etapa').style.display = 'none';
+  document.getElementById('modal-etapa-titulo').textContent = 'Nova etapa';
+  fecharModal('modal-etapa');
+}
+function cancelarModalPasso() {
+  modoSugestao = false; sugestaoInfo = null; sugestaoRevisando = null;
+  document.getElementById('campo-comentario-passo').style.display = 'none';
+  fecharModal('modal-passo');
+}
+function abrirModalSugestoes() {
+  if (!perfilAtivo || perfilAtivo.perfil !== 'coordenador') return;
+  renderListaSugestoes();
+  abrirModal('modal-sugestoes');
+}
+function atualizarBadgeSugestoes() {
+  var badge = document.getElementById('badge-sugestoes-pendentes');
+  if (!badge) return;
+  var pendentes = SUGESTOES.filter(function(s){ return s.status === 'pendente'; }).length;
+  if (pendentes > 0) { badge.textContent = pendentes; badge.style.display = 'inline-block'; }
+  else { badge.style.display = 'none'; }
+}
+var TIPO_SUGESTAO_LABEL = {
+  nova_etapa: 'Nova etapa', edicao_etapa: 'Editar etapa',
+  novo_passo: 'Novo passo', edicao_passo: 'Editar passo'
+};
+function renderListaSugestoes() {
+  var listaPend = document.getElementById('lista-sugestoes-pendentes');
+  var listaHist = document.getElementById('lista-sugestoes-historico');
+  var pendentes = SUGESTOES.filter(function(s){ return s.status === 'pendente'; });
+  var historico  = SUGESTOES.filter(function(s){ return s.status !== 'pendente'; }).slice().reverse();
+
+  listaPend.innerHTML = pendentes.length ? '' : '<div class="fstep-empty">Nenhuma sugestão pendente.</div>';
+  pendentes.forEach(function(s) {
+    var row = document.createElement('div');
+    row.className = 'vc-step';
+    var dataFmt = new Date(s.criadoEm).toLocaleDateString('pt-BR');
+    row.innerHTML =
+      '<div class="vc-step-header">' +
+      '<span class="vc-badge vc-badge-blue">' + (TIPO_SUGESTAO_LABEL[s.tipo] || s.tipo) + '</span>' +
+      '<span class="vc-title">' + s.fluxoNome + (s.etapaLabel ? ' &rsaquo; ' + s.etapaLabel : '') + '</span>' +
+      '</div>' +
+      '<div class="vc-body">Sugerido por <b>' + s.autorNome + '</b> em ' + dataFmt +
+      (s.comentarioAutor ? '<br>&ldquo;' + s.comentarioAutor + '&rdquo;' : '') + '</div>' +
+      '<div style="display:flex;gap:8px;margin-top:10px;">' +
+      '<button class="btn-primary" data-id="' + s.id + '" data-acao="revisar" style="flex:1;">Revisar e aprovar</button>' +
+      '<button class="btn-cancel" data-id="' + s.id + '" data-acao="rejeitar">Rejeitar</button>' +
+      '</div>';
+    row.querySelector('[data-acao="revisar"]').addEventListener('click', function(){ revisarSugestao(s.id); });
+    row.querySelector('[data-acao="rejeitar"]').addEventListener('click', function(){ rejeitarSugestao(s.id); });
+    listaPend.appendChild(row);
+  });
+
+  listaHist.innerHTML = historico.length ? '' : '<div class="fstep-empty">Nenhuma sugestão decidida ainda.</div>';
+  historico.forEach(function(s) {
+    var row = document.createElement('div');
+    row.className = 'prow';
+    row.style.cursor = 'default';
+    var corStatus = s.status === 'aprovada' ? 'var(--success-text)' : 'var(--danger-text)';
+    var dataFmt = new Date(s.revisadoEm || s.criadoEm).toLocaleDateString('pt-BR');
+    row.innerHTML =
+      '<div style="flex:1;">' +
+      '<div class="prow-label">' + s.fluxoNome + (s.etapaLabel ? ' &rsaquo; ' + s.etapaLabel : '') + '</div>' +
+      '<div class="prow-sub">' + (TIPO_SUGESTAO_LABEL[s.tipo] || s.tipo) + ' &middot; por ' + s.autorNome + '</div>' +
+      '</div>' +
+      '<span style="font-size:11px;font-weight:600;color:' + corStatus + ';">' + (s.status === 'aprovada' ? 'Aprovada' : 'Rejeitada') + ' em ' + dataFmt + '</span>';
+    listaHist.appendChild(row);
+  });
+}
+function marcarSugestaoDecidida(sug, status) {
+  sug.status = status;
+  sug.revisorId = perfilAtivo.id;
+  sug.revisorNome = perfilAtivo.nome;
+  sug.revisadoEm = Date.now();
+  salvarSugestoes();
+}
+function rejeitarSugestao(id) {
+  var s = SUGESTOES.find(function(x){ return x.id === id; });
+  if (!s) return;
+  marcarSugestaoDecidida(s, 'rejeitada');
+  renderListaSugestoes();
+  atualizarBadgeSugestoes();
+}
+function revisarSugestao(id) {
+  var s = SUGESTOES.find(function(x){ return x.id === id; });
+  if (!s) return;
+  sugestaoRevisando = s;
+  modoSugestao = false;
+  fecharModal('modal-sugestoes');
+  if (s.tipo === 'nova_etapa' || s.tipo === 'edicao_etapa') {
+    document.getElementById('modal-etapa-titulo').textContent = 'Revisar sugestão de etapa';
+    document.getElementById('inp-etapa-nome').value = s.conteudo.label;
+    document.getElementById('modal-etapa').dataset.editIdx = '';
+    document.getElementById('campo-comentario-etapa').style.display = 'none';
+    abrirModal('modal-etapa');
+  } else {
+    var p = s.conteudo;
+    document.getElementById('modal-passo-titulo').textContent = 'Revisar sugestão de passo';
+    document.getElementById('inp-passo-tipo').value = p.tipo;
+    document.getElementById('inp-passo-titulo').value = p.titulo;
+    document.getElementById('inp-passo-desc').value = p.desc || '';
+    document.getElementById('inp-passo-msg').value = p.msg || '';
+    opcoesTemp = p.opcoes ? JSON.parse(JSON.stringify(p.opcoes)) : [];
+    toggleOpcoes(); renderOpcoes();
+    document.getElementById('campo-comentario-passo').style.display = 'none';
+    abrirModal('modal-passo');
+  }
+}
+/* ═══════════════════════════════ FIM SISTEMA DE SUGESTOES ══ */
 
 function abrirModal(id)  { document.getElementById(id).classList.add('open');    }
 function fecharModal(id) { document.getElementById(id).classList.remove('open'); }

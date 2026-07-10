@@ -412,6 +412,7 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
     <div class="modal">
       <div class="modal-title" id="modal-etapa-titulo">Nova etapa</div>
       <div class="field"><label>Nome da etapa</label><input type="text" id="inp-etapa-nome" placeholder="Ex: Verificação do cliente"></div>
+      <div class="field" id="campo-impacto-etapa" style="display:none;"><label>Impacto desta mudança</label><select id="inp-impacto-etapa"><option value="positivo">Positivo</option><option value="negativo">Negativo</option></select></div>
       <div class="field" id="campo-comentario-etapa" style="display:none;"><label>Comentário (opcional)</label><textarea id="inp-comentario-sugestao-etapa" rows="3" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-md);font-size:13px;font-family:inherit;" placeholder="Explique o motivo da sugestão..."></textarea></div>
       <div class="modal-acts">
         <button class="btn-cancel" onclick="cancelarModalEtapa()">Cancelar</button>
@@ -454,6 +455,7 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
         <label>Mensagem rapida (opcional)</label>
         <textarea id="inp-passo-msg" rows="4" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-md);font-size:13px;font-family:inherit;" placeholder="Texto que o atendente pode copiar com um clique..."></textarea>
       </div>
+      <div class="field" id="campo-impacto-passo" style="display:none;"><label>Impacto desta mudança</label><select id="inp-impacto-passo"><option value="positivo">Positivo</option><option value="negativo">Negativo</option></select></div>
       <div class="field" id="campo-comentario-passo" style="display:none;"><label>Comentário (opcional)</label><textarea id="inp-comentario-sugestao-passo" rows="3" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-md);font-size:13px;font-family:inherit;" placeholder="Explique o motivo da sugestão..."></textarea></div>
       <div class="modal-acts">
         <button class="btn-cancel" onclick="cancelarModalPasso()">Cancelar</button>
@@ -1040,12 +1042,14 @@ function abrirModalNovaEtapaPainel() {
   document.getElementById('inp-etapa-nome').value = '';
   document.getElementById('modal-etapa').dataset.editIdx = '';
   document.getElementById('campo-comentario-etapa').style.display = 'none';
+  document.getElementById('campo-impacto-etapa').style.display = 'none';
   document.getElementById('modal-etapa-titulo').textContent = 'Nova etapa';
   abrirModal('modal-etapa');
 }
 function editarEtapa(idx) {
   modoSugestao = false; sugestaoInfo = null; sugestaoRevisando = null;
   document.getElementById('campo-comentario-etapa').style.display = 'none';
+  document.getElementById('campo-impacto-etapa').style.display = 'none';
   document.getElementById('modal-etapa-titulo').textContent = 'Editar etapa';
   document.getElementById('inp-etapa-nome').value = DATA[fluxoKey].etapas[idx].label;
   document.getElementById('modal-etapa').dataset.editIdx = idx;
@@ -1063,8 +1067,10 @@ function salvarEtapa() {
       alvo.etapas.push({ label:nome, passos:[], arvore:'', mensagemRapida:'' });
     }
     salvarData();
-    marcarSugestaoDecidida(sugestaoRevisando, 'aprovada');
+    var impactoEtapa = document.getElementById('inp-impacto-etapa').value;
+    marcarSugestaoDecidida(sugestaoRevisando, 'aprovada', impactoEtapa);
     sugestaoRevisando = null;
+    document.getElementById('campo-impacto-etapa').style.display = 'none';
     document.getElementById('modal-etapa-titulo').textContent = 'Nova etapa';
     fecharModal('modal-etapa');
     renderListaSugestoes(); atualizarBadgeSugestoes();
@@ -1141,6 +1147,7 @@ function renderEditorPassos() {
   document.getElementById('btn-novo-passo').addEventListener('click', function(){
     modoSugestao = false; sugestaoInfo = null; sugestaoRevisando = null;
     document.getElementById('campo-comentario-passo').style.display = 'none';
+    document.getElementById('campo-impacto-passo').style.display = 'none';
     abrirModalPasso(-1);
   });
   document.getElementById('btn-preview-etapa').addEventListener('click', abrirPreviewEtapa);
@@ -1148,6 +1155,7 @@ function renderEditorPassos() {
     btn.addEventListener('click', function(){
       modoSugestao = false; sugestaoInfo = null; sugestaoRevisando = null;
       document.getElementById('campo-comentario-passo').style.display = 'none';
+      document.getElementById('campo-impacto-passo').style.display = 'none';
       abrirModalPasso(parseInt(btn.dataset.idx));
     });
   });
@@ -1351,9 +1359,11 @@ function salvarPasso() {
     sincronizarArvore();
     fluxoKey = fkBak; etapaIdx = eiBak;
     salvarData();
-    marcarSugestaoDecidida(sugestaoRevisando, 'aprovada');
+    var impactoPasso = document.getElementById('inp-impacto-passo').value;
+    marcarSugestaoDecidida(sugestaoRevisando, 'aprovada', impactoPasso);
     sugestaoRevisando = null;
     document.getElementById('campo-comentario-passo').style.display = 'none';
+    document.getElementById('campo-impacto-passo').style.display = 'none';
     fecharModal('modal-passo');
     renderListaSugestoes(); atualizarBadgeSugestoes();
     if (fluxoKey && etapaIdx > -1) renderEditorPassos();
@@ -1747,6 +1757,7 @@ function continuarSugestao() {
     document.getElementById('inp-etapa-nome').value = '';
     document.getElementById('modal-etapa').dataset.editIdx = '';
     document.getElementById('campo-comentario-etapa').style.display = 'block';
+    document.getElementById('campo-impacto-etapa').style.display = 'none';
     document.getElementById('inp-comentario-sugestao-etapa').value = '';
     fecharModal('modal-sugestao-tipo');
     abrirModal('modal-etapa');
@@ -1765,6 +1776,7 @@ function continuarSugestao() {
     document.getElementById('inp-etapa-nome').value = etapaAlvo.label;
     document.getElementById('modal-etapa').dataset.editIdx = '';
     document.getElementById('campo-comentario-etapa').style.display = 'block';
+    document.getElementById('campo-impacto-etapa').style.display = 'none';
     document.getElementById('inp-comentario-sugestao-etapa').value = '';
     fecharModal('modal-sugestao-tipo');
     abrirModal('modal-etapa');
@@ -1782,6 +1794,7 @@ function continuarSugestao() {
     opcoesTemp = [];
     toggleOpcoes(); renderOpcoes();
     document.getElementById('campo-comentario-passo').style.display = 'block';
+    document.getElementById('campo-impacto-passo').style.display = 'none';
     document.getElementById('inp-comentario-sugestao-passo').value = '';
     fecharModal('modal-sugestao-tipo');
     abrirModal('modal-passo');
@@ -1803,6 +1816,7 @@ function continuarSugestao() {
     opcoesTemp = passoAlvo.opcoes ? JSON.parse(JSON.stringify(passoAlvo.opcoes)) : [];
     toggleOpcoes(); renderOpcoes();
     document.getElementById('campo-comentario-passo').style.display = 'block';
+    document.getElementById('campo-impacto-passo').style.display = 'none';
     document.getElementById('inp-comentario-sugestao-passo').value = '';
     fecharModal('modal-sugestao-tipo');
     abrirModal('modal-passo');
@@ -1812,12 +1826,14 @@ function continuarSugestao() {
 function cancelarModalEtapa() {
   modoSugestao = false; sugestaoInfo = null; sugestaoRevisando = null;
   document.getElementById('campo-comentario-etapa').style.display = 'none';
+  document.getElementById('campo-impacto-etapa').style.display = 'none';
   document.getElementById('modal-etapa-titulo').textContent = 'Nova etapa';
   fecharModal('modal-etapa');
 }
 function cancelarModalPasso() {
   modoSugestao = false; sugestaoInfo = null; sugestaoRevisando = null;
   document.getElementById('campo-comentario-passo').style.display = 'none';
+  document.getElementById('campo-impacto-passo').style.display = 'none';
   fecharModal('modal-passo');
 }
 function abrirModalSugestoes() {
@@ -1880,22 +1896,30 @@ function renderListaSugestoes() {
     row.style.cursor = 'default';
     var corStatus = s.status === 'aprovada' ? 'var(--success-text)' : 'var(--danger-text)';
     var dataFmt = new Date(s.revisadoEm || s.criadoEm).toLocaleDateString('pt-BR');
+    var impactoTag = '';
+    if (s.status === 'aprovada' && s.impacto) {
+      var corImpacto = s.impacto === 'positivo' ? 'var(--success-text)' : 'var(--danger-text)';
+      var bgImpacto  = s.impacto === 'positivo' ? 'var(--success-bg)' : '#fff0f0';
+      impactoTag = '<span style="font-size:10px;font-weight:600;color:' + corImpacto + ';background:' + bgImpacto + ';border-radius:20px;padding:1px 8px;margin-right:8px;">' + (s.impacto === 'positivo' ? 'Positiva' : 'Negativa') + '</span>';
+    }
     row.innerHTML =
       '<div style="flex:1;">' +
       '<div class="prow-label">' + s.fluxoNome + (s.etapaLabel ? ' &rsaquo; ' + s.etapaLabel : '') + '</div>' +
       '<div class="prow-sub">' + (TIPO_SUGESTAO_LABEL[s.tipo] || s.tipo) + ' &middot; por ' + s.autorNome + '</div>' +
       '</div>' +
+      impactoTag +
       '<span style="font-size:11px;font-weight:600;color:' + corStatus + ';margin-right:8px;">' + (s.status === 'aprovada' ? 'Aprovada' : 'Rejeitada') + ' em ' + dataFmt + '</span>' +
       '<button class="btn-del" title="Excluir do histórico">x</button>';
     row.querySelector('.btn-del').addEventListener('click', function(){ excluirSugestaoHistorico(s.id); });
     listaHist.appendChild(row);
   });
 }
-function marcarSugestaoDecidida(sug, status) {
+function marcarSugestaoDecidida(sug, status, impacto) {
   sug.status = status;
   sug.revisorId = perfilAtivo.id;
   sug.revisorNome = perfilAtivo.nome;
   sug.revisadoEm = Date.now();
+  if (impacto) sug.impacto = impacto;
   salvarSugestoes();
 }
 function excluirSugestaoHistorico(id) {
@@ -1922,6 +1946,8 @@ function revisarSugestao(id) {
     document.getElementById('inp-etapa-nome').value = s.conteudo.label;
     document.getElementById('modal-etapa').dataset.editIdx = '';
     document.getElementById('campo-comentario-etapa').style.display = 'none';
+    document.getElementById('inp-impacto-etapa').value = 'positivo';
+    document.getElementById('campo-impacto-etapa').style.display = 'block';
     abrirModal('modal-etapa');
   } else {
     var p = s.conteudo;
@@ -1933,6 +1959,8 @@ function revisarSugestao(id) {
     opcoesTemp = p.opcoes ? JSON.parse(JSON.stringify(p.opcoes)) : [];
     toggleOpcoes(); renderOpcoes();
     document.getElementById('campo-comentario-passo').style.display = 'none';
+    document.getElementById('inp-impacto-passo').value = 'positivo';
+    document.getElementById('campo-impacto-passo').style.display = 'block';
     abrirModal('modal-passo');
   }
 }

@@ -168,6 +168,9 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
 .sug-tab{padding:8px 14px;border:none;background:none;font-size:13px;font-family:inherit;color:var(--gray2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
 .sug-tab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600;}
 .sug-tab-badge{background:var(--danger-text);color:#fff;border-radius:20px;font-size:10px;padding:1px 6px;margin-left:4px;}
+.depto-check-row{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;}
+.depto-check-row input{width:auto;}
+.depto-chip{display:inline-block;font-size:10px;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:1px 8px;margin-right:4px;color:var(--gray2);}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:#1a1a1a;color:#fff;font-size:13px;padding:9px 18px;border-radius:20px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:200;}
 .btn-tema-toggle{position:fixed;bottom:16px;left:16px;width:38px;height:38px;border-radius:50%;border:1px solid var(--border2);background:var(--bg);color:var(--gray1);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.1);z-index:150;transition:background .15s,color .15s,border-color .15s;}
 .btn-tema-toggle:hover{border-color:var(--brand);color:var(--brand);}
@@ -221,7 +224,11 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
         <div><div class="header-title">Mapa Pós Contemplação</div><div class="header-sub">Porto Vale Consórcio</div></div>
       </div>
       <div class="header-right">
+        <div id="wrap-seletor-depto" style="display:none;align-items:center;gap:6px;">
+          <select id="sel-departamento" onchange="trocarDepartamento(this.value)" style="padding:6px 10px;border:1px solid var(--border2);border-radius:var(--r-md);font-size:12px;font-family:inherit;background:var(--bg);color:var(--gray1);"></select>
+        </div>
         <span class="perfil-badge" id="perfil-badge"></span>
+        <button class="btn-icon" id="btn-departamentos" style="display:none;" onclick="abrirModalDepartamentos()">&#127970; Departamentos</button>
         <button class="btn-icon" id="btn-painel" style="display:none;" onclick="showPainel()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="18" r="2"/></svg> Painel</button>
         <button class="btn-icon" id="btn-categorias" style="display:none;" onclick="abrirModalCategorias()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><path d="M5 4h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2"/></svg> Categorias</button>
         <button class="btn-icon" id="btn-usuarios" style="display:none;" onclick="abrirModalUsuarios()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/></svg> Usuários</button>
@@ -363,6 +370,20 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
     </div>
   </div>
 
+  <!-- MODAL: Departamentos (so Coordenador Geral) -->
+  <div class="modal-bg" id="modal-departamentos">
+    <div class="modal modal-wide">
+      <div class="modal-title">Gerenciar departamentos</div>
+      <div id="lista-departamentos"></div>
+      <button class="btn-add" onclick="adicionarDepartamento()" style="margin-top:8px;">+ Novo departamento</button>
+      <div class="login-error" id="departamentos-error">Mantenha ao menos um departamento.</div>
+      <div class="modal-acts">
+        <button class="btn-cancel" onclick="fecharModal('modal-departamentos')">Cancelar</button>
+        <button class="btn-primary" onclick="salvarDepartamentosModal()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: Categorias -->
   <div class="modal-bg" id="modal-categorias">
     <div class="modal modal-wide">
@@ -401,6 +422,9 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
           <option value="editor">Editor de Fluxos</option>
           <option value="coordenador">Coordenador</option>
         </select>
+      </div>
+      <div class="field"><label>Departamentos com acesso</label>
+        <div id="lista-depto-checkboxes"></div>
       </div>
       <div class="login-error" id="usuario-form-error">Preencha nome, login e senha corretamente.</div>
       <div class="modal-acts">
@@ -514,7 +538,12 @@ var SUGESTOES = [];
 var modoSugestao = false;
 var sugestaoInfo = null;
 var sugestaoRevisando = null;
-var PERFIL_LABEL = { atendente:'Atendente', editor:'Editor de Fluxos', coordenador:'Coordenador' };
+var PERFIL_LABEL = { atendente:'Atendente', editor:'Editor de Fluxos', coordenador:'Coordenador', coordenador_geral:'Coordenador Geral' };
+var DEPARTAMENTOS = [];
+var deptoAtivo = null;
+function nivelPermiteEditar(perfil) { return perfil === 'editor' || perfil === 'coordenador' || perfil === 'coordenador_geral'; }
+function nivelEhCoordenador(perfil) { return perfil === 'coordenador' || perfil === 'coordenador_geral'; }
+function docIdParaDepto(deptoId) { return deptoId === 'pos-contemplacao' ? 'data' : 'data_' + deptoId; }
 /* ═════════════════════════════════════════════ TOAST ══ */
 var toastTimer = null;
 function mostrarToast(msg) {
@@ -562,33 +591,41 @@ carregarUsuarios();
 
 function salvarData() {
   mostrarToast('Salvo!');
-  if (db) {
-    db.collection('porto-vale').doc('data').set({ payload: JSON.stringify(DATA) }, { merge: true })
+  if (db && deptoAtivo) {
+    db.collection('porto-vale').doc(docIdParaDepto(deptoAtivo)).set({ payload: JSON.stringify(DATA) }, { merge: true })
       .catch(function(e){ console.error('Erro ao salvar:', e); });
   }
 }
 function salvarCategorias() {
   mostrarToast('Salvo!');
-  if (db) {
-    db.collection('porto-vale').doc('data').set({ categoriasPayload: JSON.stringify(CATEGORIAS) }, { merge: true })
+  if (db && deptoAtivo) {
+    db.collection('porto-vale').doc(docIdParaDepto(deptoAtivo)).set({ categoriasPayload: JSON.stringify(CATEGORIAS) }, { merge: true })
       .catch(function(e){ console.error('Erro ao salvar categorias:', e); });
   }
 }
 function salvarSugestoes() {
   mostrarToast('Salvo!');
-  if (db) {
-    db.collection('porto-vale').doc('data').set({ sugestoesPayload: JSON.stringify(SUGESTOES) }, { merge: true })
+  if (db && deptoAtivo) {
+    db.collection('porto-vale').doc(docIdParaDepto(deptoAtivo)).set({ sugestoesPayload: JSON.stringify(SUGESTOES) }, { merge: true })
       .catch(function(e){ console.error('Erro ao salvar sugestoes:', e); });
   }
 }
-function carregarData(cb) {
-  if (db) {
-    db.collection('porto-vale').doc('data').get().then(function(doc) {
+function carregarDadosDepartamento(deptoId, cb) {
+  DATA = {}; CATEGORIAS = []; SUGESTOES = [];
+  if (db && deptoId) {
+    db.collection('porto-vale').doc(docIdParaDepto(deptoId)).get().then(function(doc) {
       if (doc.exists && doc.data().payload) {
         try { DATA = JSON.parse(doc.data().payload); } catch(e) {}
       }
       if (doc.exists && doc.data().categoriasPayload) {
         try { CATEGORIAS = JSON.parse(doc.data().categoriasPayload); } catch(e) {}
+      }
+      if (!CATEGORIAS.length) {
+        CATEGORIAS = [
+          { id:'basicos',     nome:'Atendimentos Básicos' },
+          { id:'bem',         nome:'Atendimentos por tipo de bem' },
+          { id:'especificos', nome:'Atendimentos Específicos' }
+        ];
       }
       if (doc.exists && doc.data().sugestoesPayload) {
         try { SUGESTOES = JSON.parse(doc.data().sugestoesPayload); } catch(e) {}
@@ -628,7 +665,7 @@ function carregarUsuarios(cb) {
     }
     if (!USUARIOS.length) {
       sha256Hex('trocar123').then(function(hash) {
-        USUARIOS = [{ id:'u'+Date.now(), nome:'Coordenador', usuario:'coordenador', senhaHash:hash, perfil:'coordenador' }];
+        USUARIOS = [{ id:'u'+Date.now(), nome:'Coordenador Geral', usuario:'coordenador', senhaHash:hash, perfil:'coordenador_geral', departamentos:['pos-contemplacao'] }];
         salvarUsuarios();
         usuariosProntos = true;
         if (cb) cb();
@@ -644,11 +681,12 @@ function carregarUsuarios(cb) {
   });
 }
 function usarUsuariosTeste(cb) {
-  Promise.all([sha256Hex('teste123'), sha256Hex('teste123'), sha256Hex('teste123')]).then(function(hashes) {
+  Promise.all([sha256Hex('teste123'), sha256Hex('teste123'), sha256Hex('teste123'), sha256Hex('teste123')]).then(function(hashes) {
     USUARIOS = [
-      { id:'t1', nome:'Teste Atendente',   usuario:'teste-atendente',   senhaHash:hashes[0], perfil:'atendente'   },
-      { id:'t2', nome:'Teste Editor',      usuario:'teste-editor',      senhaHash:hashes[1], perfil:'editor'      },
-      { id:'t3', nome:'Teste Coordenador', usuario:'teste-coordenador', senhaHash:hashes[2], perfil:'coordenador' }
+      { id:'t1', nome:'Teste Atendente',   usuario:'teste-atendente',   senhaHash:hashes[0], perfil:'atendente',        departamentos:['pos-contemplacao'] },
+      { id:'t2', nome:'Teste Editor',      usuario:'teste-editor',      senhaHash:hashes[1], perfil:'editor',           departamentos:['pos-contemplacao'] },
+      { id:'t3', nome:'Teste Coordenador', usuario:'teste-coordenador', senhaHash:hashes[2], perfil:'coordenador',      departamentos:['pos-contemplacao'] },
+      { id:'t4', nome:'Teste Coord. Geral',usuario:'teste-geral',       senhaHash:hashes[3], perfil:'coordenador_geral' }
     ];
     usuariosProntos = true;
     if (cb) cb();
@@ -695,17 +733,71 @@ function saudacaoHorario() {
   if (h < 18) return 'Boa tarde';
   return 'Boa noite';
 }
+function carregarDepartamentos(cb) {
+  if (!db) { DEPARTAMENTOS = [{ id:'pos-contemplacao', nome:'Pós-Contemplação' }]; if (cb) cb(); return; }
+  db.collection('porto-vale').doc('departamentos').get().then(function(doc) {
+    if (doc.exists && doc.data().payload) {
+      try { DEPARTAMENTOS = JSON.parse(doc.data().payload); } catch(e) { DEPARTAMENTOS = []; }
+    }
+    if (!DEPARTAMENTOS.length) {
+      DEPARTAMENTOS = [{ id:'pos-contemplacao', nome:'Pós-Contemplação' }];
+      salvarDepartamentos();
+    }
+    if (cb) cb();
+  }).catch(function(e) {
+    console.error('Erro ao carregar departamentos:', e);
+    DEPARTAMENTOS = [{ id:'pos-contemplacao', nome:'Pós-Contemplação' }];
+    if (cb) cb();
+  });
+}
+function salvarDepartamentos() {
+  mostrarToast('Salvo!');
+  if (db) {
+    db.collection('porto-vale').doc('departamentos').set({ payload: JSON.stringify(DEPARTAMENTOS) })
+      .catch(function(e){ console.error('Erro ao salvar departamentos:', e); });
+  }
+}
+function departamentosDoUsuario(usuario) {
+  if (usuario.perfil === 'coordenador_geral') return DEPARTAMENTOS.slice();
+  var ids = usuario.departamentos || ['pos-contemplacao'];
+  return DEPARTAMENTOS.filter(function(d){ return ids.indexOf(d.id) !== -1; });
+}
+function renderSeletorDepartamento() {
+  var acessiveis = departamentosDoUsuario(perfilAtivo);
+  var wrap = document.getElementById('wrap-seletor-depto');
+  var sel  = document.getElementById('sel-departamento');
+  if (acessiveis.length <= 1) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'flex';
+  sel.innerHTML = acessiveis.map(function(d){ return '<option value="'+d.id+'"'+(d.id===deptoAtivo?' selected':'')+'>'+d.nome+'</option>'; }).join('');
+}
+function trocarDepartamento(deptoId) {
+  if (!deptoId || deptoId === deptoAtivo) return;
+  deptoAtivo = deptoId;
+  try { localStorage.setItem('mpv_depto_' + perfilAtivo.id, deptoId); } catch(e) {}
+  carregarDadosDepartamento(deptoAtivo, function(){ renderHome(); atualizarBadgeSugestoes(); });
+}
 function finalizarLogin(usuario) {
   perfilAtivo = usuario;
   document.getElementById('home-greeting').textContent = saudacaoHorario() + ', ' + usuario.nome + '!';
   document.getElementById('perfil-badge').textContent  = PERFIL_LABEL[usuario.perfil] || usuario.perfil;
-  var podeEditar = usuario.perfil === 'editor' || usuario.perfil === 'coordenador';
-  document.getElementById('btn-painel').style.display     = podeEditar ? 'flex' : 'none';
-  document.getElementById('btn-categorias').style.display = podeEditar ? 'flex' : 'none';
-  document.getElementById('btn-usuarios').style.display    = usuario.perfil === 'coordenador' ? 'flex' : 'none';
-  document.getElementById('btn-minha-senha').style.display  = 'flex';
-  document.getElementById('btn-sugestoes').style.display    = usuario.perfil === 'coordenador' ? 'flex' : 'none';
-  carregarData(function(){ renderHome(); atualizarBadgeSugestoes(); go('home'); });
+  var podeEditar = nivelPermiteEditar(usuario.perfil);
+  document.getElementById('btn-painel').style.display      = podeEditar ? 'flex' : 'none';
+  document.getElementById('btn-categorias').style.display  = podeEditar ? 'flex' : 'none';
+  document.getElementById('btn-usuarios').style.display    = nivelEhCoordenador(usuario.perfil) ? 'flex' : 'none';
+  document.getElementById('btn-minha-senha').style.display = 'flex';
+  document.getElementById('btn-sugestoes').style.display   = nivelEhCoordenador(usuario.perfil) ? 'flex' : 'none';
+  document.getElementById('btn-departamentos').style.display = usuario.perfil === 'coordenador_geral' ? 'flex' : 'none';
+
+  carregarDepartamentos(function() {
+    var acessiveis = departamentosDoUsuario(usuario);
+    if (!acessiveis.length) acessiveis = [{ id:'pos-contemplacao', nome:'Pós-Contemplação' }];
+    var salvo = null;
+    try { salvo = localStorage.getItem('mpv_depto_' + usuario.id); } catch(e) {}
+    var valido = salvo && acessiveis.some(function(d){ return d.id === salvo; });
+    deptoAtivo = valido ? salvo : acessiveis[0].id;
+    renderSeletorDepartamento();
+    carregarDadosDepartamento(deptoAtivo, function(){ renderHome(); atualizarBadgeSugestoes(); go('home'); });
+  });
 }
 function definirNovaSenha() {
   var novaSenha = document.getElementById('inp-nova-senha').value;
@@ -723,7 +815,7 @@ function definirNovaSenha() {
   });
 }
 function doLogout() {
-  perfilAtivo = null; DATA = {}; flowKey = ''; fluxoKey = ''; etapaIdx = -1;
+  perfilAtivo = null; DATA = {}; flowKey = ''; fluxoKey = ''; etapaIdx = -1; deptoAtivo = null;
   document.getElementById('inp-user').value = '';
   document.getElementById('inp-pass').value = '';
   document.getElementById('btn-painel').style.display = 'none';
@@ -731,6 +823,8 @@ function doLogout() {
   document.getElementById('btn-usuarios').style.display = 'none';
   document.getElementById('btn-minha-senha').style.display = 'none';
   document.getElementById('btn-sugestoes').style.display = 'none';
+  document.getElementById('btn-departamentos').style.display = 'none';
+  document.getElementById('wrap-seletor-depto').style.display = 'none';
   go('login');
 }
 /* ════════════════════════════════════════════════ HOME ══ */
@@ -752,7 +846,7 @@ function renderHome() {
   var empty = document.getElementById('home-empty');
   var container = document.getElementById('home-categorias');
   container.innerHTML = '';
-  var isCoordenador = perfilAtivo && (perfilAtivo.perfil === 'coordenador' || perfilAtivo.perfil === 'editor');
+  var isCoordenador = perfilAtivo && nivelPermiteEditar(perfilAtivo.perfil);
 
   // Garante que exista pelo menos uma categoria valida
   if (!CATEGORIAS.length) CATEGORIAS = [{ id:'basicos', nome:'Atendimentos Básicos' }];
@@ -924,7 +1018,7 @@ function flashCopy(btn) {
 }
 /* ════════════════════════════════════ PAINEL COORDENADOR ══ */
 function showPainel() {
-  if (!perfilAtivo || (perfilAtivo.perfil !== 'editor' && perfilAtivo.perfil !== 'coordenador')) return;
+  if (!perfilAtivo || !nivelPermiteEditar(perfilAtivo.perfil)) return;
   renderListaFluxos(); go('painel');
 }
 function renderListaFluxos() {
@@ -1550,9 +1644,70 @@ function fmtOpcaoTopico(idx) {
 /* ══════════════════════════ FIM FORMATACAO DAS OPCOES ══ */
 
 /* ══════════════════════════════════════════════ MODAIS ══ */
+/* ══════════════════════════════════ GERENCIAR DEPARTAMENTOS ══ */
+function abrirModalDepartamentos() {
+  if (!perfilAtivo || perfilAtivo.perfil !== 'coordenador_geral') return;
+  renderListaDepartamentosModal();
+  abrirModal('modal-departamentos');
+}
+function renderListaDepartamentosModal() {
+  var list = document.getElementById('lista-departamentos');
+  list.innerHTML = '';
+  document.getElementById('departamentos-error').style.display = 'none';
+  DEPARTAMENTOS.forEach(function(d) {
+    var row = document.createElement('div');
+    row.className = 'cat-row';
+    row.dataset.id = d.id;
+    row.innerHTML =
+      '<input type="text" class="cat-nome-input" value="' + d.nome + '" placeholder="Nome do departamento">' +
+      '<button class="btn-del" type="button">x</button>';
+    row.querySelector('.btn-del').addEventListener('click', function() { row.remove(); });
+    list.appendChild(row);
+  });
+}
+function adicionarDepartamento() {
+  var list = document.getElementById('lista-departamentos');
+  var row = document.createElement('div');
+  row.className = 'cat-row';
+  row.dataset.id = 'd' + Date.now() + Math.floor(Math.random()*1000);
+  row.innerHTML =
+    '<input type="text" class="cat-nome-input" value="" placeholder="Nome do departamento">' +
+    '<button class="btn-del" type="button">x</button>';
+  row.querySelector('.btn-del').addEventListener('click', function() { row.remove(); });
+  list.appendChild(row);
+  row.querySelector('input').focus();
+}
+function salvarDepartamentosModal() {
+  var rows = document.querySelectorAll('#lista-departamentos .cat-row');
+  var novos = [];
+  rows.forEach(function(row) {
+    var nome = row.querySelector('.cat-nome-input').value.trim();
+    if (!nome) return;
+    novos.push({ id: row.dataset.id, nome: nome });
+  });
+  if (!novos.length) {
+    document.getElementById('departamentos-error').style.display = 'flex';
+    return;
+  }
+  var idsNovos = novos.map(function(d){ return d.id; });
+  var idsRemovidos = DEPARTAMENTOS.filter(function(d){ return idsNovos.indexOf(d.id) === -1; }).map(function(d){ return d.id; });
+  if (idsRemovidos.length) {
+    USUARIOS.forEach(function(u) {
+      if (!u.departamentos) return;
+      u.departamentos = u.departamentos.filter(function(id){ return idsRemovidos.indexOf(id) === -1; });
+    });
+    salvarUsuarios();
+  }
+  DEPARTAMENTOS = novos;
+  salvarDepartamentos();
+  fecharModal('modal-departamentos');
+  renderSeletorDepartamento();
+}
+/* ══════════════════════════════ FIM GERENCIAR DEPARTAMENTOS ══ */
+
 /* ══════════════════════════════════ GERENCIAR CATEGORIAS ══ */
 function abrirModalCategorias() {
-  if (!perfilAtivo || (perfilAtivo.perfil !== 'editor' && perfilAtivo.perfil !== 'coordenador')) return;
+  if (!perfilAtivo || !nivelPermiteEditar(perfilAtivo.perfil)) return;
   renderListaCategoriasModal();
   abrirModal('modal-categorias');
 }
@@ -1647,18 +1802,33 @@ function salvarCategoriasModal() {
 
 /* ═══════════════════════════════════ GERENCIAR USUARIOS ══ */
 function abrirModalUsuarios() {
-  if (!perfilAtivo || perfilAtivo.perfil !== 'coordenador') return;
+  if (!perfilAtivo || !nivelEhCoordenador(perfilAtivo.perfil)) return;
   renderListaUsuariosModal();
   abrirModal('modal-usuarios');
+}
+function nomeDepartamento(id) {
+  var d = DEPARTAMENTOS.find(function(x){ return x.id === id; });
+  return d ? d.nome : id;
 }
 function renderListaUsuariosModal() {
   var list = document.getElementById('lista-usuarios');
   list.innerHTML = '';
-  USUARIOS.forEach(function(u) {
+  var meusDeptos = departamentosQueEuGerencio();
+  var visiveis = USUARIOS.filter(function(u) {
+    if (perfilAtivo.perfil === 'coordenador_geral') return true;
+    var deptosDele = u.departamentos || ['pos-contemplacao'];
+    return deptosDele.some(function(id){ return meusDeptos.indexOf(id) !== -1; });
+  });
+  visiveis.forEach(function(u) {
+    var deptosDele = u.departamentos || ['pos-contemplacao'];
+    var chips = deptosDele.map(function(id){ return '<span class="depto-chip">' + nomeDepartamento(id) + '</span>'; }).join('');
     var row = document.createElement('div');
     row.className = 'prow';
+    row.style.height = 'auto';
+    row.style.alignItems = 'flex-start';
+    row.style.padding = '10px';
     row.innerHTML =
-      '<div style="flex:1;"><div class="prow-label">' + u.nome + '</div><div class="prow-sub">' + u.usuario + '</div></div>' +
+      '<div style="flex:1;"><div class="prow-label">' + u.nome + '</div><div class="prow-sub">' + u.usuario + '</div><div style="margin-top:4px;">' + chips + '</div></div>' +
       '<span class="perfil-badge" style="margin-right:6px;">' + (PERFIL_LABEL[u.perfil] || u.perfil) + '</span>' +
       '<button class="btn-edit-fluxo" style="width:22px;height:22px;border:none;background:none;color:var(--gray3);cursor:pointer;font-size:14px;border-radius:4px;">&#9998;</button>' +
       '<button class="btn-del">x</button>';
@@ -1667,15 +1837,40 @@ function renderListaUsuariosModal() {
     list.appendChild(row);
   });
 }
+function departamentosQueEuGerencio() {
+  if (perfilAtivo.perfil === 'coordenador_geral') return DEPARTAMENTOS.map(function(d){ return d.id; });
+  return (perfilAtivo.departamentos || ['pos-contemplacao']).slice();
+}
+function popularSelectPerfil() {
+  var sel = document.getElementById('inp-usuario-perfil');
+  var opcoes = '<option value="atendente">Atendente</option><option value="editor">Editor de Fluxos</option><option value="coordenador">Coordenador</option>';
+  if (perfilAtivo.perfil === 'coordenador_geral') opcoes += '<option value="coordenador_geral">Coordenador Geral</option>';
+  sel.innerHTML = opcoes;
+}
+function renderCheckboxesDepartamento(deptosDoUsuario) {
+  var meusDeptos = departamentosQueEuGerencio();
+  var wrap = document.getElementById('lista-depto-checkboxes');
+  wrap.innerHTML = '';
+  DEPARTAMENTOS.forEach(function(d) {
+    var possoGerenciar = meusDeptos.indexOf(d.id) !== -1;
+    var marcado = deptosDoUsuario.indexOf(d.id) !== -1;
+    var row = document.createElement('div');
+    row.className = 'depto-check-row';
+    row.innerHTML = '<input type="checkbox" class="chk-depto" value="' + d.id + '"' + (marcado ? ' checked' : '') + (possoGerenciar ? '' : ' disabled') + '><span>' + d.nome + (possoGerenciar ? '' : ' <span style="color:var(--gray3);">(fora da sua gestão)</span>') + '</span>';
+    wrap.appendChild(row);
+  });
+}
 function abrirFormNovoUsuario() {
   document.getElementById('modal-usuario-form-titulo').textContent = 'Novo usuario';
   document.getElementById('modal-usuario-form').dataset.editId = '';
   document.getElementById('inp-usuario-nome').value  = '';
   document.getElementById('inp-usuario-login').value = '';
   document.getElementById('inp-usuario-senha').value = '';
+  popularSelectPerfil();
   document.getElementById('inp-usuario-perfil').value = 'atendente';
   document.getElementById('label-usuario-senha').textContent = 'Senha';
   document.getElementById('usuario-form-error').style.display = 'none';
+  renderCheckboxesDepartamento(departamentosQueEuGerencio());
   abrirModal('modal-usuario-form');
 }
 function editarUsuario(id) {
@@ -1686,13 +1881,26 @@ function editarUsuario(id) {
   document.getElementById('inp-usuario-nome').value  = u.nome;
   document.getElementById('inp-usuario-login').value = u.usuario;
   document.getElementById('inp-usuario-senha').value = '';
+  popularSelectPerfil();
   document.getElementById('inp-usuario-perfil').value = u.perfil;
   document.getElementById('label-usuario-senha').textContent = 'Senha (deixe em branco para não alterar)';
   document.getElementById('usuario-form-error').style.display = 'none';
+  renderCheckboxesDepartamento(u.departamentos || ['pos-contemplacao']);
   abrirModal('modal-usuario-form');
 }
-function contarCoordenadores() {
-  return USUARIOS.filter(function(u){ return u.perfil === 'coordenador'; }).length;
+function contarCoordenadoresGerais() {
+  return USUARIOS.filter(function(u){ return u.perfil === 'coordenador_geral'; }).length;
+}
+function coletarDepartamentosMarcados(deptosOriginais) {
+  var meusDeptos = departamentosQueEuGerencio();
+  var marcados = [];
+  document.querySelectorAll('#lista-depto-checkboxes .chk-depto').forEach(function(chk) {
+    if (chk.checked) marcados.push(chk.value);
+  });
+  var preservados = (deptosOriginais || []).filter(function(id){ return meusDeptos.indexOf(id) === -1; });
+  var resultado = marcados.slice();
+  preservados.forEach(function(id){ if (resultado.indexOf(id) === -1) resultado.push(id); });
+  return resultado;
 }
 function salvarUsuarioForm() {
   var nome  = document.getElementById('inp-usuario-nome').value.trim();
@@ -1703,6 +1911,11 @@ function salvarUsuarioForm() {
   var errEl = document.getElementById('usuario-form-error');
 
   if (!nome || !login || (!editId && !senha)) { errEl.style.display = 'flex'; return; }
+  if (perfil === 'coordenador_geral' && perfilAtivo.perfil !== 'coordenador_geral') {
+    errEl.textContent = 'Somente um Coordenador Geral pode conceder esse nível.';
+    errEl.style.display = 'flex';
+    return;
+  }
   var loginDuplicado = USUARIOS.some(function(u){ return u.usuario === login && u.id !== editId; });
   if (loginDuplicado) { errEl.textContent = 'Já existe um usuário com esse login.'; errEl.style.display = 'flex'; return; }
   errEl.style.display = 'none';
@@ -1710,12 +1923,13 @@ function salvarUsuarioForm() {
   if (editId) {
     var u = USUARIOS.find(function(x){ return x.id === editId; });
     if (!u) return;
-    if (u.perfil === 'coordenador' && perfil !== 'coordenador' && contarCoordenadores() <= 1) {
-      errEl.textContent = 'Não é possível rebaixar o único coordenador restante.';
+    if (u.perfil === 'coordenador_geral' && perfil !== 'coordenador_geral' && contarCoordenadoresGerais() <= 1) {
+      errEl.textContent = 'Não é possível rebaixar o único Coordenador Geral restante.';
       errEl.style.display = 'flex';
       return;
     }
-    u.nome = nome; u.usuario = login; u.perfil = perfil;
+    var novosDeptos = coletarDepartamentosMarcados(u.departamentos || ['pos-contemplacao']);
+    u.nome = nome; u.usuario = login; u.perfil = perfil; u.departamentos = novosDeptos;
     if (senha) {
       sha256Hex(senha).then(function(hash) {
         u.senhaHash = hash;
@@ -1725,8 +1939,9 @@ function salvarUsuarioForm() {
       salvarUsuarios(); renderListaUsuariosModal(); fecharModal('modal-usuario-form');
     }
   } else {
+    var deptosNovoUsuario = coletarDepartamentosMarcados([]);
     sha256Hex(senha).then(function(hash) {
-      USUARIOS.push({ id:'u'+Date.now(), nome:nome, usuario:login, senhaHash:hash, perfil:perfil });
+      USUARIOS.push({ id:'u'+Date.now(), nome:nome, usuario:login, senhaHash:hash, perfil:perfil, departamentos:deptosNovoUsuario });
       salvarUsuarios(); renderListaUsuariosModal(); fecharModal('modal-usuario-form');
     });
   }
@@ -1734,8 +1949,8 @@ function salvarUsuarioForm() {
 function excluirUsuario(id) {
   var u = USUARIOS.find(function(x){ return x.id === id; });
   if (!u) return;
-  if (u.perfil === 'coordenador' && contarCoordenadores() <= 1) {
-    alert('Não é possível excluir o único coordenador restante.');
+  if (u.perfil === 'coordenador_geral' && contarCoordenadoresGerais() <= 1) {
+    alert('Não é possível excluir o único Coordenador Geral restante.');
     return;
   }
   USUARIOS = USUARIOS.filter(function(x){ return x.id !== id; });
@@ -1909,7 +2124,7 @@ function cancelarModalPasso() {
   fecharModal('modal-passo');
 }
 function abrirModalSugestoes() {
-  if (!perfilAtivo || perfilAtivo.perfil !== 'coordenador') return;
+  if (!perfilAtivo || !nivelEhCoordenador(perfilAtivo.perfil)) return;
   renderListaSugestoes();
   mudarAbaSugestoes('pendentes');
   abrirModal('modal-sugestoes');

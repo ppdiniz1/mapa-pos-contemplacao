@@ -62,6 +62,22 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
 .home-desc{font-size:13px;color:var(--gray2);margin-bottom:24px;}
 .card{border:1px solid var(--border2);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:border-color .15s,box-shadow .15s,transform .15s;background:var(--bg);}
 .card:hover{border-color:var(--brand);box-shadow:0 6px 16px rgba(0,155,219,.14);transform:translateY(-2px);}
+.card{position:relative;overflow:hidden;}
+.card-destinos{font-size:11px;color:var(--gray2);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.view-toggle{display:flex;gap:4px;margin-bottom:18px;border-bottom:1px solid var(--border2);}
+.view-toggle-btn{padding:8px 14px;border:none;background:none;font-size:13px;font-family:inherit;color:var(--gray2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.view-toggle-btn.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600;}
+.mapa-controls{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.mapa-viewport{position:relative;overflow:hidden;height:calc(100vh - 320px);min-height:320px;border:1px solid var(--border2);border-radius:var(--r-lg);background:var(--bg2);cursor:grab;touch-action:none;}
+.mapa-viewport.panning{cursor:grabbing;}
+.mapa-canvas{position:absolute;top:0;left:0;transform-origin:0 0;}
+.mapa-svg-lines{position:absolute;top:0;left:0;pointer-events:none;overflow:visible;}
+.mapa-node{position:absolute;width:180px;background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;cursor:grab;box-shadow:0 2px 8px rgba(0,0,0,.06);user-select:none;touch-action:none;}
+.mapa-node:hover{border-color:var(--brand);}
+.mapa-node.dragging{cursor:grabbing;box-shadow:0 8px 20px rgba(0,0,0,.18);z-index:10;}
+.mapa-node .card-icon{width:26px;height:26px;}
+.mapa-node .card-label{font-size:12px;}
+.mapa-node .card-sub{font-size:10px;}
 .card-icon{width:38px;height:38px;border-radius:8px;background:var(--chip-azul);color:var(--brand);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
 .card-label{font-size:13px;font-weight:500;color:var(--black);margin-bottom:2px;}
 .card-sub{font-size:11px;color:var(--gray2);}
@@ -258,11 +274,28 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
     <div class="home-body">
       <div class="home-greeting" id="home-greeting">Olá</div>
       <div class="home-desc">Selecione um fluxo para consultar as etapas e orientações.</div>
+      <div class="view-toggle">
+        <button type="button" class="view-toggle-btn active" id="btn-view-categorias" onclick="mudarVisaoHome('categorias')">Categorias</button>
+        <button type="button" class="view-toggle-btn" id="btn-view-mapa" onclick="mudarVisaoHome('mapa')">Mapa</button>
+      </div>
       <div id="home-empty" style="display:none;text-align:center;padding:48px 20px;color:var(--gray2);">
         <div style="font-size:14px;font-weight:500;margin-bottom:4px;">Nenhum fluxo disponível</div>
         <div style="font-size:12px;">O coordenador ainda nao criou nenhum fluxo.</div>
       </div>
       <div id="home-categorias"></div>
+      <div id="home-mapa-wrap" style="display:none;">
+        <div class="mapa-controls">
+          <button type="button" class="btn-icon" onclick="mapaZoomBtn(1.2)">+</button>
+          <button type="button" class="btn-icon" onclick="mapaZoomBtn(0.8)">&minus;</button>
+          <button type="button" class="btn-icon" onclick="mapaResetView()">Centralizar</button>
+          <span style="font-size:11px;color:var(--gray2);margin-left:6px;">Arraste os cards para reorganizar. Role a roda do mouse para zoom.</span>
+        </div>
+        <div class="mapa-viewport" id="mapa-viewport">
+          <div class="mapa-canvas" id="mapa-canvas">
+            <svg class="mapa-svg-lines" id="mapa-svg-lines"></svg>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <!-- ══════════════════════════════════════════ FIM HOME ══ -->
@@ -858,6 +891,213 @@ var ICON_SET = {
   calendar: '<path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/>'
 };
 var ICON_KEYS = ['car','building','clipboard','message','folder','home','users','star','wallet','shield','calendar'];
+function calcularDestinosFluxoKeys(key) {
+  var f = DATA[key];
+  var destinos = [];
+  (f.etapas || []).forEach(function(et) {
+    (et.passos || []).forEach(function(p) {
+      if (p.tipo === 'Decisao' && p.opcoes) {
+        p.opcoes.forEach(function(op) {
+          if (op.proximoFluxo && DATA[op.proximoFluxo] && op.proximoFluxo !== key && destinos.indexOf(op.proximoFluxo) === -1) {
+            destinos.push(op.proximoFluxo);
+          }
+        });
+      }
+    });
+  });
+  return destinos;
+}
+function calcularDestinosFluxo(key) {
+  return calcularDestinosFluxoKeys(key).map(function(k){ return DATA[k].nome; });
+}
+/* ══════════════════════════════════════════════ MAPA ══ */
+var homeViewAtual = 'categorias';
+var mapaZoomLevel = 1;
+var mapaPanX = 0;
+var mapaPanY = 0;
+var mapaPanZoomAtivado = false;
+
+function mudarVisaoHome(view) {
+  homeViewAtual = view;
+  document.getElementById('btn-view-categorias').classList.toggle('active', view === 'categorias');
+  document.getElementById('btn-view-mapa').classList.toggle('active', view === 'mapa');
+  document.getElementById('home-categorias').style.display = view === 'categorias' ? 'block' : 'none';
+  document.getElementById('home-mapa-wrap').style.display  = view === 'mapa' ? 'block' : 'none';
+  if (view === 'mapa') {
+    if (!mapaPanZoomAtivado) { ativarPanZoomMapa(); mapaPanZoomAtivado = true; }
+    renderMapaFluxos();
+  }
+}
+
+function atribuirPosicoesIniciaisMapa(keysFaltando) {
+  var keys = Object.keys(DATA);
+  var destinosPorKey = {};
+  keys.forEach(function(k){ destinosPorKey[k] = calcularDestinosFluxoKeys(k); });
+  var todosDestinos = {};
+  keys.forEach(function(k){ destinosPorKey[k].forEach(function(dk){ todosDestinos[dk] = true; }); });
+  var nivel = {};
+  var visitado = {};
+  var fila = keys.filter(function(k){ return !todosDestinos[k]; });
+  if (!fila.length) fila = keys.slice(0, 1);
+  var nivelAtual = 0;
+  while (fila.length) {
+    var proxima = [];
+    fila.forEach(function(k) {
+      if (visitado[k]) return;
+      visitado[k] = true;
+      nivel[k] = nivelAtual;
+      destinosPorKey[k].forEach(function(dk) { if (!visitado[dk]) proxima.push(dk); });
+    });
+    fila = proxima;
+    nivelAtual++;
+  }
+  keys.forEach(function(k){ if (!(k in nivel)) nivel[k] = 0; });
+  var contagemPorNivel = {};
+  keysFaltando.forEach(function(k) {
+    var n = nivel[k] || 0;
+    var idx = contagemPorNivel[n] || 0;
+    contagemPorNivel[n] = idx + 1;
+    DATA[k].mapaX = n * 260 + 40;
+    DATA[k].mapaY = idx * 110 + 40;
+  });
+}
+
+function ativarDragNodeMapa(node, key) {
+  var arrastando = false, startX, startY, origX, origY;
+  node.addEventListener('pointerdown', function(e) {
+    e.stopPropagation();
+    arrastando = true;
+    node.dataset.moveu = '0';
+    node.setPointerCapture(e.pointerId);
+    startX = e.clientX; startY = e.clientY;
+    origX = DATA[key].mapaX; origY = DATA[key].mapaY;
+    node.classList.add('dragging');
+  });
+  node.addEventListener('pointermove', function(e) {
+    if (!arrastando) return;
+    var dx = (e.clientX - startX) / mapaZoomLevel;
+    var dy = (e.clientY - startY) / mapaZoomLevel;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) node.dataset.moveu = '1';
+    DATA[key].mapaX = origX + dx;
+    DATA[key].mapaY = origY + dy;
+    node.style.left = DATA[key].mapaX + 'px';
+    node.style.top  = DATA[key].mapaY + 'px';
+    redesenharLinhasMapa();
+  });
+  node.addEventListener('pointerup', function() {
+    if (!arrastando) return;
+    arrastando = false;
+    node.classList.remove('dragging');
+    salvarData();
+  });
+  node.addEventListener('click', function() {
+    if (node.dataset.moveu === '1') { node.dataset.moveu = '0'; return; }
+    showFlow(key);
+  });
+}
+
+function renderMapaFluxos() {
+  var canvas = document.getElementById('mapa-canvas');
+  canvas.querySelectorAll('.mapa-node').forEach(function(n){ n.remove(); });
+
+  var keys = Object.keys(DATA);
+  if (!keys.length) { redesenharLinhasMapa(); return; }
+  var faltandoPosicao = keys.filter(function(k){ return DATA[k].mapaX === undefined || DATA[k].mapaY === undefined; });
+  if (faltandoPosicao.length) {
+    atribuirPosicoesIniciaisMapa(faltandoPosicao);
+    salvarData();
+  }
+
+  var maxX = 0, maxY = 0;
+  keys.forEach(function(k) {
+    maxX = Math.max(maxX, DATA[k].mapaX + 220);
+    maxY = Math.max(maxY, DATA[k].mapaY + 120);
+  });
+  canvas.style.width  = (maxX + 60) + 'px';
+  canvas.style.height = (maxY + 60) + 'px';
+
+  keys.forEach(function(key, ki) {
+    var f = DATA[key];
+    var iconKey = (f.icone && ICON_SET[f.icone]) ? f.icone : ICON_KEYS[ki % ICON_KEYS.length];
+    var n = f.etapas ? f.etapas.length : 0;
+    var node = document.createElement('div');
+    node.className = 'mapa-node';
+    node.dataset.key = key;
+    node.style.left = f.mapaX + 'px';
+    node.style.top  = f.mapaY + 'px';
+    node.innerHTML =
+      '<div style="display:flex;align-items:center;gap:8px;">' +
+      '<div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + ICON_SET[iconKey] + '</svg></div>' +
+      '<div style="min-width:0;"><div class="card-label">' + f.nome + '</div><div class="card-sub">' + n + ' etapa' + (n!==1?'s':'') + '</div></div>' +
+      '</div>';
+    ativarDragNodeMapa(node, key);
+    canvas.appendChild(node);
+  });
+
+  redesenharLinhasMapa();
+}
+
+function redesenharLinhasMapa() {
+  var svg = document.getElementById('mapa-svg-lines');
+  var canvas = document.getElementById('mapa-canvas');
+  if (!svg || !canvas) return;
+  svg.setAttribute('width', canvas.style.width);
+  svg.setAttribute('height', canvas.style.height);
+  var cor = getComputedStyle(document.documentElement).getPropertyValue('--brand-border').trim() || '#85cef0';
+  var html = '<defs><marker id="seta-mapa" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="' + cor + '"/></marker></defs>';
+  Object.keys(DATA).forEach(function(key) {
+    var f1 = DATA[key];
+    if (f1.mapaX === undefined) return;
+    calcularDestinosFluxoKeys(key).forEach(function(destKey) {
+      var f2 = DATA[destKey];
+      if (!f2 || f2.mapaX === undefined) return;
+      var x1 = f1.mapaX + 180, y1 = f1.mapaY + 30;
+      var x2 = f2.mapaX,       y2 = f2.mapaY + 30;
+      var midX = (x1 + x2) / 2;
+      html += '<path d="M' + x1 + ',' + y1 + ' C' + midX + ',' + y1 + ' ' + midX + ',' + y2 + ' ' + x2 + ',' + y2 + '" stroke="' + cor + '" stroke-width="2" fill="none" marker-end="url(#seta-mapa)"/>';
+    });
+  });
+  svg.innerHTML = html;
+}
+
+function aplicarTransformMapa() {
+  document.getElementById('mapa-canvas').style.transform = 'translate(' + mapaPanX + 'px,' + mapaPanY + 'px) scale(' + mapaZoomLevel + ')';
+}
+function mapaZoomBtn(fator) {
+  mapaZoomLevel = Math.min(2.5, Math.max(0.3, mapaZoomLevel * fator));
+  aplicarTransformMapa();
+}
+function mapaResetView() {
+  mapaPanX = 0; mapaPanY = 0; mapaZoomLevel = 1;
+  aplicarTransformMapa();
+}
+function ativarPanZoomMapa() {
+  var viewport = document.getElementById('mapa-viewport');
+  var panning = false, panStartX, panStartY, panOrigX, panOrigY;
+  viewport.addEventListener('pointerdown', function(e) {
+    if (e.target.closest('.mapa-node')) return;
+    panning = true;
+    viewport.classList.add('panning');
+    viewport.setPointerCapture(e.pointerId);
+    panStartX = e.clientX; panStartY = e.clientY;
+    panOrigX = mapaPanX; panOrigY = mapaPanY;
+  });
+  viewport.addEventListener('pointermove', function(e) {
+    if (!panning) return;
+    mapaPanX = panOrigX + (e.clientX - panStartX);
+    mapaPanY = panOrigY + (e.clientY - panStartY);
+    aplicarTransformMapa();
+  });
+  viewport.addEventListener('pointerup', function() { panning = false; viewport.classList.remove('panning'); });
+  viewport.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    var delta = e.deltaY < 0 ? 1.1 : 0.9;
+    mapaZoomLevel = Math.min(2.5, Math.max(0.3, mapaZoomLevel * delta));
+    aplicarTransformMapa();
+  }, { passive: false });
+}
+/* ══════════════════════════════════════════ FIM MAPA ══ */
+
 function renderHome() {
   var empty = document.getElementById('home-empty');
   var container = document.getElementById('home-categorias');
@@ -896,9 +1136,11 @@ function renderHome() {
     c.draggable   = isCoordenador;
     c.dataset.key = key;
     var iconKey = (f.icone && ICON_SET[f.icone]) ? f.icone : ICON_KEYS[ki % ICON_KEYS.length];
+    var destinos = calcularDestinosFluxo(key);
+    var linhaDestinos = destinos.length ? '<div class="card-destinos">&#8618; Pode seguir para: ' + destinos.join(', ') + '</div>' : '';
     c.innerHTML   =
       '<div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + ICON_SET[iconKey] + '</svg></div>' +
-      '<div><div class="card-label">' + f.nome + '</div><div class="card-sub">' + n + ' etapa' + (n!==1?'s':'') + '</div></div>';
+      '<div style="min-width:0;"><div class="card-label">' + f.nome + '</div><div class="card-sub">' + n + ' etapa' + (n!==1?'s':'') + '</div>' + linhaDestinos + '</div>';
     c.onclick = (function(k){ return function(e){ if (e.defaultPrevented) return; showFlow(k); }; })(key);
     if (isCoordenador) {
       c.addEventListener('dragstart', function(e) {
@@ -933,6 +1175,8 @@ function renderHome() {
     if (countEl) countEl.textContent = count;
     if (!count) grids[catId].innerHTML = '<div class="cat-empty">Nenhum fluxo nesta categoria.</div>';
   });
+
+  if (homeViewAtual === 'mapa') renderMapaFluxos();
 }
 /* ════════════════════════════════════════ TELA DE FLUXO ══ */
 function showFlow(key) {

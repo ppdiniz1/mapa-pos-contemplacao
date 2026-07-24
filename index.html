@@ -67,6 +67,14 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
 .view-toggle{display:flex;gap:4px;margin-bottom:18px;border-bottom:1px solid var(--border2);}
 .view-toggle-btn{padding:8px 14px;border:none;background:none;font-size:13px;font-family:inherit;color:var(--gray2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
 .view-toggle-btn.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:600;}
+.funil-wrap{display:flex;flex-direction:column;align-items:center;}
+.funil-linha{display:flex;gap:16px;align-items:flex-start;}
+.funil-degrau{flex:1;min-width:0;}
+.funil-seta{color:var(--gray3);font-size:18px;margin:2px 0 14px;text-align:center;}
+.fora-funil-divisor{display:flex;align-items:center;gap:10px;margin:28px 0 18px;}
+.fora-funil-divisor::before,.fora-funil-divisor::after{content:'';flex:1;height:1px;background:var(--border2);}
+.fora-funil-divisor span{font-size:11px;color:var(--gray3);white-space:nowrap;}
+.fora-funil-degrau{opacity:.92;}
 .mapa-controls{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
 .mapa-viewport{position:relative;overflow:hidden;height:calc(100vh - 320px);min-height:320px;border:1px solid var(--border2);border-radius:var(--r-lg);background:var(--bg2);cursor:grab;touch-action:none;}
 .mapa-viewport.panning{cursor:grabbing;}
@@ -1107,20 +1115,69 @@ function renderHome() {
   // Garante que exista pelo menos uma categoria valida
   if (!CATEGORIAS.length) CATEGORIAS = [{ id:'basicos', nome:'Atendimentos Básicos' }];
 
-  var grids = {};
-  CATEGORIAS.forEach(function(cat) {
-    var section = document.createElement('div');
-    section.className = 'cat-section';
-    section.innerHTML =
-      '<div class="cat-header">' +
-        '<span class="cat-header-title">' + cat.nome + '</span>' +
-        '<div class="cat-header-line"></div>' +
-        '<span class="cat-header-count" id="count-' + cat.id + '">0</span>' +
-      '</div>' +
-      '<div class="cat-grid" id="cat-' + cat.id + '"></div>';
-    container.appendChild(section);
-    grids[cat.id] = section.querySelector('.cat-grid');
+  var categoriasFunil = CATEGORIAS.filter(function(c){ return !c.foraFunil; });
+  var categoriasFora  = CATEGORIAS.filter(function(c){ return c.foraFunil; });
+  if (!categoriasFunil.length) categoriasFunil = CATEGORIAS;
+
+  // Agrupa categorias marcadas como "mesmo nivel" na mesma linha
+  var niveis = [];
+  categoriasFunil.forEach(function(cat) {
+    if (cat.mesmoNivel && niveis.length) niveis[niveis.length - 1].push(cat);
+    else niveis.push([cat]);
   });
+
+  var funilWrap = document.createElement('div');
+  funilWrap.className = 'funil-wrap';
+  container.appendChild(funilWrap);
+
+  var grids = {};
+  var passoAumento = 9, larguraInicial = 42, larguraMax = 100;
+  niveis.forEach(function(grupo, idx) {
+    if (idx > 0) {
+      var seta = document.createElement('div');
+      seta.className = 'funil-seta';
+      seta.innerHTML = '&#8595;';
+      funilWrap.appendChild(seta);
+    }
+    var largura = Math.min(larguraMax, larguraInicial + idx * passoAumento);
+    var linha = document.createElement('div');
+    linha.className = 'funil-linha';
+    linha.style.width = largura + '%';
+    funilWrap.appendChild(linha);
+    grupo.forEach(function(cat) {
+      var section = document.createElement('div');
+      section.className = 'cat-section funil-degrau';
+      section.innerHTML =
+        '<div class="cat-header">' +
+          '<span class="cat-header-title">' + cat.nome + '</span>' +
+          '<div class="cat-header-line"></div>' +
+          '<span class="cat-header-count" id="count-' + cat.id + '">0</span>' +
+        '</div>' +
+        '<div class="cat-grid" id="cat-' + cat.id + '"></div>';
+      linha.appendChild(section);
+      grids[cat.id] = section.querySelector('.cat-grid');
+    });
+  });
+
+  if (categoriasFora.length) {
+    var divisor = document.createElement('div');
+    divisor.className = 'fora-funil-divisor';
+    divisor.innerHTML = '<span>Processos à parte, sem relação direta com o atendimento</span>';
+    container.appendChild(divisor);
+    categoriasFora.forEach(function(cat) {
+      var section = document.createElement('div');
+      section.className = 'cat-section fora-funil-degrau';
+      section.innerHTML =
+        '<div class="cat-header">' +
+          '<span class="cat-header-title">' + cat.nome + '</span>' +
+          '<div class="cat-header-line"></div>' +
+          '<span class="cat-header-count" id="count-' + cat.id + '">0</span>' +
+        '</div>' +
+        '<div class="cat-grid" id="cat-' + cat.id + '"></div>';
+      container.appendChild(section);
+      grids[cat.id] = section.querySelector('.cat-grid');
+    });
+  }
 
   var keys = Object.keys(DATA);
   if (!keys.length) { empty.style.display = 'block'; }
@@ -1982,6 +2039,8 @@ function renderListaCategoriasModal() {
     row.innerHTML =
       '<span class="cat-drag-handle">&#8942;&#8942;</span>' +
       '<input type="text" class="cat-nome-input" value="' + cat.nome + '" placeholder="Nome da categoria">' +
+      '<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray2);white-space:nowrap;"><input type="checkbox" class="cat-mesmo-nivel"' + (cat.mesmoNivel ? ' checked' : '') + '> Mesmo nível da anterior</label>' +
+      '<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray2);white-space:nowrap;"><input type="checkbox" class="cat-fora-funil"' + (cat.foraFunil ? ' checked' : '') + '> Fora do funil</label>' +
       '<button class="btn-del" type="button">x</button>';
     row.querySelector('.btn-del').addEventListener('click', function() { row.remove(); });
     ativarDragCategoria(row, list);
@@ -2026,6 +2085,8 @@ function adicionarCategoria() {
   row.innerHTML =
     '<span class="cat-drag-handle">&#8942;&#8942;</span>' +
     '<input type="text" class="cat-nome-input" value="" placeholder="Nome da categoria">' +
+    '<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray2);white-space:nowrap;"><input type="checkbox" class="cat-mesmo-nivel"> Mesmo nível da anterior</label>' +
+    '<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray2);white-space:nowrap;"><input type="checkbox" class="cat-fora-funil"> Fora do funil</label>' +
     '<button class="btn-del" type="button">x</button>';
   row.querySelector('.btn-del').addEventListener('click', function() { row.remove(); });
   ativarDragCategoria(row, list);
@@ -2038,7 +2099,9 @@ function salvarCategoriasModal() {
   rows.forEach(function(row) {
     var nome = row.querySelector('.cat-nome-input').value.trim();
     if (!nome) return;
-    novasCategorias.push({ id: row.dataset.id, nome: nome });
+    var foraFunil = row.querySelector('.cat-fora-funil').checked;
+    var mesmoNivel = row.querySelector('.cat-mesmo-nivel').checked;
+    novasCategorias.push({ id: row.dataset.id, nome: nome, foraFunil: foraFunil, mesmoNivel: mesmoNivel });
   });
   if (!novasCategorias.length) { alert('E preciso manter ao menos uma categoria.'); return; }
 

@@ -311,7 +311,8 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
   <!-- ═════════════════════════════════════ TELA DE FLUXO ══ -->
   <div id="screen-flow" class="screen">
     <div class="header">
-      <button class="btn-icon" onclick="go('home')">&#8592; Voltar</button>
+      <button class="btn-icon" onclick="voltarFluxo()">&#8592; Voltar</button>
+      <button class="btn-icon" onclick="irParaHome()" title="Voltar para a pagina inicial"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12l0 7a2 2 0 0 0 2 2l10 0a2 2 0 0 0 2 -2l0 -7"/><path d="M9 21l0 -6a2 2 0 0 1 2 -2l2 0a2 2 0 0 1 2 2l0 6"/></svg></button>
       <div><div class="header-title" id="flow-title"></div><div class="header-sub" id="flow-sub"></div></div>
       <div class="header-right">
         <button class="btn-icon" onclick="abrirModalSugestaoTipo()">+ Sugerir mudança</button>
@@ -873,7 +874,7 @@ function definirNovaSenha() {
   });
 }
 function doLogout() {
-  perfilAtivo = null; DATA = {}; flowKey = ''; fluxoKey = ''; etapaIdx = -1; deptoAtivo = null;
+  perfilAtivo = null; DATA = {}; flowKey = ''; fluxoKey = ''; etapaIdx = -1; deptoAtivo = null; historicoNavegacao = [];
   document.getElementById('inp-user').value = '';
   document.getElementById('inp-pass').value = '';
   document.getElementById('btn-painel').style.display = 'none';
@@ -1000,6 +1001,7 @@ function ativarDragNodeMapa(node, key) {
   });
   node.addEventListener('click', function() {
     if (node.dataset.moveu === '1') { node.dataset.moveu = '0'; return; }
+    historicoNavegacao.push({ tipo:'home' });
     showFlow(key);
   });
 }
@@ -1198,7 +1200,7 @@ function renderHome() {
     c.innerHTML   =
       '<div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + ICON_SET[iconKey] + '</svg></div>' +
       '<div style="min-width:0;"><div class="card-label">' + f.nome + '</div><div class="card-sub">' + n + ' etapa' + (n!==1?'s':'') + '</div>' + linhaDestinos + '</div>';
-    c.onclick = (function(k){ return function(e){ if (e.defaultPrevented) return; showFlow(k); }; })(key);
+    c.onclick = (function(k){ return function(e){ if (e.defaultPrevented) return; historicoNavegacao.push({ tipo:'home' }); showFlow(k); }; })(key);
     if (isCoordenador) {
       c.addEventListener('dragstart', function(e) {
         e.dataTransfer.setData('flow-key', key);
@@ -1236,6 +1238,19 @@ function renderHome() {
   if (homeViewAtual === 'mapa') renderMapaFluxos();
 }
 /* ════════════════════════════════════════ TELA DE FLUXO ══ */
+var historicoNavegacao = [];
+function voltarFluxo() {
+  var anterior = historicoNavegacao.pop();
+  if (!anterior || anterior.tipo === 'home') {
+    go('home');
+  } else if (anterior.tipo === 'flow') {
+    showFlow(anterior.key);
+  }
+}
+function irParaHome() {
+  historicoNavegacao = [];
+  go('home');
+}
 function showFlow(key) {
   if (!DATA[key]) return;
   flowKey = key;
@@ -1250,6 +1265,7 @@ function showFlow(key) {
 }
 function irParaFluxo(destKey) {
   if (!DATA[destKey]) return;
+  historicoNavegacao.push({ tipo:'flow', key:flowKey });
   showFlow(destKey);
   if (DATA[destKey].etapas && DATA[destKey].etapas.length) {
     selecionarEtapaFluxo(0);

@@ -1239,12 +1239,16 @@ function renderHome() {
 }
 /* ════════════════════════════════════════ TELA DE FLUXO ══ */
 var historicoNavegacao = [];
+var etapaFluxoAtual = -1;
 function voltarFluxo() {
   var anterior = historicoNavegacao.pop();
   if (!anterior || anterior.tipo === 'home') {
     go('home');
   } else if (anterior.tipo === 'flow') {
     showFlow(anterior.key);
+    if (typeof anterior.etapaIdx === 'number' && anterior.etapaIdx > -1 && DATA[anterior.key].etapas[anterior.etapaIdx]) {
+      selecionarEtapaFluxo(anterior.etapaIdx);
+    }
   }
 }
 function irParaHome() {
@@ -1254,6 +1258,7 @@ function irParaHome() {
 function showFlow(key) {
   if (!DATA[key]) return;
   flowKey = key;
+  etapaFluxoAtual = -1;
   document.getElementById('flow-title').textContent = DATA[key].nome;
   var n = DATA[key].etapas ? DATA[key].etapas.length : 0;
   document.getElementById('flow-sub').textContent = n + ' etapa' + (n!==1?'s':'');
@@ -1265,7 +1270,7 @@ function showFlow(key) {
 }
 function irParaFluxo(destKey) {
   if (!DATA[destKey]) return;
-  historicoNavegacao.push({ tipo:'flow', key:flowKey });
+  historicoNavegacao.push({ tipo:'flow', key:flowKey, etapaIdx:etapaFluxoAtual });
   showFlow(destKey);
   if (DATA[destKey].etapas && DATA[destKey].etapas.length) {
     selecionarEtapaFluxo(0);
@@ -1285,6 +1290,7 @@ function renderEtapasFluxo() {
   });
 }
 function selecionarEtapaFluxo(idx) {
+  etapaFluxoAtual = idx;
   document.querySelectorAll('.enode').forEach(function(n){ n.classList.remove('selected'); });
   var node = document.getElementById('enode-'+idx);
   if (node) { node.classList.add('selected'); node.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }

@@ -88,6 +88,14 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
 .estat-depto-fluxos{padding:6px 14px 12px;border-top:1px solid var(--border2);}
 .estat-fluxo-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;font-size:12px;border-bottom:1px solid var(--border2);}
 .estat-fluxo-row:last-child{border-bottom:none;}
+.estat-graficos{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+.estat-grafico-bloco{border:1px solid var(--border2);border-radius:var(--r-lg);padding:14px;background:var(--bg2);}
+.estat-grafico-titulo{font-size:11px;font-weight:600;color:var(--gray2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;}
+.estat-barra-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.estat-barra-label{font-size:11px;color:var(--gray1);width:72px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.estat-barra-track{flex:1;height:8px;background:var(--border2);border-radius:4px;overflow:hidden;}
+.estat-barra-fill{height:100%;border-radius:4px;transition:width .3s ease;}
+.estat-barra-valor{font-size:11px;font-weight:600;color:var(--gray1);width:20px;text-align:right;flex-shrink:0;}
 .mapa-controls{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
 .mapa-viewport{position:relative;overflow:hidden;height:calc(100vh - 320px);min-height:320px;border:1px solid var(--border2);border-radius:var(--r-lg);background:var(--bg2);cursor:grab;touch-action:none;}
 .mapa-viewport.panning{cursor:grabbing;}
@@ -455,6 +463,7 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
         </select>
       </div>
       <div id="estatisticas-loading" style="text-align:center;padding:24px;color:var(--gray2);font-size:13px;">Carregando dados de todos os departamentos...</div>
+      <div id="estatisticas-graficos"></div>
       <div id="estatisticas-conteudo"></div>
       <div class="modal-acts">
         <button class="btn-cancel" onclick="fecharModal('modal-estatisticas')">Fechar</button>
@@ -2136,8 +2145,35 @@ function toggleEstatDepto(header) {
   painel.style.display = aberto ? 'none' : 'block';
   if (seta) seta.style.transform = aberto ? 'rotate(0deg)' : 'rotate(180deg)';
 }
+function renderGraficosComparativos(lista) {
+  var wrap = document.getElementById('estatisticas-graficos');
+  if (lista.length < 2) { wrap.innerHTML = ''; return; }
+  var metricas = [
+    { campo:'totalFluxos', titulo:'Fluxos por departamento', cor:'#009BDB' },
+    { campo:'totalEtapas', titulo:'Etapas por departamento', cor:'#8a63d2' },
+    { campo:'totalPassos', titulo:'Passos por departamento', cor:'#e8a020' }
+  ];
+  var html = '<div class="estat-graficos">';
+  metricas.forEach(function(m) {
+    var max = Math.max.apply(null, lista.map(function(d){ return d[m.campo]; }).concat([1]));
+    html += '<div class="estat-grafico-bloco">';
+    html += '<div class="estat-grafico-titulo">' + m.titulo + '</div>';
+    lista.slice().sort(function(a,b){ return b[m.campo] - a[m.campo]; }).forEach(function(d) {
+      var pct = (d[m.campo] / max) * 100;
+      html += '<div class="estat-barra-row">' +
+        '<span class="estat-barra-label">' + d.nome + '</span>' +
+        '<div class="estat-barra-track"><div class="estat-barra-fill" style="width:' + pct + '%;background:' + m.cor + ';"></div></div>' +
+        '<span class="estat-barra-valor">' + d[m.campo] + '</span>' +
+      '</div>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  wrap.innerHTML = html;
+}
 function renderEstatisticas(lista) {
   document.getElementById('estatisticas-loading').style.display = 'none';
+  renderGraficosComparativos(lista);
   var totalFluxosGeral = lista.reduce(function(s,d){ return s + d.totalFluxos; }, 0);
   var totalEtapasGeral = lista.reduce(function(s,d){ return s + d.totalEtapas; }, 0);
   var totalPassosGeral = lista.reduce(function(s,d){ return s + d.totalPassos; }, 0);

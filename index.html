@@ -89,13 +89,11 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
 .estat-fluxo-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;font-size:12px;border-bottom:1px solid var(--border2);}
 .estat-fluxo-row:last-child{border-bottom:none;}
 .estat-graficos{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
-.estat-grafico-bloco{border:1px solid var(--border2);border-radius:var(--r-lg);padding:14px;background:var(--bg2);}
-.estat-grafico-titulo{font-size:11px;font-weight:600;color:var(--gray2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;}
-.estat-barra-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.estat-barra-label{font-size:11px;color:var(--gray1);width:72px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.estat-barra-track{flex:1;height:8px;background:var(--border2);border-radius:4px;overflow:hidden;}
-.estat-barra-fill{height:100%;border-radius:4px;transition:width .3s ease;}
-.estat-barra-valor{font-size:11px;font-weight:600;color:var(--gray1);width:20px;text-align:right;flex-shrink:0;}
+.estat-grafico-bloco{border:1px solid var(--border2);border-radius:var(--r-lg);padding:14px 10px 8px;background:var(--bg2);}
+.estat-grafico-titulo{font-size:11px;font-weight:600;color:var(--gray2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;padding-left:4px;}
+.estat-checks-deptos{display:flex;flex-wrap:wrap;gap:12px;padding:8px 0;}
+.estat-check-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gray1);cursor:pointer;}
+.estat-check-item input{width:auto;}
 .mapa-controls{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
 .mapa-viewport{position:relative;overflow:hidden;height:calc(100vh - 320px);min-height:320px;border:1px solid var(--border2);border-radius:var(--r-lg);background:var(--bg2);cursor:grab;touch-action:none;}
 .mapa-viewport.panning{cursor:grabbing;}
@@ -463,6 +461,10 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
         </select>
       </div>
       <div id="estatisticas-loading" style="text-align:center;padding:24px;color:var(--gray2);font-size:13px;">Carregando dados de todos os departamentos...</div>
+      <div class="field" id="estat-selecao-wrap" style="display:none;">
+        <label>Comparar nos gráficos</label>
+        <div id="estat-checks-deptos" class="estat-checks-deptos"></div>
+      </div>
       <div id="estatisticas-graficos"></div>
       <div id="estatisticas-conteudo"></div>
       <div class="modal-acts">
@@ -2094,6 +2096,7 @@ function abrirModalEstatisticas() {
   document.getElementById('estatisticas-loading').style.display = 'block';
   document.getElementById('estatisticas-conteudo').innerHTML = '';
   document.getElementById('estat-filtro-wrap').style.display = 'none';
+  document.getElementById('estat-selecao-wrap').style.display = 'none';
   document.getElementById('estat-filtro-depto').value = '';
   abrirModal('modal-estatisticas');
   carregarEstatisticasTodosDepartamentos(function(lista) {
@@ -2102,8 +2105,21 @@ function abrirModalEstatisticas() {
     sel.innerHTML = '<option value="">Todos os departamentos</option>' +
       lista.map(function(d){ return '<option value="' + d.id + '">' + d.nome + '</option>'; }).join('');
     document.getElementById('estat-filtro-wrap').style.display = 'block';
+
+    var checks = document.getElementById('estat-checks-deptos');
+    checks.innerHTML = lista.map(function(d) {
+      return '<label class="estat-check-item"><input type="checkbox" class="estat-chk-comparar" value="' + d.id + '" checked onchange="atualizarGraficosComparativos()"> ' + d.nome + '</label>';
+    }).join('');
+    document.getElementById('estat-selecao-wrap').style.display = lista.length > 1 ? 'block' : 'none';
+
     renderEstatisticas(lista);
+    renderGraficosComparativos(lista);
   });
+}
+function atualizarGraficosComparativos() {
+  var idsSelecionados = Array.prototype.map.call(document.querySelectorAll('.estat-chk-comparar:checked'), function(chk){ return chk.value; });
+  var selecionados = estatisticasCache.filter(function(d){ return idsSelecionados.indexOf(d.id) !== -1; });
+  renderGraficosComparativos(selecionados);
 }
 function filtrarEstatisticas() {
   var deptoId = document.getElementById('estat-filtro-depto').value;
@@ -2145,27 +2161,48 @@ function toggleEstatDepto(header) {
   painel.style.display = aberto ? 'none' : 'block';
   if (seta) seta.style.transform = aberto ? 'rotate(0deg)' : 'rotate(180deg)';
 }
+function construirBarraSVG(lista, campo, cor) {
+  var max = Math.max.apply(null, lista.map(function(d){ return d[campo]; }).concat([1]));
+  var margemEsq = 26, margemBaixo = 30, margemCima = 14, margemDir = 8;
+  var alturaUtil = 130;
+  var larguraSvg = Math.max(220, lista.length * 74);
+  var alturaSvg = alturaUtil + margemBaixo + margemCima;
+  var larguraFaixa = (larguraSvg - margemEsq - margemDir) / lista.length;
+  var larguraBarra = Math.min(42, larguraFaixa * 0.55);
+
+  var svg = '<svg viewBox="0 0 ' + larguraSvg + ' ' + alturaSvg + '" width="100%" height="' + alturaSvg + '" style="overflow:visible;">';
+  for (var g = 0; g <= 4; g++) {
+    var y = margemCima + (alturaUtil / 4) * g;
+    var valorLinha = Math.round(max - (max / 4) * g);
+    svg += '<line x1="' + margemEsq + '" y1="' + y + '" x2="' + (larguraSvg - margemDir) + '" y2="' + y + '" stroke="var(--border2)" stroke-width="1"/>';
+    svg += '<text x="' + (margemEsq - 6) + '" y="' + (y + 3) + '" font-size="9" fill="var(--gray3)" text-anchor="end">' + valorLinha + '</text>';
+  }
+  lista.forEach(function(d, i) {
+    var valor = d[campo];
+    var alturaBarra = (valor / max) * alturaUtil;
+    var x = margemEsq + i * larguraFaixa + (larguraFaixa - larguraBarra) / 2;
+    var y = margemCima + (alturaUtil - alturaBarra);
+    var nomeCurto = d.nome.length > 11 ? d.nome.slice(0, 10) + '…' : d.nome;
+    svg += '<rect x="' + x + '" y="' + y + '" width="' + larguraBarra + '" height="' + Math.max(alturaBarra,1) + '" rx="3" fill="' + cor + '"/>';
+    svg += '<text x="' + (x + larguraBarra / 2) + '" y="' + (y - 5) + '" font-size="11" font-weight="600" fill="var(--gray1)" text-anchor="middle">' + valor + '</text>';
+    svg += '<text x="' + (x + larguraBarra / 2) + '" y="' + (margemCima + alturaUtil + 15) + '" font-size="9" fill="var(--gray2)" text-anchor="middle">' + nomeCurto + '</text>';
+  });
+  svg += '</svg>';
+  return svg;
+}
 function renderGraficosComparativos(lista) {
   var wrap = document.getElementById('estatisticas-graficos');
-  if (lista.length < 2) { wrap.innerHTML = ''; return; }
+  if (lista.length < 2) { wrap.innerHTML = '<div class="fstep-empty">Selecione ao menos 2 departamentos acima para comparar.</div>'; return; }
   var metricas = [
-    { campo:'totalFluxos', titulo:'Fluxos por departamento', cor:'#009BDB' },
-    { campo:'totalEtapas', titulo:'Etapas por departamento', cor:'#8a63d2' },
-    { campo:'totalPassos', titulo:'Passos por departamento', cor:'#e8a020' }
+    { campo:'totalFluxos', titulo:'Fluxos', cor:'#009BDB' },
+    { campo:'totalEtapas', titulo:'Etapas', cor:'#8a63d2' },
+    { campo:'totalPassos', titulo:'Passos', cor:'#e8a020' }
   ];
   var html = '<div class="estat-graficos">';
   metricas.forEach(function(m) {
-    var max = Math.max.apply(null, lista.map(function(d){ return d[m.campo]; }).concat([1]));
     html += '<div class="estat-grafico-bloco">';
     html += '<div class="estat-grafico-titulo">' + m.titulo + '</div>';
-    lista.slice().sort(function(a,b){ return b[m.campo] - a[m.campo]; }).forEach(function(d) {
-      var pct = (d[m.campo] / max) * 100;
-      html += '<div class="estat-barra-row">' +
-        '<span class="estat-barra-label">' + d.nome + '</span>' +
-        '<div class="estat-barra-track"><div class="estat-barra-fill" style="width:' + pct + '%;background:' + m.cor + ';"></div></div>' +
-        '<span class="estat-barra-valor">' + d[m.campo] + '</span>' +
-      '</div>';
-    });
+    html += construirBarraSVG(lista, m.campo, m.cor);
     html += '</div>';
   });
   html += '</div>';
@@ -2173,7 +2210,6 @@ function renderGraficosComparativos(lista) {
 }
 function renderEstatisticas(lista) {
   document.getElementById('estatisticas-loading').style.display = 'none';
-  renderGraficosComparativos(lista);
   var totalFluxosGeral = lista.reduce(function(s,d){ return s + d.totalFluxos; }, 0);
   var totalEtapasGeral = lista.reduce(function(s,d){ return s + d.totalEtapas; }, 0);
   var totalPassosGeral = lista.reduce(function(s,d){ return s + d.totalPassos; }, 0);

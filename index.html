@@ -450,11 +450,14 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
     </div>
   </div>
 
-  <!-- MODAL: Painel Geral (so Coordenador Geral) -->
-  <div class="modal-bg" id="modal-estatisticas">
-    <div class="modal modal-wide">
-      <div class="modal-title">Painel do Coordenador Geral</div>
-      <div class="field" id="estat-filtro-wrap" style="display:none;">
+  <!-- ═══════════════════════════════ TELA: Painel Geral (so Coordenador Geral) ══ -->
+  <div id="screen-estatisticas" class="screen">
+    <div class="header">
+      <button class="btn-icon" onclick="go('home')">&#8592; Voltar</button>
+      <div><div class="header-title">Painel do Coordenador Geral</div><div class="header-sub">Visão consolidada de todos os departamentos</div></div>
+    </div>
+    <div class="painel-conteudo" style="padding:24px;overflow-y:auto;flex:1;min-height:0;">
+      <div class="field" id="estat-filtro-wrap" style="display:none;max-width:340px;">
         <label>Filtrar por departamento</label>
         <select id="estat-filtro-depto" onchange="filtrarEstatisticas()">
           <option value="">Todos os departamentos</option>
@@ -467,11 +470,9 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
       </div>
       <div id="estatisticas-graficos"></div>
       <div id="estatisticas-conteudo"></div>
-      <div class="modal-acts">
-        <button class="btn-cancel" onclick="fecharModal('modal-estatisticas')">Fechar</button>
-      </div>
     </div>
   </div>
+  <!-- ═══════════════════════════════ FIM TELA: Painel Geral ══ -->
 
   <!-- MODAL: Departamentos (so Coordenador Geral) -->
   <div class="modal-bg" id="modal-departamentos">
@@ -2098,7 +2099,7 @@ function abrirModalEstatisticas() {
   document.getElementById('estat-filtro-wrap').style.display = 'none';
   document.getElementById('estat-selecao-wrap').style.display = 'none';
   document.getElementById('estat-filtro-depto').value = '';
-  abrirModal('modal-estatisticas');
+  go('estatisticas');
   carregarEstatisticasTodosDepartamentos(function(lista) {
     estatisticasCache = lista;
     var sel = document.getElementById('estat-filtro-depto');

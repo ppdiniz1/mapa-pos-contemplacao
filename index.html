@@ -397,6 +397,24 @@ body{font-family:"Inter",-apple-system,sans-serif;background:#f0f2f5;min-height:
     </div>
   </div>
 
+  <!-- MODAL: Copiar passo para outro fluxo/etapa -->
+  <div class="modal-bg" id="modal-copiar-passo">
+    <div class="modal">
+      <div class="modal-title">Copiar passo para...</div>
+      <div class="field"><label>Fluxo de destino</label>
+        <select id="copiar-passo-fluxo" onchange="atualizarEtapasCopiarPasso()"></select>
+      </div>
+      <div class="field"><label>Etapa de destino</label>
+        <select id="copiar-passo-etapa"></select>
+      </div>
+      <div class="login-error" id="copiar-passo-error">Este fluxo ainda não tem etapas cadastradas.</div>
+      <div class="modal-acts">
+        <button class="btn-cancel" onclick="fecharModal('modal-copiar-passo')">Cancelar</button>
+        <button class="btn-primary" onclick="confirmarCopiarPasso()">Copiar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: Preview da etapa (visao do atendente) -->
   <div class="modal-bg" id="modal-preview">
     <div class="modal modal-wide">
@@ -1699,6 +1717,9 @@ function renderEditorPassos() {
   right.querySelectorAll('.btn-dup-p').forEach(function(btn){
     btn.addEventListener('click', function(){ duplicarPasso(parseInt(btn.dataset.idx)); });
   });
+  right.querySelectorAll('.btn-copiar-outro').forEach(function(btn){
+    btn.addEventListener('click', function(){ abrirModalCopiarPasso(parseInt(btn.dataset.idx)); });
+  });
   right.querySelectorAll('.btn-del-p').forEach(function(btn){
     btn.addEventListener('click', function(){ excluirPasso(parseInt(btn.dataset.idx)); });
   });
@@ -1757,6 +1778,7 @@ function renderPassoHTML(p, pi) {
   h += '<span class="vc-title">Passo '+(pi+1)+' &mdash; '+p.titulo+'</span>';
   h += '<div style="margin-left:auto;display:flex;gap:4px;">';
   h += '<button class="btn-passo-del btn-dup-p" data-idx="'+pi+'" title="Duplicar">&#10697;</button>';
+  h += '<button class="btn-passo-del btn-copiar-outro" data-idx="'+pi+'" title="Copiar para outro fluxo">&#128203;</button>';
   h += '<button class="btn-passo-del btn-edit" data-idx="'+pi+'" title="Editar">&#9998;</button>';
   h += '<button class="btn-passo-del btn-del-p" data-idx="'+pi+'" title="Excluir">&#10005;</button>';
   h += '</div></div>';
@@ -1779,6 +1801,47 @@ function renderPassoHTML(p, pi) {
   if (p.anexoLink) h += '<a class="anexo-download-btn" href="' + p.anexoLink + '" target="_blank" rel="noopener">&#128196; Baixar documento</a>';
   h += '</div>';
   return h;
+}
+var passoParaCopiar = null;
+function abrirModalCopiarPasso(idx) {
+  var p = DATA[fluxoKey].etapas[etapaIdx].passos[idx];
+  passoParaCopiar = JSON.parse(JSON.stringify(p));
+  document.getElementById('copiar-passo-error').style.display = 'none';
+  var selFluxo = document.getElementById('copiar-passo-fluxo');
+  selFluxo.innerHTML = Object.keys(DATA).map(function(k){
+    return '<option value="' + k + '"' + (k === fluxoKey ? ' selected' : '') + '>' + DATA[k].nome + '</option>';
+  }).join('');
+  atualizarEtapasCopiarPasso();
+  abrirModal('modal-copiar-passo');
+}
+function atualizarEtapasCopiarPasso() {
+  var fluxoDest = document.getElementById('copiar-passo-fluxo').value;
+  var selEtapa  = document.getElementById('copiar-passo-etapa');
+  var etapas = (DATA[fluxoDest] && DATA[fluxoDest].etapas) || [];
+  selEtapa.innerHTML = etapas.map(function(et, i){ return '<option value="' + i + '">' + et.label + '</option>'; }).join('');
+}
+function confirmarCopiarPasso() {
+  if (!passoParaCopiar) return;
+  var fluxoDest    = document.getElementById('copiar-passo-fluxo').value;
+  var etapaDestVal = document.getElementById('copiar-passo-etapa').value;
+  var errEl = document.getElementById('copiar-passo-error');
+  if (!fluxoDest || etapaDestVal === '' || !DATA[fluxoDest] || !DATA[fluxoDest].etapas[parseInt(etapaDestVal)]) {
+    errEl.style.display = 'flex';
+    return;
+  }
+  var etapaDestIdx = parseInt(etapaDestVal);
+  DATA[fluxoDest].etapas[etapaDestIdx].passos.push(JSON.parse(JSON.stringify(passoParaCopiar)));
+
+  var fkBak = fluxoKey, eiBak = etapaIdx;
+  fluxoKey = fluxoDest; etapaIdx = etapaDestIdx;
+  sincronizarArvore();
+  fluxoKey = fkBak; etapaIdx = eiBak;
+
+  salvarData();
+  passoParaCopiar = null;
+  fecharModal('modal-copiar-passo');
+  mostrarToast('Passo copiado!');
+  if (fluxoKey === fluxoDest && etapaIdx === etapaDestIdx) renderEditorPassos();
 }
 function excluirPasso(idx) {
   DATA[fluxoKey].etapas[etapaIdx].passos.splice(idx, 1);
